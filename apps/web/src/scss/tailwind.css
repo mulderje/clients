@@ -5,8 +5,8 @@
 @import "../../../../libs/components/src/tw-theme.css";
 
 @layer components {
-  .tw-h2 {
-    @apply tw-text-2xl tw-font-semibold;
+  .tw-h1 {
+    @apply tw-text-3xl tw-font-semibold;
   }
 
   .tw-btn {
