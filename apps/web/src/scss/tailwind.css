@@ -3,3 +3,20 @@
 @tailwind utilities;
 
 @import "../../../../libs/components/src/tw-theme.css";
+
+@layer components {
+  .tw-h2 {
+    @apply tw-text-2xl tw-font-semibold;
+  }
+
+  .tw-btn {
+    @apply tw-font-semibold tw-py-1.5 tw-px-3 tw-rounded tw-transition tw-border tw-border-solid tw-text-center tw-no-underline hover:tw-no-underline focus:tw-outline-none;
+  }
+
+  .tw-btn-primary {
+    @apply tw-btn;
+
+    @apply tw-border-primary-600 tw-bg-primary-600 hover:tw-bg-primary-700 hover:tw-border-primary-700;
+    @apply tw-text-contrast !important;
+  }
+}
