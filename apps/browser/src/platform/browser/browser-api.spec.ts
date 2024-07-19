@@ -277,6 +277,7 @@ describe("BrowserApi", () => {
 
   describe("reloadExtension", () => {
     it("forwards call to extension runtime", () => {
+      BrowserApi.reloadExtension();
       expect(chrome.runtime.reload).toHaveBeenCalled();
     });
   });
