@@ -276,7 +276,7 @@ describe("BrowserApi", () => {
   });
 
   describe("reloadExtension", () => {
-    it("reloads the extension runtime if the passed globalContext is not for the window", () => {
+    it("forwards call to extension runtime", () => {
       expect(chrome.runtime.reload).toHaveBeenCalled();
     });
   });

@@ -414,8 +414,6 @@ export class BrowserApi {
   /**
    * Handles reloading the extension, either by calling the window location
    * to reload or by calling the extension's runtime to reload.
-   *
-   * @param globalContext - The global context to use for the reload.
    */
   static reloadExtension() {
     return chrome.runtime.reload();
