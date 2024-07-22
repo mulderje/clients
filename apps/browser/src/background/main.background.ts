@@ -1022,8 +1022,6 @@ export default class MainBackground {
         this.accountService,
       );
       this.nativeMessagingBackground = new NativeMessagingBackground(
-        this.accountService,
-        this.masterPasswordService,
         this.cryptoService,
         this.cryptoFunctionService,
         this.runtimeBackground,
@@ -1473,16 +1471,7 @@ export default class MainBackground {
       return;
     }
 
-    const storage = await this.storageService.getAll();
-    await this.storageService.clear();
-
-    for (const key in storage) {
-      // eslint-disable-next-line
-      if (!storage.hasOwnProperty(key)) {
-        continue;
-      }
-      await this.storageService.save(key, storage[key]);
-    }
+    await this.storageService.reseed();
   }
 
   async clearClipboard(clipboardValue: string, clearMs: number) {

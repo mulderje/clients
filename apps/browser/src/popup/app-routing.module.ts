@@ -39,7 +39,9 @@ import { TwoFactorOptionsComponent } from "../auth/popup/two-factor-options.comp
 import { TwoFactorComponent } from "../auth/popup/two-factor.component";
 import { UpdateTempPasswordComponent } from "../auth/popup/update-temp-password.component";
 import { AutofillComponent } from "../autofill/popup/settings/autofill.component";
+import { ExcludedDomainsV1Component } from "../autofill/popup/settings/excluded-domains-v1.component";
 import { ExcludedDomainsComponent } from "../autofill/popup/settings/excluded-domains.component";
+import { NotificationsSettingsV1Component } from "../autofill/popup/settings/notifications-v1.component";
 import { NotificationsSettingsComponent } from "../autofill/popup/settings/notifications.component";
 import { PremiumComponent } from "../billing/popup/settings/premium.component";
 import BrowserPopupUtils from "../platform/popup/browser-popup-utils";
@@ -48,7 +50,7 @@ import { PasswordGeneratorHistoryComponent } from "../tools/popup/generator/pass
 import { SendAddEditComponent } from "../tools/popup/send/send-add-edit.component";
 import { SendGroupingsComponent } from "../tools/popup/send/send-groupings.component";
 import { SendTypeComponent } from "../tools/popup/send/send-type.component";
-import { SendV2Component } from "../tools/popup/send/send-v2.component";
+import { SendV2Component } from "../tools/popup/send-v2/send-v2.component";
 import { AboutPageV2Component } from "../tools/popup/settings/about-page/about-page-v2.component";
 import { AboutPageComponent } from "../tools/popup/settings/about-page/about-page.component";
 import { MoreFromBitwardenPageV2Component } from "../tools/popup/settings/about-page/more-from-bitwarden-page-v2.component";
@@ -288,12 +290,12 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     data: { state: "account-security" },
   },
-  {
+  ...extensionRefreshSwap(NotificationsSettingsV1Component, NotificationsSettingsComponent, {
     path: "notifications",
-    component: NotificationsSettingsComponent,
+    component: NotificationsSettingsV1Component,
     canActivate: [AuthGuard],
     data: { state: "notifications" },
-  },
+  }),
   ...extensionRefreshSwap(VaultSettingsComponent, VaultSettingsV2Component, {
     path: "vault-settings",
     canActivate: [AuthGuard],
@@ -323,12 +325,12 @@ const routes: Routes = [
     canActivate: [AuthGuard],
     data: { state: "sync" },
   },
-  {
+  ...extensionRefreshSwap(ExcludedDomainsV1Component, ExcludedDomainsComponent, {
     path: "excluded-domains",
-    component: ExcludedDomainsComponent,
+    component: ExcludedDomainsV1Component,
     canActivate: [AuthGuard],
     data: { state: "excluded-domains" },
-  },
+  }),
   {
     path: "premium",
     component: PremiumComponent,
