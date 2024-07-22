@@ -412,7 +412,7 @@ export class BrowserApi {
   }
 
   /**
-   * Handles reloading the extension using underlying functionalify exposed by the browser API.
+   * Handles reloading the extension using the underlying functionality exposed by the browser API.
    */
   static reloadExtension() {
     return chrome.runtime.reload();
