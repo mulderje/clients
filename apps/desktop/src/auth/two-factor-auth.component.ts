@@ -5,6 +5,8 @@ import { ReactiveFormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
 
 import { TwoFactorAuthAuthenticatorComponent } from "../../../../libs/angular/src/auth/components/two-factor-auth/two-factor-auth-authenticator.component";
+import { TwoFactorAuthEmailComponent } from "../../../../libs/angular/src/auth/components/two-factor-auth/two-factor-auth-email.component";
+import { TwoFactorAuthWebAuthnComponent } from "../../../../libs/angular/src/auth/components/two-factor-auth/two-factor-auth-webauthn.component";
 import { TwoFactorAuthYubikeyComponent } from "../../../../libs/angular/src/auth/components/two-factor-auth/two-factor-auth-yubikey.component";
 import { TwoFactorAuthComponent as BaseTwoFactorAuthComponent } from "../../../../libs/angular/src/auth/components/two-factor-auth/two-factor-auth.component";
 import { TwoFactorOptionsComponent } from "../../../../libs/angular/src/auth/components/two-factor-auth/two-factor-options.component";
@@ -16,6 +18,8 @@ import { FormFieldModule } from "../../../../libs/components/src/form-field";
 import { LinkModule } from "../../../../libs/components/src/link";
 import { I18nPipe } from "../../../../libs/components/src/shared/i18n.pipe";
 import { TypographyModule } from "../../../../libs/components/src/typography";
+
+import { TwoFactorAuthDuoComponent } from "./two-factor-auth-duo.component";
 
 @Component({
   standalone: true,
@@ -35,8 +39,11 @@ import { TypographyModule } from "../../../../libs/components/src/typography";
     RouterLink,
     CheckboxModule,
     TwoFactorOptionsComponent,
+    TwoFactorAuthEmailComponent,
     TwoFactorAuthAuthenticatorComponent,
     TwoFactorAuthYubikeyComponent,
+    TwoFactorAuthDuoComponent,
+    TwoFactorAuthWebAuthnComponent,
   ],
   providers: [I18nPipe],
 })

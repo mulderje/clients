@@ -14,15 +14,19 @@ export enum FeatureFlag {
   EnableDeleteProvider = "AC-1218-delete-provider",
   ExtensionRefresh = "extension-refresh",
   RestrictProviderAccess = "restrict-provider-access",
+  PM4154_BulkEncryptionService = "PM-4154-bulk-encryption-service",
   UseTreeWalkerApiForPageDetailsCollection = "use-tree-walker-api-for-page-details-collection",
   EmailVerification = "email-verification",
   InlineMenuFieldQualification = "inline-menu-field-qualification",
   MemberAccessReport = "ac-2059-member-access-report",
   TwoFactorComponentRefactor = "two-factor-component-refactor",
   EnableTimeThreshold = "PM-5864-dollar-threshold",
-  GroupsComponentRefactor = "groups-component-refactor",
+  InlineMenuPositioningImprovements = "inline-menu-positioning-improvements",
   ProviderClientVaultPrivacyBanner = "ac-2833-provider-client-vault-privacy-banner",
   VaultBulkManagementAction = "vault-bulk-management-action",
+  AC2828_ProviderPortalMembersPage = "AC-2828_provider-portal-members-page",
+  DeviceTrustLogging = "pm-8285-device-trust-logging",
+  AuthenticatorTwoFactorToken = "authenticator-2fa-token",
 }
 
 export type AllowedFeatureFlagTypes = boolean | number | string;
@@ -47,15 +51,19 @@ export const DefaultFeatureFlagValue = {
   [FeatureFlag.EnableDeleteProvider]: FALSE,
   [FeatureFlag.ExtensionRefresh]: FALSE,
   [FeatureFlag.RestrictProviderAccess]: FALSE,
+  [FeatureFlag.PM4154_BulkEncryptionService]: FALSE,
   [FeatureFlag.UseTreeWalkerApiForPageDetailsCollection]: FALSE,
   [FeatureFlag.EmailVerification]: FALSE,
   [FeatureFlag.InlineMenuFieldQualification]: FALSE,
   [FeatureFlag.MemberAccessReport]: FALSE,
   [FeatureFlag.TwoFactorComponentRefactor]: FALSE,
   [FeatureFlag.EnableTimeThreshold]: FALSE,
-  [FeatureFlag.GroupsComponentRefactor]: FALSE,
+  [FeatureFlag.InlineMenuPositioningImprovements]: FALSE,
   [FeatureFlag.ProviderClientVaultPrivacyBanner]: FALSE,
   [FeatureFlag.VaultBulkManagementAction]: FALSE,
+  [FeatureFlag.AC2828_ProviderPortalMembersPage]: FALSE,
+  [FeatureFlag.DeviceTrustLogging]: FALSE,
+  [FeatureFlag.AuthenticatorTwoFactorToken]: FALSE,
 } satisfies Record<FeatureFlag, AllowedFeatureFlagTypes>;
 
 export type DefaultFeatureFlagValueType = typeof DefaultFeatureFlagValue;

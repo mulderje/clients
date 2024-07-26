@@ -540,16 +540,16 @@
     }
   },
   "masterPassword": {
-    "message": "Master password"
+    "message": "Pääsalasana"
   },
   "masterPassImportant": {
-    "message": "Your master password cannot be recovered if you forget it!"
+    "message": "Pääsalasanasi palauttaminen ei ole mahdollista, jos unohdat sen!"
   },
   "confirmMasterPassword": {
-    "message": "Confirm master password"
+    "message": "Vahvista pääsalasana"
   },
   "masterPassHintLabel": {
-    "message": "Master password hint"
+    "message": "Pääsalasanan vihje"
   },
   "settings": {
     "message": "Asetukset"
@@ -626,6 +626,9 @@
   },
   "verificationCodeRequired": {
     "message": "Todennuskoodi vaaditaan."
+  },
+  "webauthnCancelOrTimeout": {
+    "message": "Todennus peruutettiin tai siinä kesti liian kauan. Yritä uudelleen."
   },
   "invalidVerificationCode": {
     "message": "Virheellinen todennuskoodi"
@@ -1968,7 +1971,7 @@
     "message": "Sähköpostiosoite on vahvistettava"
   },
   "emailVerifiedV2": {
-    "message": "Email verified"
+    "message": "Sähköpostiosoite on vahvistettu"
   },
   "emailVerificationRequiredDesc": {
     "message": "Sinun on vahvistettava sähköpostiosoitteesi käyttääksesi tätä ominaisuutta."
@@ -2777,6 +2780,9 @@
         "example": "My Org Name"
       }
     }
+  },
+  "duoHealthCheckResultsInNullAuthUrlError": {
+    "message": "Virhe yhdistettäessä Duo-palveluun. Käytä toista kaksivaiheista kirjautumismenetelmää tai ota yhteyttä Duoon saadaksesi apua."
   },
   "launchDuoAndFollowStepsToFinishLoggingIn": {
     "message": "Avaa Duo ja viimeistele kirjautuminen seuraamalla ohjeita."

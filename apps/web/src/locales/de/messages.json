@@ -42,6 +42,12 @@
   "cardholderName": {
     "message": "Name des Karteninhabers"
   },
+  "loginCredentials": {
+    "message": "Zugangsdaten"
+  },
+  "authenticatorKey": {
+    "message": "Authenticator-Schlüssel"
+  },
   "number": {
     "message": "Nummer"
   },
@@ -137,6 +143,15 @@
   },
   "authenticatorKeyTotp": {
     "message": "Authentifizierungsschlüssel (TOTP)"
+  },
+  "totpHelperTitle": {
+    "message": "Zwei-Faktor-Authentifizierung nahtlos gestalten"
+  },
+  "totpHelper": {
+    "message": "Bitwarden kann Zwei-Faktor-Authentifizierungsscodes speichern und ausfüllen. Kopiere und füge den Schlüssel in dieses Feld ein."
+  },
+  "totpHelperWithCapture": {
+    "message": "Bitwarden kann Zwei-Faktor-Authentifizierungsscodes speichern und ausfüllen. Wähle das Kamerasymbol aus, um einen Screenshot des Authenticator-QR-Codes dieser Website zu machen oder kopiere und füge den Schlüssel in dieses Feld ein."
   },
   "folder": {
     "message": "Ordner"
@@ -611,6 +626,18 @@
   },
   "loginExpired": {
     "message": "Ihre Anmeldungsitzung ist abgelaufen."
+  },
+  "restartRegistration": {
+    "message": "Restart registration"
+  },
+  "expiredLink": {
+    "message": "Expired link"
+  },
+  "pleaseRestartRegistrationOrTryLoggingIn": {
+    "message": "Please restart registration or try logging in."
+  },
+  "youMayAlreadyHaveAnAccount": {
+    "message": "You may already have an account"
   },
   "logOutConfirmation": {
     "message": "Bist du sicher, dass du dich abmelden möchtest?"
@@ -3783,8 +3810,8 @@
   "nothingSelected": {
     "message": "Sie haben keine Auswahl getroffen."
   },
-  "receiveMarketingEmails": {
-    "message": "Erhalte E-Mails von Bitwarden für Ankündigungen, Ratschläge und Forschungsmöglichkeiten."
+  "receiveMarketingEmailsV2": {
+    "message": "Get advice, announcements, and research opportunities from Bitwarden in your inbox."
   },
   "unsubscribe": {
     "message": "Deabonnieren"
@@ -5519,6 +5546,9 @@
   "verificationCodeRequired": {
     "message": "Verifizierungscode ist erforderlich."
   },
+  "webauthnCancelOrTimeout": {
+    "message": "Die Authentifizierung wurde abgebrochen oder hat zu lange gedauert. Bitte versuche es erneut."
+  },
   "invalidVerificationCode": {
     "message": "Ungültiger Verifizierungscode"
   },
@@ -6209,6 +6239,9 @@
         "example": "4"
       }
     }
+  },
+  "duoHealthCheckResultsInNullAuthUrlError": {
+    "message": "Fehler beim Verbinden mit dem Duo-Dienst. Verwende eine andere Zwei-Faktor-Authentifizierungsmethode oder kontaktiere Duo für Hilfe."
   },
   "launchDuoAndFollowStepsToFinishLoggingIn": {
     "message": "Starte DUO und folge den Schritten, um die Anmeldung abzuschließen."
@@ -7883,7 +7916,7 @@
     "message": "Diesen Sammlungen zuweisen"
   },
   "bulkCollectionAssignmentDialogDescription": {
-    "message": "Wähle die Sammlungen, mit denen die Einträge geteilt werden. Sobald ein Eintrag in einer Sammlung aktualisiert wird, wird es in allen Sammlungen reflektiert. Nur Mitglieder von Organisationen mit Zugang zu diesen Sammlungen können die Einträge sehen."
+    "message": "Nur Organisationsmitglieder mit Zugriff auf diese Sammlungen können die Einträge sehen."
   },
   "selectCollectionsToAssign": {
     "message": "Zu zuweisende Sammlungen auswählen"
@@ -8160,23 +8193,6 @@
   },
   "restrictedGroupAccessDesc": {
     "message": "Du kannst dich nicht selbst zu einer Gruppe hinzufügen."
-  },
-  "unassignedItemsBannerSelfHost": {
-    "message": "Hinweis: Ab dem 2. Mai 2024 werden nicht zugewiesene Organisationseinträge nicht mehr geräteübergreifend in der Ansicht aller Tresore sichtbar sein und sind nur über die Administrator-Konsole zugänglich. Weise diese Elemente einer Sammlung aus der Administrator-Konsole zu, um sie sichtbar zu machen."
-  },
-  "unassignedItemsBannerNotice": {
-    "message": "Hinweis: Nicht zugewiesene Organisationseinträge sind nicht mehr geräteübergreifend in der Ansicht aller Tresore sichtbar und nun nur über die Administrator-Konsole zugänglich."
-  },
-  "unassignedItemsBannerSelfHostNotice": {
-    "message": "Hinweis: Ab dem 16. Mai 2024 werden nicht zugewiesene Organisationseinträge nicht mehr geräteübergreifend in der Ansicht aller Tresore sichtbar sein und nur über die Administrator-Konsole zugänglich."
-  },
-  "unassignedItemsBannerCTAPartOne": {
-    "message": "Weise diese Einträge einer Sammlung aus der",
-    "description": "This will be part of a larger sentence, which will read like so: Assign these items to a collection from the Admin Console to make them visible."
-  },
-  "unassignedItemsBannerCTAPartTwo": {
-    "message": "zu, um sie sichtbar zu machen.",
-    "description": "This will be part of a larger sentence, which will read like so: Assign these items to a collection from the Admin Console to make them visible."
   },
   "deleteProvider": {
     "message": "Anbieter löschen"
@@ -8549,13 +8565,13 @@
     "message": "Lade nach der Durchführung von Aktualisierungen im Bitwarden Cloud Server deine Lizenzdatei hoch, um die neuesten Änderungen anzuwenden."
   },
   "addToFolder": {
-    "message": "Add to folder"
+    "message": "Zu Ordner hinzufügen"
   },
   "selectFolder": {
-    "message": "Select folder"
+    "message": "Ordner auswählen"
   },
   "personalItemsTransferWarning": {
-    "message": "$PERSONAL_ITEMS_COUNT$ will be permanently transferred to the selected organization. You will no longer own these items.",
+    "message": "$PERSONAL_ITEMS_COUNT$ werden dauerhaft an die ausgewählte Organisation übertragen. Du wirst diese Einträge nicht mehr besitzen.",
     "placeholders": {
       "personal_items_count": {
         "content": "$1",
@@ -8564,7 +8580,7 @@
     }
   },
   "personalItemsWithOrgTransferWarning": {
-    "message": "$PERSONAL_ITEMS_COUNT$ will be permanently transferred to $ORG$. You will no longer own these items.",
+    "message": "$PERSONAL_ITEMS_COUNT$ werden dauerhaft an $ORG$ übertragen. Du wirst diese Einträge nicht mehr besitzen.",
     "placeholders": {
       "personal_items_count": {
         "content": "$1",
@@ -8575,5 +8591,8 @@
         "example": "Organization name"
       }
     }
+  },
+  "purchasedSeatsRemoved": {
+    "message": "erworbene Benutzerplätze entfernt"
   }
 }
