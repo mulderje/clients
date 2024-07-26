@@ -29,8 +29,10 @@
    * Loading page
    */
   body.layout_frontend {
+    /* We apply the background color here since body classes are dynamically added and removed */
     @apply tw-bg-background-alt !important;
 
+    /* Spinner requires fixed height and width to appear centered */
     .spinner-container {
       @apply tw-fixed tw-inset-2/4 -tw-translate-x-1/2 -tw-translate-y-1/2;
 
@@ -45,10 +47,12 @@
     }
   }
 
+  /**
+   * Logo, used both in loading and on "frontend" pages.
+   */
   .theme_light .layout_frontend img.new-logo-themed {
     content: url("../images/logo.svg");
   }
-
   .theme_dark .layout_frontend img.new-logo-themed {
     content: url("../images/logo-white.svg");
   }
