@@ -24,4 +24,32 @@
     @apply tw-bg-transparent tw-border-text-muted hover:tw-bg-text-muted hover:tw-border-text-muted hover:!tw-text-contrast disabled:tw-bg-transparent disabled:tw-border-text-muted/60 disabled:!tw-text-muted/60 disabled:tw-cursor-not-allowed;
     @apply tw-text-muted !important;
   }
+
+  /**
+   * Loading page
+   */
+  body.layout_frontend {
+    @apply tw-bg-background-alt !important;
+
+    .spinner-container {
+      @apply tw-fixed tw-inset-2/4 -tw-translate-x-1/2 -tw-translate-y-1/2;
+
+      height: 42px;
+      width: 42px;
+    }
+
+    img.new-logo-themed {
+      @apply tw-block;
+
+      width: 280px;
+    }
+  }
+
+  .theme_light .layout_frontend img.new-logo-themed {
+    content: url("../images/logo.svg");
+  }
+
+  .theme_dark .layout_frontend img.new-logo-themed {
+    content: url("../images/logo-white.svg");
+  }
 }
