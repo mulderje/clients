@@ -4,6 +4,11 @@
 
 @import "../../../../libs/components/src/tw-theme.css";
 
+/*
+ * Duplicated styling from Angular components.
+ *
+ * For use in non Angular pages like the 404 and connectors.
+ */
 @layer components {
   .tw-h1 {
     @apply tw-text-3xl tw-font-semibold;
