@@ -44,21 +44,20 @@
       height: 42px;
       width: 42px;
     }
-
-    img.new-logo-themed {
-      @apply tw-block;
-
-      width: 280px;
-    }
   }
 
   /**
    * Logo, used both in loading and on "frontend" pages.
    */
-  .theme_light .layout_frontend img.new-logo-themed {
+  img.new-logo-themed {
+    @apply tw-block;
+
+    width: 128px;
+  }
+  .theme_light img.new-logo-themed {
     content: url("../images/logo.svg");
   }
-  .theme_dark .layout_frontend img.new-logo-themed {
+  .theme_dark img.new-logo-themed {
     content: url("../images/logo-white.svg");
   }
 }

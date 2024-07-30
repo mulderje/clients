@@ -116,6 +116,21 @@
   "copySecurityCode": {
     "message": "Copy security code"
   },
+  "copyName": {
+    "message": "Copy name"
+  },
+  "copyCompany": {
+    "message": "Copy company"
+  },
+  "copySSN": {
+    "message": "Copy Social Security number"
+  },
+  "copyPassportNumber": {
+    "message": "Copy passport number"
+  },
+  "copyLicenseNumber": {
+    "message": "Copy license number"
+  },
   "autoFill": {
     "message": "Autofill"
   },
@@ -4014,5 +4029,11 @@
   },
   "itemLocation": {
     "message": "Item Location"
+  },
+  "bitwardenNewLook": {
+    "message": "Bitwarden has a new look!"
+  },
+  "bitwardenNewLookDesc": {
+    "message": "It's easier and more intuitive than ever to autofill and search from the Vault tab. Take a look around!"
   }
 }
