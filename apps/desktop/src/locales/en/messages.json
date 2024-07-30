@@ -551,6 +551,12 @@
   "masterPassHintLabel": {
     "message": "Master password hint"
   },
+  "joinOrganization": {
+    "message": "Join organization"
+  },
+  "finishJoiningThisOrganizationBySettingAMasterPassword": {
+    "message": "Finish joining this organization by setting a master password."
+  },
   "settings": {
     "message": "Settings"
   },
@@ -1380,7 +1386,7 @@
   },
   "exportPasswordDescription": {
     "message": "This password will be used to export and import this file"
-  },  
+  },
   "accountRestrictedOptionDescription": {
     "message": "Use your account encryption key, derived from your account's username and Master Password, to encrypt the export and restrict import to only the current Bitwarden account."
   },
@@ -2092,6 +2098,9 @@
   },
   "vaultTimeoutTooLarge": {
     "message": "Your vault timeout exceeds the restrictions set by your organization."
+  },
+  "inviteAccepted": {
+    "message": "Invitation accepted"
   },
   "resetPasswordPolicyAutoEnroll": {
     "message": "Automatic enrollment"
@@ -2817,8 +2826,8 @@
   "invalidFilePassword": {
     "message": "Invalid file password, please use the password you entered when you created the export file."
   },
-  "importDestination": {
-    "message": "Import destination"
+  "destination": {
+    "message": "Destination"
   },
   "learnAboutImportOptions": {
     "message": "Learn about your import options"
@@ -3013,5 +3022,8 @@
         "example": "Work"
       }
     }
+  },
+  "data": {
+    "message": "Data"
   }
 }

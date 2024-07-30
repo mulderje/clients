@@ -6,7 +6,7 @@ import { DefaultEffUsernameOptions, UsernameDigits } from "../data";
 import { UsernameRandomizer } from "../engine";
 import { newDefaultEvaluator } from "../rx";
 import { EffUsernameGenerationOptions, NoPolicy } from "../types";
-import { clone$PerUserId, sharedStateByUserId } from "../util";
+import { observe$PerUserId, sharedStateByUserId } from "../util";
 
 import { EFF_USERNAME_SETTINGS } from "./storage";
 
@@ -25,18 +25,18 @@ export class EffUsernameGeneratorStrategy
 
   // configuration
   durableState = sharedStateByUserId(EFF_USERNAME_SETTINGS, this.stateProvider);
-  defaults$ = clone$PerUserId(this.defaultOptions);
+  defaults$ = observe$PerUserId(() => this.defaultOptions);
   toEvaluator = newDefaultEvaluator<EffUsernameGenerationOptions>();
   readonly policy = PolicyType.PasswordGenerator;
 
   // algorithm
   async generate(options: EffUsernameGenerationOptions) {
     const casing =
-      options.wordCapitalize ?? DefaultEffUsernameOptions.wordCapitalize
+      (options.wordCapitalize ?? DefaultEffUsernameOptions.wordCapitalize)
         ? "TitleCase"
         : "lowercase";
     const digits =
-      options.wordIncludeNumber ?? DefaultEffUsernameOptions.wordIncludeNumber
+      (options.wordIncludeNumber ?? DefaultEffUsernameOptions.wordIncludeNumber)
         ? UsernameDigits.enabled
         : UsernameDigits.disabled;
     const word = await this.randomizer.randomWords({ numberOfWords: 1, casing, digits });

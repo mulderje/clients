@@ -109,7 +109,10 @@ export class Main {
       this.storageService,
       this.memoryStorageForStateProviders,
     );
-    const globalStateProvider = new DefaultGlobalStateProvider(storageServiceProvider);
+    const globalStateProvider = new DefaultGlobalStateProvider(
+      storageServiceProvider,
+      this.logService,
+    );
 
     this.i18nService = new I18nMainService("en", "./locales/", globalStateProvider);
 
@@ -130,6 +133,7 @@ export class Main {
     const singleUserStateProvider = new DefaultSingleUserStateProvider(
       storageServiceProvider,
       stateEventRegistrarService,
+      this.logService,
     );
 
     const activeUserStateProvider = new DefaultActiveUserStateProvider(
@@ -184,7 +188,7 @@ export class Main {
       });
     });
 
-    this.powerMonitorMain = new PowerMonitorMain(this.messagingService);
+    this.powerMonitorMain = new PowerMonitorMain(this.messagingService, this.logService);
     this.menuMain = new MenuMain(
       this.i18nService,
       this.messagingService,

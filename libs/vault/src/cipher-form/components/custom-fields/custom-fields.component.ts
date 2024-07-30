@@ -8,35 +8,34 @@ import {
   DestroyRef,
   ElementRef,
   EventEmitter,
+  inject,
   OnInit,
   Output,
   QueryList,
   ViewChildren,
-  inject,
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormArray, FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { Subject, switchMap, take } from "rxjs";
+import { Subject, zip } from "rxjs";
 
 import { JslibModule } from "@bitwarden/angular/jslib.module";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
-import { Utils } from "@bitwarden/common/platform/misc/utils";
 import { CipherType, FieldType, LinkedIdType } from "@bitwarden/common/vault/enums";
 import { CardView } from "@bitwarden/common/vault/models/view/card.view";
 import { FieldView } from "@bitwarden/common/vault/models/view/field.view";
 import { IdentityView } from "@bitwarden/common/vault/models/view/identity.view";
 import { LoginView } from "@bitwarden/common/vault/models/view/login.view";
 import {
+  CardComponent,
+  CheckboxModule,
   DialogService,
+  FormFieldModule,
+  IconButtonModule,
+  LinkModule,
   SectionComponent,
   SectionHeaderComponent,
-  FormFieldModule,
-  TypographyModule,
-  CardComponent,
-  IconButtonModule,
-  CheckboxModule,
   SelectModule,
-  LinkModule,
+  TypographyModule,
 } from "@bitwarden/components";
 
 import { CipherFormContainer } from "../../cipher-form-container";
@@ -135,13 +134,14 @@ export class CustomFieldsComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     const linkedFieldsOptionsForCipher = this.getLinkedFieldsOptionsForCipher();
+    const optionsArray = Array.from(linkedFieldsOptionsForCipher?.entries() ?? []);
+    optionsArray.sort((a, b) => a[1].sortPosition - b[1].sortPosition);
+
     // Populate options for linked custom fields
-    this.linkedFieldOptions = Array.from(linkedFieldsOptionsForCipher?.entries() ?? [])
-      .map(([id, linkedFieldOption]) => ({
-        name: this.i18nService.t(linkedFieldOption.i18nKey),
-        value: id,
-      }))
-      .sort(Utils.getSortFunction(this.i18nService, "name"));
+    this.linkedFieldOptions = optionsArray.map(([id, linkedFieldOption]) => ({
+      name: this.i18nService.t(linkedFieldOption.i18nKey),
+      value: id,
+    }));
 
     // Populate the form with the existing fields
     this.cipherFormContainer.originalCipherView?.fields?.forEach((field) => {
@@ -173,16 +173,12 @@ export class CustomFieldsComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     // Focus on the new input field when it is added
     // This is done after the view is initialized to ensure the input is rendered
-    this.focusOnNewInput$
-      .pipe(
-        takeUntilDestroyed(this.destroyed$),
-        // QueryList changes are emitted after the view is updated
-        switchMap(() => this.customFieldRows.changes.pipe(take(1))),
-      )
+    zip(this.focusOnNewInput$, this.customFieldRows.changes)
+      .pipe(takeUntilDestroyed(this.destroyed$))
       .subscribe(() => {
-        const input =
-          this.customFieldRows.last.nativeElement.querySelector<HTMLInputElement>("input");
-        const label = document.querySelector(`label[for="${input.id}"]`).textContent.trim();
+        const mostRecentRow = this.customFieldRows.last.nativeElement;
+        const input = mostRecentRow.querySelector<HTMLInputElement>("input");
+        const label = mostRecentRow.querySelector<HTMLLabelElement>("label").textContent.trim();
 
         // Focus the input after the announcement element is added to the DOM,
         // this should stop the announcement from being cut off by the "focus" event.
@@ -348,8 +344,9 @@ export class CustomFieldsComponent implements OnInit, AfterViewInit {
 
     this.numberOfFieldsChange.emit(newFields.length);
 
-    this.cipherFormContainer.patchCipher({
-      fields: newFields,
+    this.cipherFormContainer.patchCipher((cipher) => {
+      cipher.fields = newFields;
+      return cipher;
     });
   }
 }
