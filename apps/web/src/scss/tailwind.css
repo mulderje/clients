@@ -5,9 +5,14 @@
 @import "../../../../libs/components/src/tw-theme.css";
 
 /*
- * Duplicated styling from Angular components.
+ * Web specific global styling.
  *
- * For use in non Angular pages like the 404 and connectors.
+ * Be mindful of what is added here. Generally use Tailwind classes directly in Angular components.
+ *
+ * Some valid scenarios for adding styles here:
+ *
+ * - Duplicated styling for CL components used in non Angular pages like connectors and 404.
+ * - Shared styles like Logo.
  */
 @layer components {
   .tw-h1 {
