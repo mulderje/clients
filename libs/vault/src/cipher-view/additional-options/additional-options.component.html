@@ -3,10 +3,8 @@
     <h2 bitTypography="h6">{{ "additionalOptions" | i18n }}</h2>
   </bit-section-header>
   <bit-card>
-    <label class="tw-text-xs tw-text-muted tw-select-none">
-      {{ "note" | i18n }}
-    </label>
     <bit-form-field>
+      <bit-label>{{ "note" | i18n }}</bit-label>
       <textarea readonly bitInput aria-readonly="true">{{ notes }}</textarea>
       <button
         bitSuffix
@@ -15,6 +13,7 @@
         type="button"
         [appCopyClick]="notes"
         showToast
+        [valueLabel]="'note' | i18n"
         [appA11yTitle]="'copyValue' | i18n"
       ></button>
     </bit-form-field>
