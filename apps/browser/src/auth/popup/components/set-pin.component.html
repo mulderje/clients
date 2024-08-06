@@ -1,7 +1,7 @@
 <form [bitSubmit]="submit" [formGroup]="setPinForm">
   <bit-dialog>
     <div class="tw-font-semibold" bitDialogTitle>
-      {{ "unlockWithPin" | i18n }}
+      {{ "setYourPinTitle" | i18n }}
     </div>
     <div bitDialogContent>
       <p>
@@ -27,7 +27,7 @@
     </div>
     <div bitDialogFooter>
       <button type="submit" bitButton bitFormButton buttonType="primary">
-        <span>{{ "ok" | i18n }}</span>
+        <span>{{ "setYourPinButton" | i18n }}</span>
       </button>
       <button type="button" bitButton bitFormButton buttonType="secondary" bitDialogClose>
         {{ "cancel" | i18n }}

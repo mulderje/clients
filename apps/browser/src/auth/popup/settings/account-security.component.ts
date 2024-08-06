@@ -1,5 +1,8 @@
+import { DialogRef } from "@angular/cdk/dialog";
+import { CommonModule } from "@angular/common";
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from "@angular/core";
-import { FormBuilder } from "@angular/forms";
+import { FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { RouterModule } from "@angular/router";
 import {
   BehaviorSubject,
   combineLatest,
@@ -16,7 +19,8 @@ import {
   takeUntil,
 } from "rxjs";
 
-import { FingerprintDialogComponent } from "@bitwarden/auth/angular";
+import { JslibModule } from "@bitwarden/angular/jslib.module";
+import { FingerprintDialogComponent, VaultTimeoutInputComponent } from "@bitwarden/auth/angular";
 import { PinServiceAbstraction } from "@bitwarden/auth/common";
 import { VaultTimeoutSettingsService } from "@bitwarden/common/abstractions/vault-timeout/vault-timeout-settings.service";
 import { VaultTimeoutService } from "@bitwarden/common/abstractions/vault-timeout/vault-timeout.service";
@@ -37,19 +41,57 @@ import {
   VaultTimeoutOption,
   VaultTimeoutStringType,
 } from "@bitwarden/common/types/vault-timeout.type";
-import { DialogService } from "@bitwarden/components";
+import {
+  CardComponent,
+  CheckboxModule,
+  DialogService,
+  FormFieldModule,
+  IconButtonModule,
+  ItemModule,
+  LinkModule,
+  SectionComponent,
+  SectionHeaderComponent,
+  SelectModule,
+  TypographyModule,
+} from "@bitwarden/components";
 
 import { BiometricErrors, BiometricErrorTypes } from "../../../models/biometricErrors";
 import { BrowserApi } from "../../../platform/browser/browser-api";
 import { enableAccountSwitching } from "../../../platform/flags";
 import BrowserPopupUtils from "../../../platform/popup/browser-popup-utils";
+import { PopOutComponent } from "../../../platform/popup/components/pop-out.component";
+import { PopupFooterComponent } from "../../../platform/popup/layout/popup-footer.component";
+import { PopupHeaderComponent } from "../../../platform/popup/layout/popup-header.component";
+import { PopupPageComponent } from "../../../platform/popup/layout/popup-page.component";
 import { SetPinComponent } from "../components/set-pin.component";
 
 import { AwaitDesktopDialogComponent } from "./await-desktop-dialog.component";
 
 @Component({
-  selector: "auth-account-security",
   templateUrl: "account-security.component.html",
+  standalone: true,
+  imports: [
+    CardComponent,
+    CheckboxModule,
+    CommonModule,
+    FormFieldModule,
+    FormsModule,
+    ReactiveFormsModule,
+    IconButtonModule,
+    ItemModule,
+    JslibModule,
+    LinkModule,
+    PopOutComponent,
+    PopupFooterComponent,
+    PopupHeaderComponent,
+    PopupPageComponent,
+    RouterModule,
+    SectionComponent,
+    SectionHeaderComponent,
+    SelectModule,
+    TypographyModule,
+    VaultTimeoutInputComponent,
+  ],
 })
 // eslint-disable-next-line rxjs-angular/prefer-takeuntil
 export class AccountSecurityComponent implements OnInit, OnDestroy {
@@ -112,7 +154,6 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
         return { timeout: timeout, action: policy.data?.action };
       }),
     );
-
     const showOnLocked =
       !this.platformUtilsService.isFirefox() && !this.platformUtilsService.isSafari();
 
@@ -382,20 +423,32 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
         return;
       }
 
-      const awaitDesktopDialogRef = AwaitDesktopDialogComponent.open(this.dialogService);
-      const awaitDesktopDialogClosed = firstValueFrom(awaitDesktopDialogRef.closed);
+      let awaitDesktopDialogRef: DialogRef<boolean, unknown> | undefined = null;
+      let desktopResponseReceived = false;
+      const awaitDesktopDialogPromise = async () => {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        if (desktopResponseReceived) {
+          return;
+        }
+        awaitDesktopDialogRef = AwaitDesktopDialogComponent.open(this.dialogService);
+        const awaitDesktopDialogClosed = firstValueFrom(awaitDesktopDialogRef.closed);
+        awaitDesktopDialogClosed
+          .then(async (result) => {
+            if (result !== true) {
+              this.form.controls.biometric.setValue(false);
+            }
+          })
+          .catch(async () => {});
+      };
 
       await this.cryptoService.refreshAdditionalKeys();
 
       await Promise.race([
-        awaitDesktopDialogClosed.then(async (result) => {
-          if (result !== true) {
-            this.form.controls.biometric.setValue(false);
-          }
-        }),
+        awaitDesktopDialogPromise(),
         this.platformUtilsService
           .authenticateBiometric()
           .then((result) => {
+            desktopResponseReceived = true;
             this.form.controls.biometric.setValue(result);
             if (!result) {
               this.platformUtilsService.showToast(
@@ -406,23 +459,28 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
             }
           })
           .catch((e) => {
+            desktopResponseReceived = true;
             // Handle connection errors
             this.form.controls.biometric.setValue(false);
 
-            const error = BiometricErrors[e.message as BiometricErrorTypes];
+            if (e != null) {
+              const error = BiometricErrors[e.message as BiometricErrorTypes];
 
-            // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
-            // eslint-disable-next-line @typescript-eslint/no-floating-promises
-            this.dialogService.openSimpleDialog({
-              title: { key: error.title },
-              content: { key: error.description },
-              acceptButtonText: { key: "ok" },
-              cancelButtonText: null,
-              type: "danger",
-            });
+              // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
+              // eslint-disable-next-line @typescript-eslint/no-floating-promises
+              this.dialogService.openSimpleDialog({
+                title: { key: error.title },
+                content: { key: error.description },
+                acceptButtonText: { key: "ok" },
+                cancelButtonText: null,
+                type: "danger",
+              });
+            }
           })
           .finally(() => {
-            awaitDesktopDialogRef.close(true);
+            if (awaitDesktopDialogRef != null) {
+              awaitDesktopDialogRef.close(true);
+            }
           }),
       ]);
     } else {

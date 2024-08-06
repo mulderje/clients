@@ -94,6 +94,7 @@ import "../platform/popup/locales";
     A11yModule,
     AppRoutingModule,
     AutofillComponent,
+    AccountSecurityComponent,
     ToastModule.forRoot({
       maxOpened: 2,
       autoDismiss: true,
@@ -163,7 +164,6 @@ import "../platform/popup/locales";
     SendListComponent,
     SendTypeComponent,
     SetPasswordComponent,
-    AccountSecurityComponent,
     SettingsComponent,
     VaultSettingsComponent,
     ShareComponent,
