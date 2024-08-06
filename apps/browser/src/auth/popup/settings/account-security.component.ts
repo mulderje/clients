@@ -1,5 +1,4 @@
 import { DialogRef } from "@angular/cdk/dialog";
-import { CommonModule } from "@angular/common";
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from "@angular/core";
 import { FormBuilder, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
@@ -423,32 +422,35 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
         return;
       }
 
-      let awaitDesktopDialogRef: DialogRef<boolean, unknown> | undefined = null;
-      let desktopResponseReceived = false;
-      const awaitDesktopDialogPromise = async () => {
-        await new Promise((resolve) => setTimeout(resolve, 200));
-        if (desktopResponseReceived) {
-          return;
-        }
-        awaitDesktopDialogRef = AwaitDesktopDialogComponent.open(this.dialogService);
-        const awaitDesktopDialogClosed = firstValueFrom(awaitDesktopDialogRef.closed);
-        awaitDesktopDialogClosed
-          .then(async (result) => {
-            if (result !== true) {
-              this.form.controls.biometric.setValue(false);
-            }
-          })
-          .catch(async () => {});
-      };
+      let awaitDesktopDialogRef: DialogRef<boolean, unknown> | undefined;
+      let biometricsResponseReceived = false;
 
       await this.cryptoService.refreshAdditionalKeys();
 
       await Promise.race([
-        awaitDesktopDialogPromise(),
-        this.platformUtilsService
-          .authenticateBiometric()
-          .then((result) => {
-            desktopResponseReceived = true;
+        (async () => {
+          // only show waiting dialog if we have waited for 200 msec to prevent double dialog
+          await new Promise((resolve) => setTimeout(resolve, 200));
+          if (biometricsResponseReceived) {
+            return;
+          }
+
+          awaitDesktopDialogRef = AwaitDesktopDialogComponent.open(this.dialogService);
+          const result = await firstValueFrom(awaitDesktopDialogRef.closed);
+          if (result !== true) {
+            this.form.controls.biometric.setValue(false);
+          }
+        })(),
+        (async () => {
+          try {
+            const result = await this.platformUtilsService.authenticateBiometric();
+
+            // prevent duplicate dialog
+            biometricsResponseReceived = true;
+            if (awaitDesktopDialogRef) {
+              awaitDesktopDialogRef.close(true);
+            }
+
             this.form.controls.biometric.setValue(result);
             if (!result) {
               this.platformUtilsService.showToast(
@@ -457,31 +459,33 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
                 this.i18nService.t("errorEnableBiometricDesc"),
               );
             }
-          })
-          .catch((e) => {
-            desktopResponseReceived = true;
-            // Handle connection errors
-            this.form.controls.biometric.setValue(false);
-
-            if (e != null) {
-              const error = BiometricErrors[e.message as BiometricErrorTypes];
-
-              // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
-              // eslint-disable-next-line @typescript-eslint/no-floating-promises
-              this.dialogService.openSimpleDialog({
-                title: { key: error.title },
-                content: { key: error.description },
-                acceptButtonText: { key: "ok" },
-                cancelButtonText: null,
-                type: "danger",
-              });
-            }
-          })
-          .finally(() => {
-            if (awaitDesktopDialogRef != null) {
+          } catch (e) {
+            // prevent duplicate dialog
+            biometricsResponseReceived = true;
+            if (awaitDesktopDialogRef) {
               awaitDesktopDialogRef.close(true);
             }
-          }),
+
+            this.form.controls.biometric.setValue(false);
+
+            if (e.message == "canceled") {
+              return;
+            }
+
+            const error = BiometricErrors[e.message as BiometricErrorTypes];
+            await this.dialogService.openSimpleDialog({
+              title: { key: error.title },
+              content: { key: error.description },
+              acceptButtonText: { key: "ok" },
+              cancelButtonText: null,
+              type: "danger",
+            });
+          } finally {
+            if (awaitDesktopDialogRef) {
+              awaitDesktopDialogRef.close(true);
+            }
+          }
+        })(),
       ]);
     } else {
       await this.biometricStateService.setBiometricUnlockEnabled(false);
