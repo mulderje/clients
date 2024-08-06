@@ -95,6 +95,7 @@ export class OrganizationPlansComponent implements OnInit, OnDestroy {
 
   private _plan = PlanType.Free;
   @Input() providerId?: string;
+  @Input() preSelectedProductTier?: ProductTierType;
   @Output() onSuccess = new EventEmitter<OnSuccessArgs>();
   @Output() onCanceled = new EventEmitter<void>();
   @Output() onTrialBillingSuccess = new EventEmitter();
@@ -186,6 +187,7 @@ export class OrganizationPlansComponent implements OnInit, OnDestroy {
 
     if (this.hasProvider) {
       this.formGroup.controls.businessOwned.setValue(true);
+      this.formGroup.controls.clientOwnerEmail.addValidators(Validators.required);
       this.changedOwnedBusiness();
       this.provider = await this.providerApiService.getProvider(this.providerId);
       const providerDefaultPlan = this.passwordManagerPlans.find(
@@ -209,6 +211,9 @@ export class OrganizationPlansComponent implements OnInit, OnDestroy {
         this.singleOrgPolicyAppliesToActiveUser = policyAppliesToActiveUser;
       });
 
+    if (this.preSelectedProductTier != null && this.productTier < this.preSelectedProductTier) {
+      this.productTier = this.preSelectedProductTier;
+    }
     if (!this.selfHosted) {
       this.changedProduct();
     }
@@ -528,7 +533,7 @@ export class OrganizationPlansComponent implements OnInit, OnDestroy {
   }
 
   changedCountry() {
-    this.paymentComponent.hideBank = this.taxComponent.taxInfo.country !== "US";
+    this.paymentComponent.hideBank = this.taxComponent.taxFormGroup?.value.country !== "US";
     // Bank Account payments are only available for US customers
     if (
       this.paymentComponent.hideBank &&
@@ -549,6 +554,11 @@ export class OrganizationPlansComponent implements OnInit, OnDestroy {
   }
 
   submit = async () => {
+    if (!this.taxComponent?.taxFormGroup.valid && this.taxComponent?.taxFormGroup.touched) {
+      this.taxComponent?.taxFormGroup.markAllAsTouched();
+      return;
+    }
+
     if (this.singleOrgPolicyBlock) {
       return;
     }
@@ -618,8 +628,8 @@ export class OrganizationPlansComponent implements OnInit, OnDestroy {
       this.selectedPlan.PasswordManager.hasPremiumAccessOption &&
       this.formGroup.controls.premiumAccessAddon.value;
     request.planType = this.selectedPlan.type;
-    request.billingAddressCountry = this.taxComponent.taxInfo.country;
-    request.billingAddressPostalCode = this.taxComponent.taxInfo.postalCode;
+    request.billingAddressCountry = this.taxComponent.taxFormGroup?.value.country;
+    request.billingAddressPostalCode = this.taxComponent.taxFormGroup?.value.postalCode;
 
     // Secrets Manager
     this.buildSecretsManagerRequest(request);
@@ -629,8 +639,8 @@ export class OrganizationPlansComponent implements OnInit, OnDestroy {
       const paymentRequest = new PaymentRequest();
       paymentRequest.paymentToken = tokenResult[0];
       paymentRequest.paymentMethodType = tokenResult[1];
-      paymentRequest.country = this.taxComponent.taxInfo.country;
-      paymentRequest.postalCode = this.taxComponent.taxInfo.postalCode;
+      paymentRequest.country = this.taxComponent.taxFormGroup?.value.country;
+      paymentRequest.postalCode = this.taxComponent.taxFormGroup?.value.postalCode;
       await this.organizationApiService.updatePayment(this.organizationId, paymentRequest);
     }
 
@@ -675,14 +685,14 @@ export class OrganizationPlansComponent implements OnInit, OnDestroy {
         this.selectedPlan.PasswordManager.hasPremiumAccessOption &&
         this.formGroup.controls.premiumAccessAddon.value;
       request.planType = this.selectedPlan.type;
-      request.billingAddressPostalCode = this.taxComponent.taxInfo.postalCode;
-      request.billingAddressCountry = this.taxComponent.taxInfo.country;
-      if (this.taxComponent.taxInfo.includeTaxId) {
-        request.taxIdNumber = this.taxComponent.taxInfo.taxId;
-        request.billingAddressLine1 = this.taxComponent.taxInfo.line1;
-        request.billingAddressLine2 = this.taxComponent.taxInfo.line2;
-        request.billingAddressCity = this.taxComponent.taxInfo.city;
-        request.billingAddressState = this.taxComponent.taxInfo.state;
+      request.billingAddressPostalCode = this.taxComponent.taxFormGroup?.value.postalCode;
+      request.billingAddressCountry = this.taxComponent.taxFormGroup?.value.country;
+      if (this.taxComponent.taxFormGroup?.value.includeTaxId) {
+        request.taxIdNumber = this.taxComponent.taxFormGroup?.value.taxId;
+        request.billingAddressLine1 = this.taxComponent.taxFormGroup?.value.line1;
+        request.billingAddressLine2 = this.taxComponent.taxFormGroup?.value.line2;
+        request.billingAddressCity = this.taxComponent.taxFormGroup?.value.city;
+        request.billingAddressState = this.taxComponent.taxFormGroup?.value.state;
       }
     }
 

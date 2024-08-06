@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { firstValueFrom } from "rxjs";
@@ -32,7 +32,7 @@ import { PasswordGenerationServiceAbstraction } from "@bitwarden/generator-legac
   templateUrl: "sso.component.html",
 })
 // eslint-disable-next-line rxjs-angular/prefer-takeuntil
-export class SsoComponent extends BaseSsoComponent {
+export class SsoComponent extends BaseSsoComponent implements OnInit {
   protected formGroup = new FormGroup({
     identifier: new FormControl(null, [Validators.required]),
   });
@@ -93,6 +93,7 @@ export class SsoComponent extends BaseSsoComponent {
       if (qParams.identifier != null) {
         // SSO Org Identifier in query params takes precedence over claimed domains
         this.identifierFormControl.setValue(qParams.identifier);
+        this.loggingIn = true;
         await this.submit();
       } else {
         // Note: this flow is written for web but both browser and desktop

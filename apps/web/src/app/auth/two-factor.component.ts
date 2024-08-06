@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy, ViewChild, ViewContainerRef } from "@angular/core";
+import { Component, Inject, OnDestroy, OnInit, ViewChild, ViewContainerRef } from "@angular/core";
 import { FormBuilder, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Subject, takeUntil, lastValueFrom } from "rxjs";
@@ -23,7 +23,7 @@ import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.servic
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { StateService } from "@bitwarden/common/platform/abstractions/state.service";
-import { DialogService } from "@bitwarden/components";
+import { DialogService, ToastService } from "@bitwarden/components";
 
 import {
   TwoFactorOptionsDialogResult,
@@ -36,7 +36,7 @@ import {
   templateUrl: "two-factor.component.html",
 })
 // eslint-disable-next-line rxjs-angular/prefer-takeuntil
-export class TwoFactorComponent extends BaseTwoFactorComponent implements OnDestroy {
+export class TwoFactorComponent extends BaseTwoFactorComponent implements OnInit, OnDestroy {
   @ViewChild("twoFactorOptions", { read: ViewContainerRef, static: true })
   twoFactorOptionsModal: ViewContainerRef;
   formGroup = this.formBuilder.group({
@@ -69,6 +69,7 @@ export class TwoFactorComponent extends BaseTwoFactorComponent implements OnDest
     configService: ConfigService,
     masterPasswordService: InternalMasterPasswordServiceAbstraction,
     accountService: AccountService,
+    toastService: ToastService,
     private formBuilder: FormBuilder,
     @Inject(WINDOW) protected win: Window,
   ) {
@@ -91,6 +92,7 @@ export class TwoFactorComponent extends BaseTwoFactorComponent implements OnDest
       configService,
       masterPasswordService,
       accountService,
+      toastService,
     );
     this.onSuccessfulLoginNavigate = this.goAfterLogIn;
   }
