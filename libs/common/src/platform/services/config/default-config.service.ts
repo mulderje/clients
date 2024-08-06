@@ -8,7 +8,6 @@ import {
   of,
   shareReplay,
   Subject,
-  Subscription,
   switchMap,
   tap,
 } from "rxjs";
@@ -158,20 +157,16 @@ export class DefaultConfigService implements ConfigService {
     environment: Environment,
   ): Promise<void> {
     try {
-      let waitSubscription: Subscription | null = null;
-      if (!environment.isCloud()) {
-        // Feature flags are generally off in self hosted so we don't want to wait around to long for
-        // for an instance that might not be responding
-        const handle = setTimeout(() => {
-          this.logService.info(
-            "Self-host environment did not respond in time, emitting previous config.",
-          );
-          this.failedFetchFallbackSubject.next(existingConfig);
-        }, SLOW_EMISSION_GUARD);
-        waitSubscription = new Subscription(() => clearTimeout(handle));
-      }
+      // Feature flags are generally off in self hosted so we don't want to wait around to long for
+      // for an instance that might not be responding
+      const handle = setTimeout(() => {
+        this.logService.info(
+          "Self-host environment did not respond in time, emitting previous config.",
+        );
+        this.failedFetchFallbackSubject.next(existingConfig);
+      }, SLOW_EMISSION_GUARD);
       const response = await this.configApiService.get(userId);
-      waitSubscription?.unsubscribe();
+      clearTimeout(handle);
       const newConfig = new ServerConfig(new ServerConfigData(response));
 
       // Update the environment region

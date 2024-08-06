@@ -310,15 +310,8 @@ describe("ConfigService", () => {
       jest.resetAllMocks();
     });
 
-    it("waits for emission on cloud", async () => {
-      environmentSubject.next(environmentFactory(apiUrl(0), true));
-
-      const config = await firstValueFrom(sut.serverConfig$);
-      expect(config.gitHash).toBe("slow-response");
-    });
-
-    it("emits old configuration on self-hosted then the slow configuration", async () => {
-      environmentSubject.next(environmentFactory(apiUrl(0), false));
+    it("emits old configuration when the http call takes a long time", async () => {
+      environmentSubject.next(environmentFactory(apiUrl(0)));
 
       const configs = await firstValueFrom(sut.serverConfig$.pipe(bufferCount(2)));
 
