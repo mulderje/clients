@@ -291,7 +291,6 @@ describe("ConfigService", () => {
 
       configApiService.get.mockImplementation(() => {
         return new Promise<ServerConfigResponse>((resolve) => {
-          jest.advanceTimersByTime(SLOW_EMISSION_GUARD + 20);
           setTimeout(() => {
             resolve(serverConfigResponseFactory("slow-response"));
           }, SLOW_EMISSION_GUARD + 20);
@@ -322,6 +321,8 @@ describe("ConfigService", () => {
       environmentSubject.next(environmentFactory(apiUrl(0), false));
 
       const configs = await firstValueFrom(sut.serverConfig$.pipe(bufferCount(2)));
+
+      await jest.runOnlyPendingTimersAsync();
 
       expect(configs[0].gitHash).toBe("existing-data");
       expect(configs[1].gitHash).toBe("slow-response");
