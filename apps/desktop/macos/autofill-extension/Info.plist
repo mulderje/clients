@@ -19,5 +19,17 @@
 		<key>NSExtensionPrincipalClass</key>
 		<string>$(PRODUCT_MODULE_NAME).CredentialProviderViewController</string>
 	</dict>
+
+	<key>OSLogPreferences</key>
+	<dict>
+		<key>com.bitwarden.desktop.autofill-extension</key>
+		<dict>
+			<key>credential-provider</key>
+			<dict>
+				<key>Enable-Private-Data</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
 </dict>
 </plist>
