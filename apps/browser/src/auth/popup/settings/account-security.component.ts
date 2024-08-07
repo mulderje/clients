@@ -8,10 +8,8 @@ import {
   combineLatest,
   concatMap,
   distinctUntilChanged,
-  filter,
   firstValueFrom,
   map,
-  Observable,
   pairwise,
   startWith,
   Subject,
@@ -97,12 +95,10 @@ import { AwaitDesktopDialogComponent } from "./await-desktop-dialog.component";
 export class AccountSecurityComponent implements OnInit, OnDestroy {
   protected readonly VaultTimeoutAction = VaultTimeoutAction;
 
+  showMasterPasswordOnClientRestartOption = true;
   availableVaultTimeoutActions: VaultTimeoutAction[] = [];
-  vaultTimeoutOptions: VaultTimeoutOption[];
-  vaultTimeoutPolicyCallout: Observable<{
-    timeout: { hours: number; minutes: number };
-    action: VaultTimeoutAction;
-  }>;
+  vaultTimeoutOptions: VaultTimeoutOption[] = [];
+  hasVaultTimeoutPolicy = false;
   supportsBiometric: boolean;
   showChangeMasterPass = true;
   accountSwitcherEnabled = false;
@@ -111,6 +107,7 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
     vaultTimeout: [null as VaultTimeout | null],
     vaultTimeoutAction: [VaultTimeoutAction.Lock],
     pin: [null as boolean | null],
+    pinLockWithMasterPassword: false,
     biometric: false,
     enableAutoBiometricsPrompt: true,
   });
@@ -140,20 +137,13 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit() {
+    const hasMasterPassword = await this.userVerificationService.hasMasterPassword();
+    this.showMasterPasswordOnClientRestartOption = hasMasterPassword;
     const maximumVaultTimeoutPolicy = this.policyService.get$(PolicyType.MaximumVaultTimeout);
-    this.vaultTimeoutPolicyCallout = maximumVaultTimeoutPolicy.pipe(
-      filter((policy) => policy != null),
-      map((policy) => {
-        let timeout;
-        if (policy.data?.minutes) {
-          timeout = {
-            hours: Math.floor(policy.data?.minutes / 60),
-            minutes: policy.data?.minutes % 60,
-          };
-        }
-        return { timeout: timeout, action: policy.data?.action };
-      }),
-    );
+    if ((await firstValueFrom(this.policyService.get$(PolicyType.MaximumVaultTimeout))) != null) {
+      this.hasVaultTimeoutPolicy = true;
+    }
+
     const showOnLocked =
       !this.platformUtilsService.isFirefox() && !this.platformUtilsService.isSafari();
 
@@ -198,6 +188,8 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
         this.vaultTimeoutSettingsService.getVaultTimeoutActionByUserId$(activeAccount.id),
       ),
       pin: await this.pinService.isPinSet(activeAccount.id),
+      pinLockWithMasterPassword:
+        (await this.pinService.getPinLockType(activeAccount.id)) == "EPHEMERAL",
       biometric: await this.vaultTimeoutSettingsService.isBiometricLockSet(),
       enableAutoBiometricsPrompt: await firstValueFrom(
         this.biometricStateService.promptAutomatically$,
@@ -234,6 +226,22 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
       .pipe(
         concatMap(async (value) => {
           await this.updatePin(value);
+          this.refreshTimeoutSettings$.next();
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe();
+
+    this.form.controls.pinLockWithMasterPassword.valueChanges
+      .pipe(
+        concatMap(async (value) => {
+          const userId = (await firstValueFrom(this.accountService.activeAccount$)).id;
+          const pinKeyEncryptedUserKey =
+            (await this.pinService.getPinKeyEncryptedUserKeyPersistent(userId)) ||
+            (await this.pinService.getPinKeyEncryptedUserKeyEphemeral(userId));
+          await this.pinService.clearPinKeyEncryptedUserKeyPersistent(userId);
+          await this.pinService.clearPinKeyEncryptedUserKeyEphemeral(userId);
+          await this.pinService.storePinKeyEncryptedUserKey(pinKeyEncryptedUserKey, value, userId);
           this.refreshTimeoutSettings$.next();
         }),
         takeUntil(this.destroy$),
@@ -380,8 +388,13 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
         return;
       }
 
+      const userId = await firstValueFrom(
+        this.accountService.activeAccount$.pipe(map((account) => account.id)),
+      );
       const userHasPinSet = await firstValueFrom(dialogRef.closed);
       this.form.controls.pin.setValue(userHasPinSet, { emitEvent: false });
+      const requireReprompt = (await this.pinService.getPinLockType(userId)) == "EPHEMERAL";
+      this.form.controls.pinLockWithMasterPassword.setValue(requireReprompt, { emitEvent: false });
     } else {
       await this.vaultTimeoutSettingsService.clear();
     }

@@ -11,7 +11,7 @@
         <h2 bitTypography="h6">{{ "unlockMethods" | i18n }}</h2>
       </bit-section-header>
       <bit-card>
-        <bit-form-control *ngIf="supportsBiometric">
+        <bit-form-control *ngIf="supportsBiometric" [disableMargin]="this.form.value.biometric">
           <input bitCheckbox id="biometric" type="checkbox" formControlName="biometric" />
           <bit-label for="biometric" class="tw-whitespace-normal">{{
             "unlockWithBiometrics" | i18n
@@ -27,6 +27,21 @@
           <input bitCheckbox id="pin" type="checkbox" formControlName="pin" />
           <bit-label for="pin" class="tw-whitespace-normal">{{ "unlockWithPin" | i18n }}</bit-label>
         </bit-form-control>
+        <bit-form-control
+          class="tw-pl-5"
+          disableMargin
+          *ngIf="this.form.value.pin && showMasterPasswordOnClientRestartOption"
+        >
+          <input
+            bitCheckbox
+            id="pinEphemeral"
+            type="checkbox"
+            formControlName="pinLockWithMasterPassword"
+          />
+          <bit-label for="pinEphemeral" class="tw-whitespace-normal">{{
+            "lockWithMasterPassOnRestart1" | i18n
+          }}</bit-label>
+        </bit-form-control>
       </bit-card>
     </bit-section>
     <bit-section>
@@ -41,8 +56,8 @@
           ngDefaultControl
         >
         </auth-vault-timeout-input>
-        <!-- <bit-form-field> -->
-        <!-- <bit-label for="vaultTimeoutAction">{{ "vaultTimeoutAction" | i18n }}</bit-label>
+        <bit-form-field>
+          <bit-label for="vaultTimeoutAction">{{ "vaultTimeoutAction" | i18n }}</bit-label>
           <select
             aria-describedby="vaultTimeoutActionHelp"
             bitInput
@@ -56,16 +71,14 @@
           </select>
           <bit-hint class="tw-text-sm" id="vaultTimeoutActionHelp">
             {{ "vaultTimeoutActionDesc" | i18n }}
-          </bit-hint> -->
-        <!-- </bit-form-field>
-        <bit-form-field
-          disableMargin
-          *ngIf="!availableVaultTimeoutActions.includes(VaultTimeoutAction.Lock)"
-        >
-          <bit-label for="unlockMethodHelp">
-            {{ "unlockMethodNeededToChangeTimeoutActionDesc" | i18n }}
-          </bit-label>
-        </bit-form-field> -->
+          </bit-hint>
+          <bit-hint *ngIf="!availableVaultTimeoutActions.includes(VaultTimeoutAction.Lock)">
+            {{ "unlockMethodNeededToChangeTimeoutActionDesc" | i18n }}<br />
+          </bit-hint>
+        </bit-form-field>
+        <bit-hint *ngIf="hasVaultTimeoutPolicy">
+          {{ "vaultTimeoutPolicyAffectingOptions" | i18n }}
+        </bit-hint>
       </bit-card>
     </bit-section>
     <bit-section>
@@ -83,14 +96,8 @@
           <i slot="end" class="bwi bwi-external-link" aria-hidden="true"></i>
         </button>
       </bit-item>
-      <bit-item>
-        <button
-          bit-item-content
-          type="button"
-          appStopClick
-          (click)="changePassword()"
-          *ngIf="showChangeMasterPass"
-        >
+      <bit-item *ngIf="showChangeMasterPass">
+        <button bit-item-content type="button" appStopClick (click)="changePassword()">
           {{ "changeMasterPassword" | i18n }}
           <i slot="end" class="bwi bwi-external-link" aria-hidden="true"></i>
         </button>
@@ -100,14 +107,12 @@
           !accountSwitcherEnabled && availableVaultTimeoutActions.includes(VaultTimeoutAction.Lock)
         "
       >
-        <button bit-item-content type="button" appStopClick (click)="lock()">
-          <div class="row-main">{{ "lockNow" | i18n }}</div>
-        </button>
+        <button bit-item-content type="button" appStopClick (click)="lock()"></button>
+        <div class="row-main">{{ "lockNow" | i18n }}</div>
       </bit-item>
       <bit-item *ngIf="!accountSwitcherEnabled">
-        <button bit-item-content type="button" appStopClick (click)="logOut()">
-          <div class="row-main">{{ "logOut" | i18n }}</div>
-        </button>
+        <button bit-item-content type="button" appStopClick (click)="logOut()"></button>
+        <div class="row-main">{{ "logOut" | i18n }}</div>
       </bit-item>
     </bit-section>
   </div>
