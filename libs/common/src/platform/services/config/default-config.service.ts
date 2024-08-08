@@ -157,8 +157,9 @@ export class DefaultConfigService implements ConfigService {
     environment: Environment,
   ): Promise<void> {
     try {
-      // Feature flags are generally off in self hosted so we don't want to wait around to long for
-      // for an instance that might not be responding
+      // Feature flags often have a big impact on user experience, lets ensure we return some value
+      // somewhat quickly even though it may not be accurate, we won't cancel the HTTP request
+      // though so that hopefully it can have finished and hydrated a more accurate value.
       const handle = setTimeout(() => {
         this.logService.info(
           "Self-host environment did not respond in time, emitting previous config.",
