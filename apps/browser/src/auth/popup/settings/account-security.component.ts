@@ -264,6 +264,15 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
       )
       .subscribe();
 
+    this.form.controls.enableAutoBiometricsPrompt.valueChanges
+      .pipe(
+        concatMap(async (enabled) => {
+          await this.biometricStateService.setPromptAutomatically(enabled);
+        }),
+        takeUntil(this.destroy$),
+      )
+      .subscribe();
+
     this.refreshTimeoutSettings$
       .pipe(
         switchMap(() =>
@@ -519,6 +528,7 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
       content: { key: "changeMasterPasswordOnWebConfirmation" },
       type: "info",
       acceptButtonText: { key: "continue" },
+      cancelButtonText: { key: "cancel" },
     });
     if (confirmed) {
       const env = await firstValueFrom(this.environmentService.environment$);
@@ -528,9 +538,11 @@ export class AccountSecurityComponent implements OnInit, OnDestroy {
 
   async twoStep() {
     const confirmed = await this.dialogService.openSimpleDialog({
-      title: { key: "twoStepLogin" },
-      content: { key: "twoStepLoginConfirmation" },
+      title: { key: "twoStepLoginConfirmationTitle" },
+      content: { key: "twoStepLoginConfirmationContent" },
       type: "info",
+      acceptButtonText: { key: "continue" },
+      cancelButtonText: { key: "cancel" },
     });
     if (confirmed) {
       // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.

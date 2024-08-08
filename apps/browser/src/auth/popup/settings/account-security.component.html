@@ -18,7 +18,12 @@
           }}</bit-label>
         </bit-form-control>
         <bit-form-control class="tw-pl-5" *ngIf="supportsBiometric && this.form.value.biometric">
-          <input bitCheckbox id="autoBiometricsPrompt" type="checkbox" />
+          <input
+            bitCheckbox
+            id="autoBiometricsPrompt"
+            type="checkbox"
+            formControlName="enableAutoBiometricsPrompt"
+          />
           <bit-label for="autoBiometricsPrompt" class="tw-whitespace-normal">{{
             "enableAutoBiometricsPrompt" | i18n
           }}</bit-label>
@@ -56,7 +61,7 @@
           ngDefaultControl
         >
         </auth-vault-timeout-input>
-        <bit-form-field>
+        <bit-form-field [disableMargin]="!hasVaultTimeoutPolicy">
           <bit-label for="vaultTimeoutAction">{{ "vaultTimeoutAction" | i18n }}</bit-label>
           <select
             aria-describedby="vaultTimeoutActionHelp"
