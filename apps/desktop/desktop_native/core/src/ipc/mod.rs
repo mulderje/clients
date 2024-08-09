@@ -18,11 +18,9 @@ pub fn path(name: &str) -> std::path::PathBuf {
 
     #[cfg(target_os = "macos")]
     {
-        // On MacOS builds, we use the $HOME/tmp directory.
-        // On sandboxed App Store builds, this should ensure that
-        // the socket is only accessible to the app bundle.
-        let home = dirs::home_dir().unwrap();
-        home.join("tmp").join(format!("app.{name}"))
+        // TODO: Because the desktop app and the extension have different bundle IDs, they don't share a home dir when sandboxed.
+        // We should look into app groups then
+        format!("/tmp/app.{name}").into()
     }
 
     #[cfg(target_os = "linux")]

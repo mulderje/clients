@@ -8,6 +8,7 @@ import { ipcMain } from "electron";
 import * as ipc from "node-ipc";
 
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
+import { macos_autofill } from "@bitwarden/desktop-napi";
 
 import { getIpcSocketRoot } from "../proxy/ipc";
 
@@ -73,6 +74,17 @@ export class NativeMessagingMain {
   }
 
   listen() {
+    if (process.platform === "darwin") {
+      macos_autofill.IpcServer.listen(
+        "bitwarden_autofill",
+        (error: Error | null, data: macos_autofill.IpcMessage) => {
+          this.logService.warning("macos_autofill.IpcServer.listen", error, data);
+        },
+      ).catch((e) => {
+        this.logService.warning("macos_autofill.IpcServer.listen.catch", e);
+      });
+    }
+
     ipc.config.id = "bitwarden";
     ipc.config.retry = 1500;
     const ipcSocketRoot = getIpcSocketRoot();
