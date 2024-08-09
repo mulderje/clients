@@ -18,13 +18,11 @@ pub fn path(name: &str) -> std::path::PathBuf {
 
     #[cfg(target_os = "macos")]
     {
-        // On MacOS builds, we use the Application Support directory.
-        // This directory should already exist as it's also used for
-        // the application data and other electron caches.
+        // On MacOS builds, we use the $HOME/tmp directory.
         // On sandboxed App Store builds, this should ensure that
         // the socket is only accessible to the app bundle.
-        let config = dirs::config_dir().unwrap();
-        config.join("Bitwarden").join(format!("app.{name}"))
+        let home = dirs::home_dir().unwrap();
+        home.join("tmp").join(format!("app.{name}"))
     }
 
     #[cfg(target_os = "linux")]
