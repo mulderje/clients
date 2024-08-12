@@ -24,7 +24,6 @@ import {
     CommonModule,
     IconButtonModule,
     ItemModule,
-    ItemModule,
     JslibModule,
     SectionComponent,
     SectionHeaderComponent,
@@ -36,8 +35,6 @@ export class Fido2CipherRowComponent {
   @Input() cipher: CipherView;
   @Input() last: boolean;
   @Input() title: string;
-  @Input() isSearching: boolean;
-  @Input() isSelected: boolean;
 
   protected selectCipher(c: CipherView) {
     this.onSelected.emit(c);

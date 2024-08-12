@@ -1,5 +1,6 @@
 import { CommonModule } from "@angular/common";
 import { Component, OnDestroy, OnInit } from "@angular/core";
+import { FormsModule } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
 import {
   BehaviorSubject,
@@ -34,6 +35,7 @@ import {
   Icons,
   ItemModule,
   NoItemsModule,
+  SearchModule,
   SectionComponent,
   SectionHeaderComponent,
 } from "@bitwarden/components";
@@ -74,11 +76,13 @@ interface ViewData {
     CommonModule,
     Fido2CipherRowComponent,
     Fido2UseBrowserLinkComponent,
+    FormsModule,
     ItemModule,
     JslibModule,
     NoItemsModule,
     PopupHeaderComponent,
     PopupPageComponent,
+    SearchModule,
     SectionComponent,
     SectionHeaderComponent,
   ],
@@ -88,8 +92,9 @@ export class Fido2Component implements OnInit, OnDestroy {
   private hasSearched = false;
   protected noResultsIcon = Icons.NoResults;
   protected cipher: CipherView;
+  protected equivalentDomainsURL: string;
+  protected equivalentDomains: Set<string>;
   protected searchTypeSearch = false;
-  protected searchPending = false;
   protected searchText: string;
   protected url: string;
   protected hostname: string;
@@ -224,6 +229,12 @@ export class Fido2Component implements OnInit, OnDestroy {
 
             break;
           }
+
+          case BrowserFido2MessageTypes.InformCredentialNotFoundRequest: {
+            this.passkeyAction = PasskeyActions.Authenticate;
+
+            break;
+          }
         }
 
         return {
@@ -332,9 +343,19 @@ export class Fido2Component implements OnInit, OnDestroy {
     });
   }
 
+  async getEquivalentDomains() {
+    if (this.equivalentDomainsURL !== this.url) {
+      this.equivalentDomainsURL = this.url;
+      this.equivalentDomains = await firstValueFrom(
+        this.domainSettingsService.getUrlEquivalentDomains(this.url),
+      );
+    }
+
+    return this.equivalentDomains;
+  }
+
   protected async search() {
     this.hasSearched = await this.searchService.isSearchable(this.searchText);
-    this.searchPending = true;
     if (this.hasSearched) {
       this.displayedCiphers = await this.searchService.searchCiphers(
         this.searchText,
@@ -342,14 +363,11 @@ export class Fido2Component implements OnInit, OnDestroy {
         this.ciphers,
       );
     } else {
-      const equivalentDomains = await firstValueFrom(
-        this.domainSettingsService.getUrlEquivalentDomains(this.url),
-      );
+      const equivalentDomains = await this.getEquivalentDomains();
       this.displayedCiphers = this.ciphers.filter((cipher) =>
         cipher.login.matchesUri(this.url, equivalentDomains),
       );
     }
-    this.searchPending = false;
   }
 
   abort(fallback: boolean) {

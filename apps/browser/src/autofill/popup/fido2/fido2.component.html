@@ -12,6 +12,17 @@
   </popup-header>
 
   <div class="tw-p-2">
+    <bit-section *ngIf="passkeyAction === PasskeyActions.Register">
+      <bit-search
+        appAutofocus
+        autocomplete="off"
+        id="search"
+        placeholder="{{ 'searchVault' | i18n }}"
+        (ngModelChange)="search()"
+        [(ngModel)]="searchText"
+      ></bit-search>
+    </bit-section>
+
     <!-- Display when adding a new passkey -->
     <bit-section *ngIf="data.message.type === BrowserFido2MessageTypes.ConfirmNewCredentialRequest">
       <!-- Display when matching ciphers (i.e. same domain, no passkeys) exist -->
@@ -22,7 +33,6 @@
         <app-fido2-cipher-row
           *ngFor="let cipherItem of displayedCiphers"
           [cipher]="cipherItem"
-          [isSearching]="searchPending"
           title="{{ 'passkeyItem' | i18n }}"
           (onSelected)="handleCipherItemSelect($event)"
         ></app-fido2-cipher-row>
@@ -76,7 +86,6 @@
         <app-fido2-cipher-row
           *ngFor="let cipherItem of displayedCiphers"
           [cipher]="cipherItem"
-          [isSearching]="searchPending"
           title="{{ 'passkeyItem' | i18n }}"
           (onSelected)="handleCipherItemSelect($event)"
         ></app-fido2-cipher-row>
