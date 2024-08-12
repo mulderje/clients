@@ -92,7 +92,7 @@ export default class NotificationBackground {
     private configService: ConfigService,
   ) {}
 
-  async init() {
+  init() {
     if (chrome.runtime == null) {
       return;
     }
