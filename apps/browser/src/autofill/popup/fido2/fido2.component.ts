@@ -89,25 +89,26 @@ interface ViewData {
 })
 export class Fido2Component implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
-  private hasSearched = false;
-  protected noResultsIcon = Icons.NoResults;
-  protected cipher: CipherView;
-  protected equivalentDomainsURL: string;
-  protected equivalentDomains: Set<string>;
-  protected searchTypeSearch = false;
-  protected searchText: string;
-  protected url: string;
-  protected hostname: string;
-  protected data$: Observable<ViewData>;
-  protected sessionId?: string;
-  protected senderTabId?: string;
-  protected ciphers?: CipherView[] = [];
-  protected displayedCiphers?: CipherView[] = [];
-  protected loading = false;
-  protected BrowserFido2MessageTypes = BrowserFido2MessageTypes;
-  protected PasskeyActions = PasskeyActions;
-  protected passkeyAction: PasskeyActionValue = PasskeyActions.Register;
   private message$ = new BehaviorSubject<BrowserFido2Message>(null);
+  private hasSearched = false;
+  protected BrowserFido2MessageTypes = BrowserFido2MessageTypes;
+  protected cipher: CipherView;
+  protected ciphers?: CipherView[] = [];
+  protected data$: Observable<ViewData>;
+  protected displayedCiphers?: CipherView[] = [];
+  protected equivalentDomains: Set<string>;
+  protected equivalentDomainsURL: string;
+  protected hostname: string;
+  protected loading = false;
+  protected noResultsIcon = Icons.NoResults;
+  protected passkeyAction: PasskeyActionValue = PasskeyActions.Register;
+  protected PasskeyActions = PasskeyActions;
+  protected searchText: string;
+  protected searchTypeSearch = false;
+  protected senderTabId?: string;
+  protected sessionId?: string;
+  protected showNewPasskeyButton: boolean = false;
+  protected url: string;
 
   constructor(
     private router: Router,
@@ -192,6 +193,9 @@ export class Fido2Component implements OnInit, OnDestroy {
             );
 
             this.passkeyAction = PasskeyActions.Register;
+
+            // @TODO fix new cipher creation for other fido2 registration message types and remove `showNewPasskeyButton` from the template
+            this.showNewPasskeyButton = true;
 
             break;
           }
@@ -298,6 +302,7 @@ export class Fido2Component implements OnInit, OnDestroy {
 
   protected async saveNewLogin() {
     const data = this.message$.value;
+
     if (data?.type === BrowserFido2MessageTypes.ConfirmNewCredentialRequest) {
       const name = data.credentialName || data.rpId;
       // TODO: Revert to check for user verification once user verification for passkeys is approved for production.
@@ -325,22 +330,23 @@ export class Fido2Component implements OnInit, OnDestroy {
   async addCipher() {
     const data = this.message$.value;
 
-    if (data?.type !== BrowserFido2MessageTypes.ConfirmNewCredentialRequest) {
-      return;
+    if (data?.type === BrowserFido2MessageTypes.ConfirmNewCredentialRequest) {
+      await this.router.navigate(["/add-cipher"], {
+        queryParams: {
+          type: CipherType.Login.toString(),
+          name: data.credentialName || data.rpId,
+          uri: this.url,
+          uilocation: "popout",
+          username: data.userName,
+          senderTabId: this.senderTabId,
+          sessionId: this.sessionId,
+          userVerification: data.userVerification,
+          singleActionPopout: `${VaultPopoutType.fido2Popout}_${this.sessionId}`,
+        },
+      });
     }
 
-    await this.router.navigate(["/add-cipher"], {
-      queryParams: {
-        name: data.credentialName || data.rpId,
-        uri: this.url,
-        uilocation: "popout",
-        username: data.userName,
-        senderTabId: this.senderTabId,
-        sessionId: this.sessionId,
-        userVerification: data.userVerification,
-        singleActionPopout: `${VaultPopoutType.fido2Popout}_${this.sessionId}`,
-      },
-    });
+    return;
   }
 
   async getEquivalentDomains() {

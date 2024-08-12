@@ -6,9 +6,17 @@
         | i18n
     }}"
   >
-    <ng-container slot="end">
-      <!-- <app-new-item-dropdown [initialValues]="newItemItemValues$ | async"></app-new-item-dropdown> -->
-    </ng-container>
+    <button
+      *ngIf="showNewPasskeyButton"
+      bitButton
+      buttonType="primary"
+      type="button"
+      (click)="addCipher()"
+      slot="end"
+    >
+      <i class="bwi bwi-plus-f" aria-hidden="true"></i>
+      {{ "new" | i18n }}
+    </button>
   </popup-header>
 
   <div class="tw-p-2">
@@ -44,7 +52,6 @@
           <ng-container slot="title">{{ "noMatchingLoginsForSite" | i18n }}</ng-container>
           <ng-container slot="description">Search or save passkey as new login</ng-container>
           <button
-            appA11yTitle="{{ 'savePasskeyNewLogin' | i18n }}"
             bitButton
             buttonType="primary"
             slot="button"
@@ -97,7 +104,6 @@
           <ng-container slot="title">No matching logins for this site</ng-container>
           <ng-container slot="description">Search or save passkey as new login</ng-container>
           <button
-            appA11yTitle="{{ 'savePasskeyNewLogin' | i18n }}"
             bitButton
             buttonType="primary"
             slot="button"
