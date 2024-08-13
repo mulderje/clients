@@ -98,20 +98,13 @@ class BrowserPopupUtils {
   static async openPopout(
     extensionUrlPath: string,
     options: {
-      routeHistory?: string[];
       senderWindowId?: number;
       singleActionKey?: string;
       forceCloseExistingWindows?: boolean;
       windowOptions?: Partial<chrome.windows.CreateData>;
     } = {},
   ) {
-    const {
-      routeHistory,
-      senderWindowId,
-      singleActionKey,
-      forceCloseExistingWindows,
-      windowOptions,
-    } = options;
+    const { senderWindowId, singleActionKey, forceCloseExistingWindows, windowOptions } = options;
     const defaultPopoutWindowOptions: chrome.windows.CreateData = {
       type: "popup",
       focused: true,
@@ -127,7 +120,7 @@ class BrowserPopupUtils {
       top: senderWindow.top + offsetTop,
       ...defaultPopoutWindowOptions,
       ...windowOptions,
-      url: BrowserPopupUtils.buildPopoutUrl(extensionUrlPath, singleActionKey, routeHistory),
+      url: BrowserPopupUtils.buildPopoutUrl(extensionUrlPath, singleActionKey),
     };
 
     if (
@@ -170,7 +163,7 @@ class BrowserPopupUtils {
    * @param win - The passed window object.
    * @param href - The href to open in the popout window.
    */
-  static async openCurrentPagePopout(win: Window, href: string = null, routeHistory?: string[]) {
+  static async openCurrentPagePopout(win: Window, href: string = null) {
     const popoutUrl = href || win.location.href;
     const parsedUrl = new URL(popoutUrl);
     let hashRoute = parsedUrl.hash;
@@ -178,7 +171,7 @@ class BrowserPopupUtils {
       hashRoute = "#/tabs/vault";
     }
 
-    await BrowserPopupUtils.openPopout(`${parsedUrl.pathname}${hashRoute}`, { routeHistory });
+    await BrowserPopupUtils.openPopout(`${parsedUrl.pathname}${hashRoute}`);
 
     if (BrowserPopupUtils.inPopup(win)) {
       BrowserApi.closePopup(win);
@@ -249,22 +242,13 @@ class BrowserPopupUtils {
    *
    * @param extensionUrlPath - A relative path to the extension page. Example: "popup/index.html#/tabs/vault"
    * @param singleActionKey - The single action popout key used to identify the popout.
-   * @param routeHistory - The route history stack
    */
-  private static buildPopoutUrl(
-    extensionUrlPath: string,
-    singleActionKey: string,
-    routeHistory?: string[],
-  ) {
+  private static buildPopoutUrl(extensionUrlPath: string, singleActionKey: string) {
     const parsedUrl = new URL(chrome.runtime.getURL(extensionUrlPath));
     parsedUrl.searchParams.set("uilocation", "popout");
 
     if (singleActionKey) {
       parsedUrl.searchParams.set("singleActionPopout", singleActionKey);
-    }
-
-    if (routeHistory) {
-      parsedUrl.searchParams.set("routeHistory", encodeURIComponent(JSON.stringify(routeHistory)));
     }
 
     return parsedUrl.toString();
