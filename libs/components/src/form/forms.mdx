@@ -46,6 +46,18 @@ Be sure to use an appropriate type attribute on fields when defining new field c
 `email` for email address or `number` for numerical information) to take advantage of newer input
 controls like email verification, number selection, and more.
 
+Labels accept an optional `end` slot for any content that should not be truncated if the label text
+is too long, such as info link buttons or badges.
+
+```
+<bit-label>
+  Label text goes here
+  <a href="#" slot="end" bitLink>
+    <i class="bwi bwi-question-circle" aria-hidden="true"></i>
+  </a>
+</bit-label>
+```
+
 #### Default with required attribute
 
 <Story id="component-library-form-field--default" />
