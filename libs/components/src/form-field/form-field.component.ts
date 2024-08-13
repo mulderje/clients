@@ -12,7 +12,7 @@ import {
 } from "@angular/core";
 
 import { BitHintComponent } from "../form-control/hint.component";
-import { BitLabel } from "../form-control/label.directive";
+import { BitLabel } from "../form-control/label.component";
 import { inputBorderClasses } from "../input/input.directive";
 
 import { BitErrorComponent } from "./error.component";

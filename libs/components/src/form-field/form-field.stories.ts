@@ -132,7 +132,7 @@ export const LabelWithIcon: Story = {
         <bit-form-field>
           <bit-label>
             Label
-            <a href="#">
+            <a href="#" slot="end" bitLink>
               <i class="bwi bwi-question-circle" aria-hidden="true"></i>
             </a>
           </bit-label>
@@ -156,6 +156,16 @@ export const LongLabel: Story = {
         <bit-form-field>
           <bit-label>
             Hello I am a very long label with lots of very cool helpful information
+          </bit-label>
+          <input bitInput formControlName="name" />
+          <bit-hint>Optional Hint</bit-hint>
+        </bit-form-field>
+        <bit-form-field>
+          <bit-label>
+            Hello I am a very long label with lots of very cool helpful information
+            <a href="#" slot="end" bitLink>
+              <i class="bwi bwi-question-circle" aria-hidden="true"></i>
+            </a>
           </bit-label>
           <input bitInput formControlName="name" />
           <bit-hint>Optional Hint</bit-hint>
@@ -252,7 +262,7 @@ export const Readonly: Story = {
             </bit-form-field>
 
             <bit-form-field>
-              <bit-label>Textarea <span bitBadge variant="success">Premium</span></bit-label>
+              <bit-label>Textarea <span slot="end" bitBadge variant="success">Premium</span></bit-label>
               <textarea bitInput rows="3" readonly class="tw-resize-none">Row1
 Row2 
 Row3</textarea>

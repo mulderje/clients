@@ -1,0 +1,5 @@
+<!-- labels inside a form control (checkbox, radio button) should not truncate -->
+<span class="[&:not(bit-form-control_*)]:tw-truncate">
+  <ng-content></ng-content>
+</span>
+<ng-content select="[slot=end]"></ng-content>
