@@ -7,7 +7,7 @@ import {
   Router,
   UrlSerializer,
 } from "@angular/router";
-import { filter, firstValueFrom, from, switchMap } from "rxjs";
+import { filter, first, firstValueFrom, map, Observable, of, switchMap } from "rxjs";
 
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
@@ -27,13 +27,17 @@ import BrowserPopupUtils from "../browser-popup-utils";
 export class PopupRouterCacheService {
   private router = inject(Router);
   private state = inject(GlobalStateProvider).get(POPUP_ROUTE_HISTORY_KEY);
-  private configService = inject(ConfigService);
   private location = inject(Location);
 
   constructor() {
-    from(this.initPopoutHistory())
+    // init history with existing state
+    this.history$()
+      .pipe(first())
+      .subscribe((history) => history.forEach((location) => this.location.go(location)));
+
+    // update state when route change occurs
+    this.router.events
       .pipe(
-        switchMap(() => this.router.events),
         filter((event) => event instanceof NavigationEnd),
         filter((_event: NavigationEnd) => {
           const state: ActivatedRouteSnapshot = this.router.routerState.snapshot.root;
@@ -50,69 +54,50 @@ export class PopupRouterCacheService {
       .subscribe();
   }
 
-  async getHistory(): Promise<string[]> {
-    return firstValueFrom(this.state.state$);
+  history$(): Observable<string[]> {
+    return this.state.state$;
   }
 
   async setHistory(state: string[]): Promise<string[]> {
     return this.state.update(() => state);
   }
 
-  /** Get the last item from the history stack */
-  async last(): Promise<string> {
-    const history = await this.getHistory();
-    if (!history || history.length === 0) {
-      return null;
-    }
-    return history[history.length - 1];
+  /** Get the last item from the history stack, or `null` if empty */
+  last$(): Observable<string | null> {
+    return this.history$().pipe(
+      map((history) => {
+        if (!history || history.length === 0) {
+          return null;
+        }
+        return history[history.length - 1];
+      }),
+    );
   }
 
   /**
    * If in browser popup, push new route onto history stack
-   *
-   * @returns a boolean that indicates if the route was successfully saved
    */
   private async push(url: string): Promise<boolean> {
-    if (!BrowserPopupUtils.inPopup(window) || url === (await this.last())) {
-      return false;
+    if (!BrowserPopupUtils.inPopup(window) || url === (await firstValueFrom(this.last$()))) {
+      return;
     }
-    await this.state.update((prevState) => (prevState === null ? [url] : prevState.concat(url)));
-    return true;
+    await this.state.update((prevState) => (prevState == null ? [url] : prevState.concat(url)));
   }
 
   /**
-   * Navigate back to the prior URL in the history stack
-   *
-   * @returns a boolean that indicates success
+   * Navigate back in history
    */
-  async back(): Promise<boolean> {
-    if (!(await this.configService.getFeatureFlag(FeatureFlag.PersistPopupView))) {
-      this.location.back();
-      return true;
+  async back() {
+    await this.state.update((prevState) => prevState.slice(0, -1));
+
+    const url = this.router.url;
+    this.location.back();
+    if (url !== this.router.url) {
+      return;
     }
 
-    const length = (await this.getHistory())?.length;
-    if (!length) {
-      return false;
-    }
-
-    const newState = await this.state.update((prevState) => {
-      return prevState.slice(0, -1);
-    });
-
-    return this.router.navigateByUrl(newState[newState.length - 1]);
-  }
-
-  /** Retrieve history from popout URL search param `routeHistory` */
-  private async initPopoutHistory(): Promise<void> {
-    if (BrowserPopupUtils.inPopout(window)) {
-      const searchParams = new URL(window.location.href).searchParams;
-      const history = JSON.parse(decodeURIComponent(searchParams.get("routeHistory")));
-      searchParams.delete("routeHistory");
-      if (Array.isArray(history)) {
-        await this.setHistory(history);
-      }
-    }
+    // if no history is present, fallback to vault page
+    await this.router.navigate([""]);
   }
 }
 
@@ -121,20 +106,26 @@ export class PopupRouterCacheService {
  *
  * If `FeatureFlag.PersistPopupView` is disabled, do nothing.
  **/
-export const popupRouterCacheGuard = (async () => {
+export const popupRouterCacheGuard = (() => {
   const configService = inject(ConfigService);
   const popupHistoryService = inject(PopupRouterCacheService);
   const urlSerializer = inject(UrlSerializer);
 
-  if (!(await configService.getFeatureFlag(FeatureFlag.PersistPopupView))) {
-    return true;
-  }
+  return configService.getFeatureFlag$(FeatureFlag.PersistPopupView).pipe(
+    switchMap((featureEnabled) => {
+      if (!featureEnabled) {
+        return of(true);
+      }
 
-  const url = await popupHistoryService.last();
+      return popupHistoryService.last$().pipe(
+        map((url: string) => {
+          if (!url) {
+            return true;
+          }
 
-  if (!url) {
-    return true;
-  }
-
-  return urlSerializer.parse(url);
+          return urlSerializer.parse(url);
+        }),
+      );
+    }),
+  );
 }) satisfies CanActivateFn;

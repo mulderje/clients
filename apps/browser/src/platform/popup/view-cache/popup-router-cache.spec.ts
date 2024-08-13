@@ -3,6 +3,7 @@ import { TestBed } from "@angular/core/testing";
 import { Router, UrlSerializer, UrlTree } from "@angular/router";
 import { RouterTestingModule } from "@angular/router/testing";
 import { mock } from "jest-mock-extended";
+import { firstValueFrom, of } from "rxjs";
 
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { GlobalStateProvider } from "@bitwarden/common/platform/state";
@@ -26,7 +27,7 @@ describe("Popup router cache guard", () => {
   let service: PopupRouterCacheService;
 
   beforeEach(async () => {
-    jest.spyOn(configServiceMock, "getFeatureFlag").mockResolvedValue(true);
+    jest.spyOn(configServiceMock, "getFeatureFlag$").mockReturnValue(of(true));
 
     testBed = TestBed.configureTestingModule({
       imports: [
@@ -57,7 +58,9 @@ describe("Popup router cache guard", () => {
   });
 
   it("returns true if the history stack is empty", async () => {
-    const response = await testBed.runInInjectionContext(() => popupRouterCacheGuard());
+    const response = await firstValueFrom(
+      testBed.runInInjectionContext(() => popupRouterCacheGuard()),
+    );
 
     expect(response).toBe(true);
   });
@@ -66,8 +69,8 @@ describe("Popup router cache guard", () => {
     await router.navigate(["a"]);
     await router.navigate(["b"]);
 
-    const response = (await testBed.runInInjectionContext(() =>
-      popupRouterCacheGuard(),
+    const response = (await firstValueFrom(
+      testBed.runInInjectionContext(() => popupRouterCacheGuard()),
     )) as UrlTree;
 
     expect(serializer.serialize(response)).toBe("/b");
@@ -80,11 +83,11 @@ describe("Popup router cache guard", () => {
     // wait for router events subscription
     await flushPromises();
 
-    expect(await service.getHistory()).toEqual(["/a", "/b"]);
+    expect(await firstValueFrom(service.history$())).toEqual(["/a", "/b"]);
 
     await service.back();
 
-    expect(await service.getHistory()).toEqual(["/a"]);
+    expect(await firstValueFrom(service.history$())).toEqual(["/a"]);
   });
 
   it("does not save ignored routes", async () => {
@@ -92,10 +95,19 @@ describe("Popup router cache guard", () => {
     await router.navigate(["b"]);
     await router.navigate(["c"]);
 
-    const response = (await testBed.runInInjectionContext(() =>
-      popupRouterCacheGuard(),
+    const response = (await firstValueFrom(
+      testBed.runInInjectionContext(() => popupRouterCacheGuard()),
     )) as UrlTree;
 
     expect(serializer.serialize(response)).toBe("/b");
+  });
+
+  it("does not save duplicate routes", async () => {
+    await router.navigate(["a"]);
+    await router.navigate(["a"]);
+
+    await flushPromises();
+
+    expect(await firstValueFrom(service.history$())).toEqual(["/a"]);
   });
 });

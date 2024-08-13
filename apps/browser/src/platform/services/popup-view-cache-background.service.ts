@@ -1,4 +1,4 @@
-import { switchMap, merge, delay, filter, concatMap } from "rxjs";
+import { switchMap, merge, delay, filter, concatMap, map } from "rxjs";
 
 import { CommandDefinition, MessageListener } from "@bitwarden/common/platform/messaging";
 import {
@@ -44,7 +44,7 @@ export class PopupViewCacheBackgroundService {
     private globalStateProvider: GlobalStateProvider,
   ) {}
 
-  async init() {
+  startObservingTabChanges() {
     this.messageListener
       .messages$(SAVE_VIEW_CACHE_COMMAND)
       .pipe(
@@ -57,18 +57,13 @@ export class PopupViewCacheBackgroundService {
       )
       .subscribe();
 
-    this.messageListener
-      .messages$(ClEAR_VIEW_CACHE_COMMAND)
-      .pipe(
-        concatMap(async () => {
-          return this.popupViewCacheState.update(() => ({}), { shouldUpdate: this.objNotEmpty });
-        }),
-      )
-      .subscribe();
-
     merge(
-      // on tab changed
-      fromChromeEvent(chrome.tabs.onActivated),
+      // on tab changed, excluding extension tabs
+      fromChromeEvent(chrome.tabs.onActivated).pipe(
+        switchMap(([tabInfo]) => chrome.tabs.get(tabInfo.tabId)),
+        map((tab) => tab.url || tab.pendingUrl),
+        filter((url) => !url.startsWith(chrome.runtime.getURL(""))),
+      ),
 
       // on popup closed, with 2 minute delay that is cancelled by re-opening the popup
       fromChromeEvent(chrome.runtime.onConnect).pipe(

@@ -116,6 +116,21 @@
   "copySecurityCode": {
     "message": "Kopiraj kontrolni broj"
   },
+  "copyName": {
+    "message": "Kopiraj naziv"
+  },
+  "copyCompany": {
+    "message": "Kopiraj tvrtku"
+  },
+  "copySSN": {
+    "message": "Kopiraj OIB"
+  },
+  "copyPassportNumber": {
+    "message": "Kopiraj broj putovnice"
+  },
+  "copyLicenseNumber": {
+    "message": "Kopiraj OIB"
+  },
   "autoFill": {
     "message": "Auto-ispuna"
   },
@@ -254,7 +269,7 @@
     "message": "Bitwarden autentifikator omogućuje pohranu ključeva za autentifikaciju i generiranje TOTP kodova za dvostruku autentifikaciju. Saznaj više na web stranici bitwarden.com"
   },
   "bitwardenSecretsManager": {
-    "message": "Bitwarden Upravitelj tajni"
+    "message": "Bitwarden Secrets Manager"
   },
   "continueToSecretsManagerPageDesc": {
     "message": "Sigurno pohrani, upravljaj i dijeli programerske tajne s Bitwarden Secrets Managerom. Saznajte više na web stranici bitwarden.com."
@@ -288,6 +303,24 @@
   },
   "editFolder": {
     "message": "Uredi mapu"
+  },
+  "newFolder": {
+    "message": "New folder"
+  },
+  "folderName": {
+    "message": "Folder name"
+  },
+  "folderHintText": {
+    "message": "Nest a folder by adding the parent folder's name followed by a “/”. Example: Social/Forums"
+  },
+  "noFoldersAdded": {
+    "message": "No folders added"
+  },
+  "createFoldersToOrganize": {
+    "message": "Create folders to organize your vault items"
+  },
+  "deleteFolderPermanently": {
+    "message": "Are you sure you want to permanently delete this folder?"
   },
   "deleteFolder": {
     "message": "Izbriši mapu"
@@ -345,7 +378,7 @@
     "message": "Ponovno generiraj lozinku"
   },
   "options": {
-    "message": "Opcije"
+    "message": "Mogućnosti"
   },
   "length": {
     "message": "Duljina"
@@ -463,7 +496,7 @@
     "message": "Ostalo"
   },
   "unlockMethods": {
-    "message": "Opcije otključavanja"
+    "message": "Mogućnosti otključavanja"
   },
   "unlockMethodNeededToChangeTimeoutActionDesc": {
     "message": "Za promjenu vremena isteka trezora, odredi način otključavanja."
@@ -606,7 +639,7 @@
     "message": "Potvrda glavne lozinke se ne podudara."
   },
   "newAccountCreated": {
-    "message": "Tvoj novi račun je kreiran! Sada se možeš prijaviti."
+    "message": "Tvoj novi račun je stvoren! Sada se možeš prijaviti."
   },
   "youSuccessfullyLoggedIn": {
     "message": "Prijava uspješna"
@@ -840,7 +873,7 @@
     "message": "Pitaj za ažuriranje lozinke za prijavu kada se otkrije promjena na web stranici. Primjenjuje se na sve prijavljene račune."
   },
   "enableUsePasskeys": {
-    "message": "Pitaj za spremanje i korištenje pristupnih ključeva"
+    "message": "Pitaj za spremanje/korištenje pristupnih ključeva"
   },
   "usePasskeysDesc": {
     "message": "Pitaj za spremanje novih pristupnih ključeva ili se prijavi pomoću pristupnih ključeva pohranjenih u tvojem trezoru. Primjenjuje se na sve prijavljene račune."
@@ -852,7 +885,7 @@
     "message": "Ažuriraj"
   },
   "notificationUnlockDesc": {
-    "message": "Za dovršetak auto-ispune, otključaj svoj trezor."
+    "message": "Za dovršetak auto-ispune, otključaj svoj Bitwarden trezor."
   },
   "notificationUnlock": {
     "message": "Otključaj"
@@ -871,7 +904,7 @@
   },
   "defaultUriMatchDetection": {
     "message": "Zadano otkrivanje URI podudaranja",
-    "description": "Default URI match detection for auto-fill."
+    "description": "Default URI match detection for autofill."
   },
   "defaultUriMatchDetectionDesc": {
     "message": "Odaberi zadani način na koji će se riješavati otkrivanje URI-ja za prijavu pri izvođenju radnji kao što je auto-ispuna."
@@ -1089,7 +1122,7 @@
     "message": "Automatski kopiraj TOTP"
   },
   "disableAutoTotpCopyDesc": {
-    "message": "Ako se za prijavu koristi dvostruka autentifikacija, TOTP kontrolni kôd se automatski kopira u međuspremnik nakon auto-ispune korisničkog imena i lozinke."
+    "message": "Ako za prijavu postoji autentifikatorski ključ, kopiraj TOTP kontrolni kôd u međuspremnik nakon auto-ispune prijave."
   },
   "enableAutoBiometricsPrompt": {
     "message": "Traži biometrijsku autentifikaciju pri pokretanju"
@@ -1240,7 +1273,7 @@
   },
   "showAutoFillMenuOnFormFields": {
     "message": "Prikaži izbornik za auto-ispunu u poljima obrasca",
-    "description": "Represents the message for allowing the user to enable the auto-fill overlay"
+    "description": "Represents the message for allowing the user to enable the autofill overlay"
   },
   "autofillSuggestionsSectionTitle": {
     "message": "Prijedlozi auto-ispune"
@@ -1327,8 +1360,14 @@
   "commandOpenSidebar": {
     "message": "Otvori trezor u bočnoj traci"
   },
-  "commandAutofillDesc": {
-    "message": "Auto-ispuni zadnju korištenu prijavu za trenutnu web stranicu."
+  "commandAutofillLoginDesc": {
+    "message": "Auto-ispuni zadnje korištenu prijavu za trenutnu web stranicu"
+  },
+  "commandAutofillCardDesc": {
+    "message": "Auto-ispuni zadnje korištenu karticu za trenutnu web stranicu"
+  },
+  "commandAutofillIdentityDesc": {
+    "message": "Auto-ispuni zadnje korišteni identitet za trenutnu web stranicu"
   },
   "commandGeneratePasswordDesc": {
     "message": "Generiraj i kopiraj novu nasumičnu lozinku u međuspremnik."
@@ -1468,7 +1507,7 @@
     "message": "dr."
   },
   "mx": {
-    "message": "Mx"
+    "message": "gx."
   },
   "firstName": {
     "message": "Ime"
@@ -1489,13 +1528,13 @@
     "message": "Tvrtka"
   },
   "ssn": {
-    "message": "Broj zdravstvenog osiguranja"
+    "message": "OIB"
   },
   "passportNumber": {
     "message": "Broj putovnice"
   },
   "licenseNumber": {
-    "message": "Broj vozačke dozvole"
+    "message": "Broj osobne iskaznice"
   },
   "email": {
     "message": "E-pošta"
@@ -1634,6 +1673,10 @@
     "message": "Primarna domena",
     "description": "Domain name. Ex. website.com"
   },
+  "baseDomainOptionRecommended": {
+    "message": "Osnovna domena (preporučeno)",
+    "description": "Domain name. Ex. website.com"
+  },
   "domainName": {
     "message": "Naziv domene",
     "description": "Domain name. Ex. website.com"
@@ -1654,11 +1697,11 @@
   },
   "matchDetection": {
     "message": "Otkrivanje podudaranja",
-    "description": "URI match detection for auto-fill."
+    "description": "URI match detection for autofill."
   },
   "defaultMatchDetection": {
     "message": "Zadano otkrivanje podudaranja",
-    "description": "Default URI match detection for auto-fill."
+    "description": "Default URI match detection for autofill."
   },
   "toggleOptions": {
     "message": "Uključi/isključi opcije"
@@ -1778,6 +1821,29 @@
   "passwordGeneratorPolicyInEffect": {
     "message": "Jedno ili više pravila organizacije utječe na postavke generatora."
   },
+  "passwordGenerator": {
+    "message": "Password generator"
+  },
+  "usernameGenerator": {
+    "message": "Username generator"
+  },
+  "useThisPassword": {
+    "message": "Use this password"
+  },
+  "useThisUsername": {
+    "message": "Use this username"
+  },
+  "securePasswordGenerated": {
+    "message": "Secure password generated! Don't forget to also update your password on the website."
+  },
+  "useGeneratorHelpTextPartOne": {
+    "message": "Use the generator",
+    "description": "This will be used as part of a larger sentence, broken up to include the generator icon. The full sentence will read 'Use the generator [GENERATOR_ICON] to create a strong unique password'"
+  },
+  "useGeneratorHelpTextPartTwo": {
+    "message": "to create a strong unique password",
+    "description": "This will be used as part of a larger sentence, broken up to include the generator icon. The full sentence will read 'Use the generator [GENERATOR_ICON] to create a strong unique password'"
+  },
   "vaultTimeoutAction": {
     "message": "Nakon isteka trezora"
   },
@@ -1796,7 +1862,7 @@
     "message": "Trajno izbriši stavku"
   },
   "permanentlyDeleteItemConfirmation": {
-    "message": "Želiš li zaista trajno izbrisati ovu stavku?"
+    "message": "Sigurno želiš trajno izbrisati ovu stavku?"
   },
   "permanentlyDeletedItem": {
     "message": "Stavka trajno izbrisana"
@@ -1823,10 +1889,10 @@
     "message": "Ispuni i spremi"
   },
   "autoFillSuccessAndSavedUri": {
-    "message": "Auto-ispunjena stavka i spremanje URI"
+    "message": "Stavka auto-ispunjena i spremljen URI"
   },
   "autoFillSuccess": {
-    "message": "Auto-ispunjena stavka"
+    "message": "Stavka je auto-ispunjena "
   },
   "insecurePageWarning": {
     "message": "Upozorenje: Ovo je nezaštićena HTTP stranica i svi podaci koje preko nje pošalješ drugi mogu vidjeti i izmijeniti. Ova prijava je prvotno bila spremljena za sigurnu (HTTPS) stranicu."
@@ -1975,6 +2041,12 @@
   "nativeMessagingWrongUserTitle": {
     "message": "Pogrešan korisnički račun"
   },
+  "nativeMessagingWrongUserKeyDesc": {
+    "message": "Biometrijsko otključavanje nije uspjelo. Biometrijski tajni ključ nije uspio otključati trezor. Pokušaj ponovo postaviti biometriju."
+  },
+  "nativeMessagingWrongUserKeyTitle": {
+    "message": "Neusklađenost biometrijskog ključa"
+  },
   "biometricsNotEnabledTitle": {
     "message": "Biometrija nije omogućena"
   },
@@ -2031,7 +2103,7 @@
     "message": "Bitwarden neće pitati treba li spremiti prijavne podatke za ove domene. Za primjenu promjena, potrebno je osvježiti stranicu."
   },
   "excludedDomainsDescAlt": {
-    "message": "Bitwarden neće tražiti spremanje podataka za prijavu za ove domene za sve prijavljene račune. Moraš osvježiti stranicu kako bi promjene stupile na snagu."
+    "message": "Bitwarden neće nuditi spremanje podataka za prijavu za ove domene za sve prijavljene račune. Moraš osvježiti stranicu kako bi promjene stupile na snagu."
   },
   "websiteItemLabel": {
     "message": "Web stranica $number$ (URI)",
@@ -2302,6 +2374,9 @@
   "updateWeakMasterPasswordWarning": {
     "message": "Tvoja glavna lozinka ne zadovoljava pravila ove organizacije. Za pristup trezoru moraš odmah ažurirati svoju glavnu lozinku. Ako nastaviš, odjaviti ćeš se iz trenutne sesije te ćeš se morati ponovno prijaviti. Aktivne sesije na drugim uređajima mogu ostati aktivne do jedan sat."
   },
+  "tdeDisabledMasterPasswordRequired": {
+    "message": "Tvoja je organizacija onemogućila šifriranje pouzdanog uređaja. Postavi glavnu lozinku za pristup svom trezoru."
+  },
   "resetPasswordPolicyAutoEnroll": {
     "message": "Automatsko učlanjenje"
   },
@@ -2509,7 +2584,7 @@
     "description": "Displayed with the address on the forwarding service's configuration screen."
   },
   "forwarderGeneratedByWithWebsite": {
-    "message": "Generirao Bitwarden",
+    "message": "Web: $WEBSITE$. Generirao Bitwarden.",
     "description": "Displayed with the address on the forwarding service's configuration screen.",
     "placeholders": {
       "WEBSITE": {
@@ -2758,14 +2833,17 @@
   "autofillKeyboardShortcutUpdateLabel": {
     "message": "Promijeni prečac"
   },
+  "autofillKeyboardManagerShortcutsLabel": {
+    "message": "Upravljaj prečacima"
+  },
   "autofillShortcut": {
     "message": "Tipkovnički precač auto-ispune"
   },
-  "autofillShortcutNotSet": {
-    "message": "Prečac auto-ispune nije postavljen. Promijeni u postavkama preglednika."
+  "autofillLoginShortcutNotSet": {
+    "message": "Prečac auto-ispune prijave nije postavljen. Promijeni u postavkama preglednika."
   },
-  "autofillShortcutText": {
-    "message": "Prečac auto-ispune je: $COMMAND$. Promijeni u postavkama preglednika.",
+  "autofillLoginShortcutText": {
+    "message": "Prečac auto-ispune prijave je: $COMMAND$. Promijeni u postavkama preglednika.",
     "placeholders": {
       "command": {
         "content": "$1",
@@ -2948,6 +3026,18 @@
       }
     }
   },
+  "singleFieldNeedsAttention": {
+    "message": "1 polje treba tvoju pažnju."
+  },
+  "multipleFieldsNeedAttention": {
+    "message": "$COUNT$ polja treba tvoju pažnju.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "2"
+      }
+    }
+  },
   "selectPlaceholder": {
     "message": "-- Odaberi --"
   },
@@ -3016,11 +3106,11 @@
   },
   "passwordRepromptDisabledAutofillOnPageLoad": {
     "message": "Stavke za koje je potrebna glavna lozinka neće se auto-ispuniti kod učitavanja stranice. Auto-ispuna pri učitavanju stranice je isključena.",
-    "description": "Toast message for describing that master password re-prompt cannot be auto-filled on page load."
+    "description": "Toast message for describing that master password re-prompt cannot be autofilled on page load."
   },
   "autofillOnPageLoadSetToDefault": {
     "message": "Auto-ispuna kod učitavanja stranice koristi zadane postavke.",
-    "description": "Toast message for informing the user that auto-fill on page load has been set to the default setting."
+    "description": "Toast message for informing the user that autofill on page load has been set to the default setting."
   },
   "turnOffMasterPasswordPromptToEditField": {
     "message": "Isključi traženje glavne lozinke za promjenu ovog polja",
@@ -3597,7 +3687,7 @@
   },
   "autofillTitle": {
     "message": "Auto-ispuna - $ITEMNAME$",
-    "description": "Title for a button that auto-fills a login item.",
+    "description": "Title for a button that autofills a login item.",
     "placeholders": {
       "itemname": {
         "content": "$1",
@@ -3748,7 +3838,7 @@
     }
   },
   "permanentlyDeleteAttachmentConfirmation": {
-    "message": "Sigurno želiš trajno obrisati ovaj privitak?"
+    "message": "Sigurno želiš trajno izbrisati ovaj privitak?"
   },
   "premium": {
     "message": "Premium"
@@ -3787,6 +3877,52 @@
   "authenticatorKey": {
     "message": "Kôd za provjeru"
   },
+  "autofillOptions": {
+    "message": "Postavke auto-ispune"
+  },
+  "websiteUri": {
+    "message": "Web stranica (URI)"
+  },
+  "websiteAdded": {
+    "message": "Web stranica dodana"
+  },
+  "addWebsite": {
+    "message": "Dodaj web stranicu"
+  },
+  "deleteWebsite": {
+    "message": "Izbriši web stranicu"
+  },
+  "defaultLabel": {
+    "message": "Zadano ($VALUE$)",
+    "description": "A label that indicates the default value for a field with the current default value in parentheses.",
+    "placeholders": {
+      "value": {
+        "content": "$1",
+        "example": "Base domain"
+      }
+    }
+  },
+  "showMatchDetection": {
+    "message": "Prikaži otkrivanje podudaranja $WEBSITE$",
+    "placeholders": {
+      "website": {
+        "content": "$1",
+        "example": "https://example.com"
+      }
+    }
+  },
+  "hideMatchDetection": {
+    "message": "Sakrij otkrivanje podudaranja $WEBSITE$",
+    "placeholders": {
+      "website": {
+        "content": "$1",
+        "example": "https://example.com"
+      }
+    }
+  },
+  "autoFillOnPageLoad": {
+    "message": "Auto-ispuna kod učitavanja?"
+  },
   "cardDetails": {
     "message": "Detalji kartice"
   },
@@ -3807,6 +3943,18 @@
   },
   "data": {
     "message": "Podaci"
+  },
+  "passkeys": {
+    "message": "Passkeys",
+    "description": "A section header for a list of passkeys."
+  },
+  "passwords": {
+    "message": "Passwords",
+    "description": "A section header for a list of passwords."
+  },
+  "logInWithPasskeyAriaLabel": {
+    "message": "Log in with passkey",
+    "description": "ARIA label for the inline menu button that logs in with a passkey."
   },
   "assign": {
     "message": "Dodijeli"
@@ -3848,7 +3996,7 @@
     "message": "Koristi skrivena polja za osjetljive podatke poput lozinke"
   },
   "checkBoxHelpText": {
-    "message": "Koristi potvrdne okvire ako ih želiš automatski uključiti u obrascu, npr. zapamti adresu e-pošte"
+    "message": "Koristi potvrdne okvire ako ih želiš auto-ispuniti u obrascu, npr. zapamti adresu e-pošte"
   },
   "linkedHelpText": {
     "message": "Koristi povezano polje kada imaš problema s auto-ispunom za određenu web stranicu."
@@ -4001,5 +4149,26 @@
   },
   "itemLocation": {
     "message": "Lokacija stavke"
+  },
+  "fileSends": {
+    "message": "File Sends"
+  },
+  "textSends": {
+    "message": "Text Sends"
+  },
+  "bitwardenNewLook": {
+    "message": "Bitwarden ima novi izgled!"
+  },
+  "bitwardenNewLookDesc": {
+    "message": "Auto-ispuna i pretraga iz kartice Trezor je lakša i intuitivnija nego ikad prije. Razgledaj!"
+  },
+  "accountActions": {
+    "message": "Radnje na računu"
+  },
+  "showNumberOfAutofillSuggestions": {
+    "message": "Show number of login autofill suggestions on extension icon"
+  },
+  "systemDefault": {
+    "message": "System default"
   }
 }
