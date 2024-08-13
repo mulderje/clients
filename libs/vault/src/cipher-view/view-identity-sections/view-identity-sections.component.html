@@ -3,7 +3,7 @@
     <h2 bitTypography="h6">{{ "personalDetails" | i18n }}</h2>
   </bit-section-header>
 
-  <bit-card>
+  <bit-card class="[&_bit-form-field:last-of-type]:tw-mb-0">
     <bit-form-field *ngIf="cipher.identity.fullName">
       <bit-label>{{ "name" | i18n }}</bit-label>
       <input bitInput [value]="cipher.identity.fullName" readonly data-testid="name" />
@@ -14,6 +14,7 @@
         [appA11yTitle]="'copyName' | i18n"
         [appCopyClick]="cipher.identity.fullName"
         showToast
+        [valueLabel]="'name' | i18n"
       ></button>
     </bit-form-field>
     <bit-form-field *ngIf="cipher.identity.username">
@@ -26,6 +27,7 @@
         [appA11yTitle]="'copyUsername' | i18n"
         [appCopyClick]="cipher.identity.username"
         showToast
+        [valueLabel]="'username' | i18n"
       ></button>
     </bit-form-field>
     <bit-form-field *ngIf="cipher.identity.company">
@@ -38,6 +40,7 @@
         [appA11yTitle]="'copyCompany' | i18n"
         [appCopyClick]="cipher.identity.company"
         showToast
+        [valueLabel]="'company' | i18n"
       ></button>
     </bit-form-field>
   </bit-card>
@@ -48,7 +51,7 @@
     <h2 bitTypography="h6">{{ "identification" | i18n }}</h2>
   </bit-section-header>
 
-  <bit-card>
+  <bit-card class="[&_bit-form-field:last-of-type]:tw-mb-0">
     <bit-form-field *ngIf="cipher.identity.ssn">
       <bit-label>{{ "ssn" | i18n }}</bit-label>
       <input bitInput type="password" [value]="cipher.identity.ssn" readonly data-testid="ssn" />
@@ -66,6 +69,7 @@
         [appA11yTitle]="'copySSN' | i18n"
         [appCopyClick]="cipher.identity.ssn"
         showToast
+        [valueLabel]="'ssn' | i18n"
       ></button>
     </bit-form-field>
     <bit-form-field *ngIf="cipher.identity.passportNumber">
@@ -91,6 +95,7 @@
         [appA11yTitle]="'copyPassportNumber' | i18n"
         [appCopyClick]="cipher.identity.passportNumber"
         showToast
+        [valueLabel]="'passportNumber' | i18n"
       ></button>
     </bit-form-field>
     <bit-form-field *ngIf="cipher.identity.licenseNumber">
@@ -103,6 +108,7 @@
         [appA11yTitle]="'copyLicenseNumber' | i18n"
         [appCopyClick]="cipher.identity.licenseNumber"
         showToast
+        [valueLabel]="'licenseNumber' | i18n"
       ></button>
     </bit-form-field>
   </bit-card>
@@ -113,7 +119,7 @@
     <h2 bitTypography="h6">{{ "contactInfo" | i18n }}</h2>
   </bit-section-header>
 
-  <bit-card>
+  <bit-card class="[&_bit-form-field:last-of-type]:tw-mb-0">
     <bit-form-field *ngIf="cipher.identity.email">
       <bit-label>{{ "email" | i18n }}</bit-label>
       <input bitInput [value]="cipher.identity.email" readonly data-testid="email" />
@@ -124,6 +130,7 @@
         [appA11yTitle]="'copyEmail' | i18n"
         [appCopyClick]="cipher.identity.email"
         showToast
+        [valueLabel]="'email' | i18n"
       ></button>
     </bit-form-field>
     <bit-form-field *ngIf="cipher.identity.phone">
@@ -136,6 +143,7 @@
         [appA11yTitle]="'copyPhone' | i18n"
         [appCopyClick]="cipher.identity.phone"
         showToast
+        [valueLabel]="'phone' | i18n"
       ></button>
     </bit-form-field>
     <bit-form-field *ngIf="addressFields">
@@ -155,6 +163,7 @@
         [appA11yTitle]="'copyAddress' | i18n"
         [appCopyClick]="addressFields"
         showToast
+        [valueLabel]="'address' | i18n"
       ></button>
     </bit-form-field>
   </bit-card>

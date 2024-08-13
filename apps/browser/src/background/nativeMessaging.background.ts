@@ -1,5 +1,6 @@
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom, map } from "rxjs";
 
+import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { AuthService } from "@bitwarden/common/auth/abstractions/auth.service";
 import { AuthenticationStatus } from "@bitwarden/common/auth/enums/authentication-status";
 import { AppIdService } from "@bitwarden/common/platform/abstractions/app-id.service";
@@ -20,7 +21,7 @@ import { BrowserApi } from "../platform/browser/browser-api";
 import RuntimeBackground from "./runtime.background";
 
 const MessageValidTimeout = 10 * 1000;
-const EncryptionAlgorithm = "sha1";
+const HashAlgorithmForEncryption = "sha1";
 
 type Message = {
   command: string;
@@ -63,6 +64,7 @@ export class NativeMessagingBackground {
   private port: browser.runtime.Port | chrome.runtime.Port;
 
   private resolver: any = null;
+  private rejecter: any = null;
   private privateKey: Uint8Array = null;
   private publicKey: Uint8Array = null;
   private secureSetupResolve: any = null;
@@ -81,6 +83,7 @@ export class NativeMessagingBackground {
     private logService: LogService,
     private authService: AuthService,
     private biometricStateService: BiometricStateService,
+    private accountService: AccountService,
   ) {
     if (chrome?.permissions?.onAdded) {
       // Reload extension to activate nativeMessaging
@@ -135,7 +138,7 @@ export class NativeMessagingBackground {
             const decrypted = await this.cryptoFunctionService.rsaDecrypt(
               encrypted,
               this.privateKey,
-              EncryptionAlgorithm,
+              HashAlgorithmForEncryption,
             );
 
             if (this.validatingFingerprint) {
@@ -156,19 +159,10 @@ export class NativeMessagingBackground {
             this.privateKey = null;
             this.connected = false;
 
-            this.messagingService.send("showDialog", {
-              title: { key: "nativeMessagingInvalidEncryptionTitle" },
-              content: { key: "nativeMessagingInvalidEncryptionDesc" },
-              acceptButtonText: { key: "ok" },
-              cancelButtonText: null,
-              type: "danger",
+            this.rejecter({
+              message: "invalidateEncryption",
             });
-
-            if (this.resolver) {
-              this.resolver(message);
-            }
-
-            break;
+            return;
           case "verifyFingerprint": {
             if (this.sharedSecret == null) {
               this.validatingFingerprint = true;
@@ -179,8 +173,10 @@ export class NativeMessagingBackground {
             break;
           }
           case "wrongUserId":
-            this.showWrongUserDialog();
-            break;
+            this.rejecter({
+              message: "wrongUserId",
+            });
+            return;
           default:
             // Ignore since it belongs to another device
             if (!this.platformUtilsService.isSafari() && message.appId !== this.appId) {
@@ -213,16 +209,6 @@ export class NativeMessagingBackground {
     });
   }
 
-  showWrongUserDialog() {
-    this.messagingService.send("showDialog", {
-      title: { key: "nativeMessagingWrongUserTitle" },
-      content: { key: "nativeMessagingWrongUserDesc" },
-      acceptButtonText: { key: "ok" },
-      cancelButtonText: null,
-      type: "danger",
-    });
-  }
-
   async send(message: Message) {
     if (!this.connected) {
       await this.connect();
@@ -248,7 +234,14 @@ export class NativeMessagingBackground {
 
   getResponse(): Promise<any> {
     return new Promise((resolve, reject) => {
-      this.resolver = resolve;
+      this.resolver = function (response: any) {
+        resolve(response);
+      };
+      this.rejecter = function (resp: any) {
+        reject({
+          message: resp,
+        });
+      };
     });
   }
 
@@ -274,13 +267,7 @@ export class NativeMessagingBackground {
       this.privateKey = null;
       this.connected = false;
 
-      this.messagingService.send("showDialog", {
-        title: { key: "nativeMessagingInvalidEncryptionTitle" },
-        content: { key: "nativeMessagingInvalidEncryptionDesc" },
-        acceptButtonText: { key: "ok" },
-        cancelButtonText: null,
-        type: "danger",
-      });
+      this.rejecter("invalidateEncryption");
     }
   }
 
@@ -299,35 +286,11 @@ export class NativeMessagingBackground {
 
     switch (message.command) {
       case "biometricUnlock": {
-        if (message.response === "not enabled") {
-          this.messagingService.send("showDialog", {
-            title: { key: "biometricsNotEnabledTitle" },
-            content: { key: "biometricsNotEnabledDesc" },
-            acceptButtonText: { key: "ok" },
-            cancelButtonText: null,
-            type: "danger",
-          });
-          break;
-        } else if (message.response === "not supported") {
-          this.messagingService.send("showDialog", {
-            title: { key: "biometricsNotSupportedTitle" },
-            content: { key: "biometricsNotSupportedDesc" },
-            acceptButtonText: { key: "ok" },
-            cancelButtonText: null,
-            type: "danger",
-          });
-          break;
-        } else if (message.response === "not unlocked") {
-          this.messagingService.send("showDialog", {
-            title: { key: "biometricsNotUnlockedTitle" },
-            content: { key: "biometricsNotUnlockedDesc" },
-            acceptButtonText: { key: "ok" },
-            cancelButtonText: null,
-            type: "danger",
-          });
-          break;
-        } else if (message.response === "canceled") {
-          break;
+        if (
+          ["not enabled", "not supported", "not unlocked", "canceled"].includes(message.response)
+        ) {
+          this.rejecter(message.response);
+          return;
         }
 
         // Check for initial setup of biometric unlock
@@ -350,24 +313,27 @@ export class NativeMessagingBackground {
               const userKey = new SymmetricCryptoKey(
                 Utils.fromB64ToArray(message.userKeyB64),
               ) as UserKey;
-              await this.cryptoService.setUserKey(userKey);
+              const activeUserId = await firstValueFrom(
+                this.accountService.activeAccount$.pipe(map((a) => a?.id)),
+              );
+              const isUserKeyValid = await this.cryptoService.validateUserKey(
+                userKey,
+                activeUserId,
+              );
+              if (isUserKeyValid) {
+                await this.cryptoService.setUserKey(userKey, activeUserId);
+              } else {
+                this.logService.error("Unable to verify biometric unlocked userkey");
+                await this.cryptoService.clearKeys(activeUserId);
+                this.rejecter("userkey wrong");
+                return;
+              }
             } else {
               throw new Error("No key received");
             }
           } catch (e) {
             this.logService.error("Unable to set key: " + e);
-            this.messagingService.send("showDialog", {
-              title: { key: "biometricsFailedTitle" },
-              content: { key: "biometricsFailedDesc" },
-              acceptButtonText: { key: "ok" },
-              cancelButtonText: null,
-              type: "danger",
-            });
-
-            // Exit early
-            if (this.resolver) {
-              this.resolver(message);
-            }
+            this.rejecter("userkey wrong");
             return;
           }
 
@@ -377,12 +343,7 @@ export class NativeMessagingBackground {
           } catch (e) {
             this.logService.error("Unable to verify key: " + e);
             await this.cryptoService.clearKeys();
-            this.showWrongUserDialog();
-
-            // Exit early
-            if (this.resolver) {
-              this.resolver(message);
-            }
+            this.rejecter("userkey wrong");
             return;
           }
 
