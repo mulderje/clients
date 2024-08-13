@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 
 import { NativeMessagingBackground } from "../../background/nativeMessaging.background";
 
@@ -6,9 +6,7 @@ import { BrowserBiometricsService } from "./browser-biometrics.service";
 
 @Injectable()
 export class BackgroundBrowserBiometricsService extends BrowserBiometricsService {
-  constructor(private nativeMessagingBackground: NativeMessagingBackground) {
-    super();
-  }
+  nativeMessagingBackground = inject(NativeMessagingBackground);
 
   async authenticateBiometric(): Promise<boolean> {
     const responsePromise = this.nativeMessagingBackground.getResponse();
