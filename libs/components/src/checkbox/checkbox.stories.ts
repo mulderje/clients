@@ -11,6 +11,7 @@ import { Meta, StoryObj, moduleMetadata } from "@storybook/angular";
 
 import { I18nService } from "@bitwarden/common/src/platform/abstractions/i18n.service";
 
+import { BadgeModule } from "../badge";
 import { FormControlModule } from "../form-control";
 import { TableModule } from "../table";
 import { I18nMockService } from "../utils/i18n-mock.service";
@@ -55,7 +56,14 @@ export default {
   decorators: [
     moduleMetadata({
       declarations: [ExampleComponent],
-      imports: [FormsModule, ReactiveFormsModule, FormControlModule, CheckboxModule, TableModule],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        FormControlModule,
+        CheckboxModule,
+        TableModule,
+        BadgeModule,
+      ],
       providers: [
         {
           provide: I18nService,
@@ -110,6 +118,14 @@ export const LongLabel: Story = {
           <input type="checkbox" bitCheckbox formControlName="checkbox">
           <bit-label>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur iaculis consequat enim vitae elementum.
             Ut non odio est. </bit-label>
+        </bit-form-control>
+        <bit-form-control>
+          <input type="checkbox" bitCheckbox formControlName="checkbox">
+          <bit-label>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur iaculis consequat enim vitae elementum.
+            Ut non odio est.
+            <span slot="end" bitBadge variant="success">Premium</span>
+          </bit-label>
         </bit-form-control>
       </form>
     `,
