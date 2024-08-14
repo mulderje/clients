@@ -190,9 +190,9 @@ export class ItemDetailsSectionComponent implements OnInit {
 
   private async initFromExistingCipher() {
     this.itemDetailsForm.setValue({
-      name: this.originalCipherView.name,
-      organizationId: this.originalCipherView.organizationId,
-      folderId: this.originalCipherView.folderId,
+      name: this.initialValues?.name ?? this.originalCipherView.name,
+      organizationId: this.originalCipherView.organizationId, // We do not allow changing ownership of an existing cipher.
+      folderId: this.initialValues?.folderId ?? this.originalCipherView.folderId,
       collectionIds: [],
       favorite: this.originalCipherView.favorite,
     });
@@ -204,11 +204,16 @@ export class ItemDetailsSectionComponent implements OnInit {
       );
 
       if (!this.allowPersonalOwnership && this.originalCipherView.organizationId == null) {
-        this.itemDetailsForm.controls.organizationId.setValue(this.defaultOwner);
+        this.itemDetailsForm.controls.organizationId.setValue(
+          this.initialValues?.organizationId ?? this.defaultOwner,
+        );
       }
     }
 
-    await this.updateCollectionOptions(this.originalCipherView.collectionIds as CollectionId[]);
+    await this.updateCollectionOptions(
+      this.initialValues?.collectionIds ??
+        (this.originalCipherView.collectionIds as CollectionId[]),
+    );
 
     if (this.partialEdit) {
       this.itemDetailsForm.disable();
