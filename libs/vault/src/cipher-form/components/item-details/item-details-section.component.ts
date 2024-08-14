@@ -204,9 +204,7 @@ export class ItemDetailsSectionComponent implements OnInit {
       );
 
       if (!this.allowPersonalOwnership && this.originalCipherView.organizationId == null) {
-        this.itemDetailsForm.controls.organizationId.setValue(
-          this.initialValues?.organizationId ?? this.defaultOwner,
-        );
+        this.itemDetailsForm.controls.organizationId.setValue(this.defaultOwner);
       }
     }
 
