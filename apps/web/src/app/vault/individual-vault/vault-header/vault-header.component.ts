@@ -14,6 +14,7 @@ import { Organization } from "@bitwarden/common/admin-console/models/domain/orga
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
+import { CipherType } from "@bitwarden/common/vault/enums";
 import { TreeNode } from "@bitwarden/common/vault/models/domain/tree-node";
 import { CollectionView } from "@bitwarden/common/vault/models/view/collection.view";
 import { BreadcrumbsModule, MenuModule } from "@bitwarden/components";
@@ -47,6 +48,8 @@ export class VaultHeaderComponent implements OnInit {
   protected Unassigned = Unassigned;
   protected All = All;
   protected CollectionDialogTabType = CollectionDialogTabType;
+  protected CipherType = CipherType;
+  protected extensionRefreshEnabled = false;
 
   /**
    * Boolean to determine the loading state of the header.
@@ -67,7 +70,7 @@ export class VaultHeaderComponent implements OnInit {
   @Input() canCreateCollections: boolean;
 
   /** Emits an event when the new item button is clicked in the header */
-  @Output() onAddCipher = new EventEmitter<void>();
+  @Output() onAddCipher = new EventEmitter<CipherType | undefined>();
 
   /** Emits an event when the new collection button is clicked in the 'New' dropdown menu */
   @Output() onAddCollection = new EventEmitter<null>();
@@ -81,16 +84,14 @@ export class VaultHeaderComponent implements OnInit {
   /** Emits an event when the delete collection button is clicked in the header */
   @Output() onDeleteCollection = new EventEmitter<void>();
 
-  private flexibleCollectionsV1Enabled = false;
-
   constructor(
     private i18nService: I18nService,
     private configService: ConfigService,
   ) {}
 
   async ngOnInit() {
-    this.flexibleCollectionsV1Enabled = await firstValueFrom(
-      this.configService.getFeatureFlag$(FeatureFlag.FlexibleCollectionsV1),
+    this.extensionRefreshEnabled = await firstValueFrom(
+      this.configService.getFeatureFlag$(FeatureFlag.ExtensionRefresh),
     );
   }
 
@@ -174,7 +175,7 @@ export class VaultHeaderComponent implements OnInit {
     const organization = this.organizations.find(
       (o) => o.id === this.collection?.node.organizationId,
     );
-    return this.collection.node.canEdit(organization, this.flexibleCollectionsV1Enabled);
+    return this.collection.node.canEdit(organization);
   }
 
   async editCollection(tab: CollectionDialogTabType): Promise<void> {
@@ -192,15 +193,15 @@ export class VaultHeaderComponent implements OnInit {
       (o) => o.id === this.collection?.node.organizationId,
     );
 
-    return this.collection.node.canDelete(organization, this.flexibleCollectionsV1Enabled);
+    return this.collection.node.canDelete(organization);
   }
 
   deleteCollection() {
     this.onDeleteCollection.emit();
   }
 
-  protected addCipher() {
-    this.onAddCipher.emit();
+  protected addCipher(cipherType?: CipherType) {
+    this.onAddCipher.emit(cipherType);
   }
 
   async addFolder(): Promise<void> {

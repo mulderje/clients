@@ -28,6 +28,7 @@ export interface AutoFillOptions {
   skipLastUsed?: boolean;
   allowUntrustedIframe?: boolean;
   allowTotpAutofill?: boolean;
+  autoSubmitLogin?: boolean;
 }
 
 export interface FormData {
@@ -43,6 +44,7 @@ export interface GenerateFillScriptOptions {
   onlyVisibleFields: boolean;
   fillNewPassword: boolean;
   allowTotpAutofill: boolean;
+  autoSubmitLogin: boolean;
   cipher: CipherView;
   tabUrl: string;
   defaultUriMatch: UriMatchStrategySetting;
@@ -75,11 +77,13 @@ export abstract class AutofillService {
     pageDetails: PageDetail[],
     tab: chrome.tabs.Tab,
     fromCommand: boolean,
+    autoSubmitLogin?: boolean,
   ) => Promise<string | null>;
   doAutoFillActiveTab: (
     pageDetails: PageDetail[],
     fromCommand: boolean,
     cipherType?: CipherType,
   ) => Promise<string | null>;
+  setAutoFillOnPageLoadOrgPolicy: () => Promise<void>;
   isPasswordRepromptRequired: (cipher: CipherView, tab: chrome.tabs.Tab) => Promise<boolean>;
 }

@@ -22,9 +22,11 @@ import {
   DialogService,
   ToastService,
 } from "@bitwarden/components";
+import { TotpCaptureService } from "@bitwarden/vault";
 
 import { CipherViewComponent } from "../../../../../../../../libs/vault/src/cipher-view";
 import { PopOutComponent } from "../../../../../platform/popup/components/pop-out.component";
+import { BrowserTotpCaptureService } from "../../../services/browser-totp-capture.service";
 
 import { PopupFooterComponent } from "./../../../../../platform/popup/layout/popup-footer.component";
 import { PopupHeaderComponent } from "./../../../../../platform/popup/layout/popup-header.component";
@@ -34,6 +36,7 @@ import { PopupPageComponent } from "./../../../../../platform/popup/layout/popup
   selector: "app-view-v2",
   templateUrl: "view-v2.component.html",
   standalone: true,
+  providers: [{ provide: TotpCaptureService, useClass: BrowserTotpCaptureService }],
   imports: [
     CommonModule,
     SearchModule,
@@ -51,7 +54,6 @@ import { PopupPageComponent } from "./../../../../../platform/popup/layout/popup
 })
 export class ViewV2Component {
   headerText: string;
-  cipherId: string;
   cipher: CipherView;
   organization$: Observable<Organization>;
   folder$: Observable<FolderView>;
@@ -72,14 +74,14 @@ export class ViewV2Component {
   subscribeToParams(): void {
     this.route.queryParams
       .pipe(
-        switchMap((param) => {
-          return this.getCipherData(param.cipherId);
+        switchMap(async (params): Promise<CipherView> => {
+          return await this.getCipherData(params.cipherId);
         }),
         takeUntilDestroyed(),
       )
-      .subscribe((data) => {
-        this.cipher = data;
-        this.headerText = this.setHeader(data.type);
+      .subscribe((cipher) => {
+        this.cipher = cipher;
+        this.headerText = this.setHeader(cipher.type);
       });
   }
 
