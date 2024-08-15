@@ -23,7 +23,7 @@ export class BitLabel {
   }
 
   @HostBinding("title") get title() {
-    return this.elementRef.nativeElement.textContent;
+    return this.elementRef.nativeElement.textContent.trim();
   }
 
   @HostBinding() @Input() id = `bit-label-${nextId++}`;
