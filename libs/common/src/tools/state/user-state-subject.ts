@@ -49,7 +49,7 @@ export type UserStateSubjectDependencies<State, Dependency> = Simplify<
     }
 >;
 
-// Need to disable this because `Observable<State>` causes the linter to pop
+// Need to disable this because `extends Observable<State>` causes the linter to crash
 // eslint-disable rxjs/no-implicit-any-catch
 
 /**
