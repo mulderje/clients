@@ -1,0 +1,18 @@
+<form class="box" formGroup="settings" class="tw-container">
+  <bit-form-field>
+    <bit-label>{{ "numWords" | i18n }}</bit-label>
+    <input bitInput formControlName="numWords" id="num-words" type="number" />
+  </bit-form-field>
+  <bit-form-field>
+    <bit-label>{{ "wordSeparator" | i18n }}</bit-label>
+    <input bitInput formControlName="wordSeparator" id="word-separator" type="text" />
+  </bit-form-field>
+  <bit-form-field>
+    <bit-label>{{ "capitalize" | i18n }}</bit-label>
+    <input bitInput formControlName="capitalize" id="capitalize" type="checkbox" />
+  </bit-form-field>
+  <bit-form-field>
+    <bit-label>{{ "includeNumber" | i18n }}</bit-label>
+    <input bitInput formControlName="includeNumber" id="include-number" type="checkbox" />
+  </bit-form-field>
+</form>
