@@ -49,6 +49,9 @@ export type UserStateSubjectDependencies<State, Dependency> = Simplify<
     }
 >;
 
+// Need to disable this because `Observable<State>` causes the linter to pop
+// eslint-disable rxjs/no-implicit-any-catch
+
 /**
  * Adapt a state provider to an rxjs subject.
  *
@@ -204,3 +207,5 @@ export class UserStateSubject<State, Dependencies = null>
     }
   }
 }
+
+// eslint-enable rxjs/no-implicit-any-catch
