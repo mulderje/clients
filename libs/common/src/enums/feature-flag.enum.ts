@@ -6,7 +6,6 @@
 export enum FeatureFlag {
   BrowserFilelessImport = "browser-fileless-import",
   ItemShare = "item-share",
-  FlexibleCollectionsV1 = "flexible-collections-v-1", // v-1 is intentional
   GeneratorToolsModernization = "generator-tools-modernization",
   ShowPaymentMethodWarningBanners = "show-payment-method-warning-banners",
   EnableConsolidatedBilling = "enable-consolidated-billing",
@@ -26,6 +25,7 @@ export enum FeatureFlag {
   ProviderClientVaultPrivacyBanner = "ac-2833-provider-client-vault-privacy-banner",
   VaultBulkManagementAction = "vault-bulk-management-action",
   AC2828_ProviderPortalMembersPage = "AC-2828_provider-portal-members-page",
+  IdpAutoSubmitLogin = "idp-auto-submit-login",
   DeviceTrustLogging = "pm-8285-device-trust-logging",
   AuthenticatorTwoFactorToken = "authenticator-2fa-token",
   UnauthenticatedExtensionUIRefresh = "unauth-ui-refresh",
@@ -48,7 +48,6 @@ const FALSE = false as boolean;
 export const DefaultFeatureFlagValue = {
   [FeatureFlag.BrowserFilelessImport]: FALSE,
   [FeatureFlag.ItemShare]: FALSE,
-  [FeatureFlag.FlexibleCollectionsV1]: FALSE,
   [FeatureFlag.GeneratorToolsModernization]: FALSE,
   [FeatureFlag.ShowPaymentMethodWarningBanners]: FALSE,
   [FeatureFlag.EnableConsolidatedBilling]: FALSE,
@@ -68,6 +67,7 @@ export const DefaultFeatureFlagValue = {
   [FeatureFlag.ProviderClientVaultPrivacyBanner]: FALSE,
   [FeatureFlag.VaultBulkManagementAction]: FALSE,
   [FeatureFlag.AC2828_ProviderPortalMembersPage]: FALSE,
+  [FeatureFlag.IdpAutoSubmitLogin]: FALSE,
   [FeatureFlag.DeviceTrustLogging]: FALSE,
   [FeatureFlag.AuthenticatorTwoFactorToken]: FALSE,
   [FeatureFlag.UnauthenticatedExtensionUIRefresh]: FALSE,

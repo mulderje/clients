@@ -9,7 +9,6 @@ import { CryptoService } from "@bitwarden/common/platform/abstractions/crypto.se
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { MessagingService } from "@bitwarden/common/platform/abstractions/messaging.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
-import { StateService } from "@bitwarden/common/platform/abstractions/state.service";
 import { BiometricStateService } from "@bitwarden/common/platform/biometrics/biometric-state.service";
 import { Utils } from "@bitwarden/common/platform/misc/utils";
 import { EncString } from "@bitwarden/common/platform/models/domain/enc-string";
@@ -79,7 +78,6 @@ export class NativeMessagingBackground {
     private messagingService: MessagingService,
     private appIdService: AppIdService,
     private platformUtilsService: PlatformUtilsService,
-    private stateService: StateService,
     private logService: LogService,
     private authService: AuthService,
     private biometricStateService: BiometricStateService,
@@ -214,7 +212,7 @@ export class NativeMessagingBackground {
       await this.connect();
     }
 
-    message.userId = await this.stateService.getUserId();
+    message.userId = (await firstValueFrom(this.accountService.activeAccount$))?.id;
     message.timestamp = Date.now();
 
     if (this.platformUtilsService.isSafari()) {
@@ -339,7 +337,8 @@ export class NativeMessagingBackground {
 
           // Verify key is correct by attempting to decrypt a secret
           try {
-            await this.cryptoService.getFingerprint(await this.stateService.getUserId());
+            const userId = (await firstValueFrom(this.accountService.activeAccount$))?.id;
+            await this.cryptoService.getFingerprint(userId);
           } catch (e) {
             this.logService.error("Unable to verify key: " + e);
             await this.cryptoService.clearKeys();
@@ -367,13 +366,14 @@ export class NativeMessagingBackground {
     const [publicKey, privateKey] = await this.cryptoFunctionService.rsaGenerateKeyPair(2048);
     this.publicKey = publicKey;
     this.privateKey = privateKey;
+    const userId = (await firstValueFrom(this.accountService.activeAccount$))?.id;
 
     // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.sendUnencrypted({
       command: "setupEncryption",
       publicKey: Utils.fromBufferToB64(publicKey),
-      userId: await this.stateService.getUserId(),
+      userId: userId,
     });
 
     return new Promise((resolve, reject) => (this.secureSetupResolve = resolve));
@@ -391,7 +391,7 @@ export class NativeMessagingBackground {
 
   private async showFingerprintDialog() {
     const fingerprint = await this.cryptoService.getFingerprint(
-      await this.stateService.getUserId(),
+      (await firstValueFrom(this.accountService.activeAccount$))?.id,
       this.publicKey,
     );
 
