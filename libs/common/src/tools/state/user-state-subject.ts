@@ -1,6 +1,3 @@
-// Disable implicit any check because `extends Observable<State>`
-// causes the linter to crash
-/* eslint-disable rxjs/no-implicit-any-catch */
 import {
   Observer,
   SubjectLike,
