@@ -1,3 +1,6 @@
+// Disable implicit any check because `extends Observable<State>`
+// causes the linter to crash
+/* eslint-disable rxjs/no-implicit-any-catch */
 import {
   Observer,
   SubjectLike,
@@ -48,9 +51,6 @@ export type UserStateSubjectDependencies<State, Dependency> = Simplify<
       shouldUpdate?: (value: State, next: State, dependencies?: Dependency) => boolean;
     }
 >;
-
-// Need to disable this because `extends Observable<State>` causes the linter to crash
-// eslint-disable rxjs/no-implicit-any-catch
 
 /**
  * Adapt a state provider to an rxjs subject.
@@ -207,5 +207,3 @@ export class UserStateSubject<State, Dependencies = null>
     }
   }
 }
-
-// eslint-enable rxjs/no-implicit-any-catch
