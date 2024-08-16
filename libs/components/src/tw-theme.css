@@ -49,6 +49,8 @@
   --color-text-code: 192 17 118;
   --color-text-headers: 2 15 102;
 
+  --color-marketing-logo: 23 93 220;
+
   --tw-ring-offset-color: #ffffff;
 }
 
@@ -95,6 +97,8 @@
   --color-text-code: 240 141 199;
   --color-text-headers: 226 227 228;
 
+  --color-marketing-logo: 255 255 255;
+
   --tw-ring-offset-color: #1f242e;
 }
 
@@ -133,6 +137,8 @@
   --color-text-contrast: 46 52 64;
   --color-text-alt2: 255 255 255;
   --color-text-code: 219 177 211;
+
+  --color-marketing-logo: 255 255 255;
 
   --tw-ring-offset-color: #434c5e;
 }
@@ -173,7 +179,13 @@
   --color-text-alt2: 255 255 255;
   --color-text-code: 240 141 199;
 
+  --color-marketing-logo: 255 255 255;
+
   --tw-ring-offset-color: #002b36;
+}
+
+.theme_solarizedDark {
+  --color-marketing-logo: 255 255 255;
 }
 
 @import "./popover/popover.component.css";
