@@ -128,7 +128,7 @@ export class DefaultSyncService extends CoreSyncService {
       await this.syncCollections(response.collections, response.profile.id);
       await this.syncCiphers(response.ciphers, response.profile.id);
       await this.syncSends(response.sends);
-      await this.syncSettings(response.domains);
+      await this.syncSettings(response.domains, response.profile.id);
       await this.syncPolicies(response.policies);
 
       await this.setLastSync(now, userId);
@@ -316,7 +316,7 @@ export class DefaultSyncService extends CoreSyncService {
     return await this.sendService.replace(sends);
   }
 
-  private async syncSettings(response: DomainsResponse) {
+  private async syncSettings(response: DomainsResponse, userId: UserId) {
     let eqDomains: string[][] = [];
     if (response != null && response.equivalentDomains != null) {
       eqDomains = eqDomains.concat(response.equivalentDomains);
@@ -330,7 +330,7 @@ export class DefaultSyncService extends CoreSyncService {
       });
     }
 
-    return this.domainSettingsService.setEquivalentDomains(eqDomains);
+    return this.domainSettingsService.setEquivalentDomains(eqDomains, userId);
   }
 
   private async syncPolicies(response: PolicyResponse[]) {
