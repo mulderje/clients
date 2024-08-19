@@ -5,6 +5,7 @@ type NotificationBarIframeInitData = {
   removeIndividualVault?: boolean;
   importType?: string;
   applyRedesign?: boolean;
+  launchTimestamp?: number;
 };
 
 type NotificationBarWindowMessage = {

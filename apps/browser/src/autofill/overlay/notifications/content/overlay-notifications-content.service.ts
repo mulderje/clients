@@ -1,3 +1,5 @@
+import { EVENTS } from "@bitwarden/common/autofill/constants";
+
 import { NotificationBarIframeInitData } from "../../../notification/abstractions/notification-bar";
 import { sendExtensionMessage, setupExtensionDisconnectAction } from "../../../utils";
 import {
@@ -46,6 +48,7 @@ export class OverlayNotificationsContentService
       removeIndividualVault: typeData.removeIndividualVault,
       importType: typeData.importType,
       applyRedesign: true,
+      launchTimestamp: typeData.launchTimestamp,
     });
   }
 
@@ -53,25 +56,35 @@ export class OverlayNotificationsContentService
     if (this.notificationBarElement) {
       return;
     }
+    const isNotificationFresh =
+      initData.launchTimestamp && Date.now() - initData.launchTimestamp < 2000;
 
     this.currentNotificationBarType = initData.type;
     this.notificationBarIframe = globalThis.document.createElement("iframe");
-    this.notificationBarIframe.style.cssText =
-      "width: 100%; height: 100%; border: 0; display: block; position:relative; transition: transform 0.15s ease-out; transform: translateX(100%);";
     this.notificationBarIframe.id = "bit-notification-bar-iframe";
     this.notificationBarIframe.src = chrome.runtime.getURL("notification/bar.html");
+    this.notificationBarIframe.style.cssText =
+      "width: 100%; height: 100%; border: 0; display: block; position:relative; transition: transform 0.15s ease-out, opacity 0.15s ease;";
+    this.notificationBarIframe.style.transform = isNotificationFresh
+      ? "translateX(100%)"
+      : "translateX(0)";
+    this.notificationBarIframe.style.opacity = isNotificationFresh ? "1" : "0";
 
     this.notificationBarElement = globalThis.document.createElement("div");
     this.notificationBarElement.id = "bit-notification-bar";
     this.notificationBarElement.style.cssText =
-      "height: 82px; width: 430px; max-width: calc(100% - 20px); min-height: initial; top: 10px; right: 10px; padding: 0; position: fixed; z-index: 2147483647; visibility: visible; overflow: hidden; border-radius: 4px; border: none; box-shadow: 2px 4px 6px 0px #0000001A; background-color: transparent; overflow: hidden;";
+      "height: 82px; width: 430px; max-width: calc(100% - 20px); min-height: initial; top: 10px; right: 10px; padding: 0; position: fixed; z-index: 2147483647; visibility: visible; overflow: hidden; border-radius: 4px; border: none; background-color: transparent; overflow: hidden; transition: box-shadow 0.15s ease; transition-delay: 0.15s;";
+
     this.notificationBarElement.appendChild(this.notificationBarIframe);
+
+    this.notificationBarIframe.addEventListener(EVENTS.LOAD, () => {
+      this.notificationBarIframe.style.transform = "translateX(0)";
+      this.notificationBarIframe.style.opacity = "1";
+      this.notificationBarElement.style.boxShadow = "2px 4px 6px 0px #0000001A";
+    });
 
     this.setupInitNotificationBarMessageListener(initData);
     globalThis.document.body.appendChild(this.notificationBarElement);
-    setTimeout(() => {
-      this.notificationBarIframe.style.transform = "translateX(0)";
-    }, 100);
   }
 
   private adjustNotificationBarHeight(message: NotificationsExtensionMessage) {

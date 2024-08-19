@@ -9,6 +9,7 @@ interface NotificationQueueMessage {
   type: NotificationQueueMessageTypes;
   domain: string;
   tab: chrome.tabs.Tab;
+  launchTimestamp: number;
   expires: Date;
   wasVaultLocked: boolean;
 }

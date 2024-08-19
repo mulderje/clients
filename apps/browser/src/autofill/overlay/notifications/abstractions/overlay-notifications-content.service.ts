@@ -3,6 +3,7 @@ export type NotificationTypeData = {
   theme?: string;
   removeIndividualVault?: boolean;
   importType?: string;
+  launchTimestamp?: number;
 };
 
 export type NotificationsExtensionMessage = {

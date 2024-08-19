@@ -188,6 +188,7 @@ export default class NotificationBackground {
     const typeData: NotificationTypeData = {
       isVaultLocked: notificationQueueMessage.wasVaultLocked,
       theme: await firstValueFrom(this.themeStateService.selectedTheme$),
+      launchTimestamp: notificationQueueMessage.launchTimestamp,
     };
 
     switch (notificationType) {
@@ -288,6 +289,7 @@ export default class NotificationBackground {
   ) {
     // remove any old messages for this tab
     this.removeTabFromNotificationQueue(tab);
+    const launchTimestamp = new Date().getTime();
     const message: AddLoginQueueMessage = {
       type: NotificationQueueMessageType.AddLogin,
       username: loginInfo.username,
@@ -295,7 +297,8 @@ export default class NotificationBackground {
       domain: loginDomain,
       uri: loginInfo.url,
       tab: tab,
-      expires: new Date(new Date().getTime() + NOTIFICATION_BAR_LIFESPAN_MS),
+      launchTimestamp,
+      expires: new Date(launchTimestamp + NOTIFICATION_BAR_LIFESPAN_MS),
       wasVaultLocked: isVaultLocked,
     };
     this.notificationQueue.push(message);
@@ -418,13 +421,15 @@ export default class NotificationBackground {
   ) {
     // remove any old messages for this tab
     this.removeTabFromNotificationQueue(tab);
+    const launchTimestamp = new Date().getTime();
     const message: AddChangePasswordQueueMessage = {
       type: NotificationQueueMessageType.ChangePassword,
       cipherId: cipherId,
       newPassword: newPassword,
       domain: loginDomain,
       tab: tab,
-      expires: new Date(new Date().getTime() + NOTIFICATION_BAR_LIFESPAN_MS),
+      launchTimestamp,
+      expires: new Date(launchTimestamp + NOTIFICATION_BAR_LIFESPAN_MS),
       wasVaultLocked: isVaultLocked,
     };
     this.notificationQueue.push(message);
@@ -433,11 +438,13 @@ export default class NotificationBackground {
 
   private async pushUnlockVaultToQueue(loginDomain: string, tab: chrome.tabs.Tab) {
     this.removeTabFromNotificationQueue(tab);
+    const launchTimestamp = new Date().getTime();
     const message: AddUnlockVaultQueueMessage = {
       type: NotificationQueueMessageType.UnlockVault,
       domain: loginDomain,
       tab: tab,
-      expires: new Date(new Date().getTime() + 0.5 * 60000), // 30 seconds
+      launchTimestamp,
+      expires: new Date(launchTimestamp + 0.5 * 60000), // 30 seconds
       wasVaultLocked: true,
     };
     await this.sendNotificationQueueMessage(tab, message);
@@ -458,11 +465,13 @@ export default class NotificationBackground {
     importType?: string,
   ) {
     this.removeTabFromNotificationQueue(tab);
+    const launchTimestamp = new Date().getTime();
     const message: AddRequestFilelessImportQueueMessage = {
       type: NotificationQueueMessageType.RequestFilelessImport,
       domain: loginDomain,
       tab,
-      expires: new Date(new Date().getTime() + 0.5 * 60000), // 30 seconds
+      launchTimestamp,
+      expires: new Date(launchTimestamp + 0.5 * 60000), // 30 seconds
       wasVaultLocked: false,
       importType,
     };
