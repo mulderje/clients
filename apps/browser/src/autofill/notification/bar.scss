@@ -193,7 +193,7 @@ button {
   .outer-wrapper {
     display: block;
     position: relative;
-    padding: 8px 8px 8px 10px;
+    padding: 8px;
     border-top: 1px solid transparent;
     border-left: 1px solid transparent;
     border-right: 1px solid transparent;
@@ -238,7 +238,7 @@ button {
 
     .notification-body {
       width: 100%;
-      padding: 4px 38px 24px 40px;
+      padding: 4px 38px 24px 42px;
       font-weight: 400;
     }
     .notification-actions {
