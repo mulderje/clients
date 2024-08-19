@@ -57,7 +57,7 @@ export class OverlayNotificationsContentService
       return;
     }
     const isNotificationFresh =
-      initData.launchTimestamp && Date.now() - initData.launchTimestamp < 2000;
+      initData.launchTimestamp && Date.now() - initData.launchTimestamp < 250;
 
     this.currentNotificationBarType = initData.type;
     this.notificationBarIframe = globalThis.document.createElement("iframe");
