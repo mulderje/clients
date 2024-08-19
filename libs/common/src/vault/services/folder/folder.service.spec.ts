@@ -120,18 +120,11 @@ describe("Folder Service", () => {
   });
 
   it("replace", async () => {
-    await folderService.replace({ "2": folderData("2", "test 2") });
+    await folderService.replace({ "2": folderData("2", "test 2") }, mockUserId);
 
-    expect(await firstValueFrom(folderService.folders$)).toEqual([
-      {
-        id: "2",
-        name: {
-          encryptedString: "test 2",
-          encryptionType: 0,
-        },
-        revisionDate: null,
-      },
-    ]);
+    expect(
+      await firstValueFrom(stateProvider.getUser(mockUserId, FOLDER_ENCRYPTED_FOLDERS).state$),
+    ).toEqual({ "2": folderData("2", "test 2") });
   });
 
   it("delete", async () => {
