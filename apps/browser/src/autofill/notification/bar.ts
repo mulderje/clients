@@ -390,6 +390,10 @@ function setNotificationBarTheme() {
   }
 
   document.documentElement.classList.add(`theme_${theme}`);
+
+  if (notificationBarIframeInitData.applyRedesign) {
+    document.body.classList.add("notification-bar-redesign");
+  }
 }
 
 function postMessageToParent(message: NotificationBarWindowMessage) {

@@ -38,7 +38,7 @@ export interface AutofillOverlayContentService {
   pageDetailsUpdateRequired: boolean;
   messageHandlers: AutofillOverlayContentExtensionMessageHandlers;
   init(): void;
-  setupInlineMenu(
+  setupOverlayListeners(
     autofillFieldElement: ElementWithOpId<FormFieldElement>,
     autofillFieldData: AutofillField,
     pageDetails: AutofillPageDetails,

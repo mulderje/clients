@@ -43,6 +43,7 @@ import {
   NotificationBackgroundExtensionMessage,
   NotificationBackgroundExtensionMessageHandlers,
 } from "./abstractions/notification.background";
+import { NotificationTypeData } from "./abstractions/overlay-notifications.background";
 import { OverlayBackgroundExtensionMessage } from "./abstractions/overlay.background";
 
 export default class NotificationBackground {
@@ -184,7 +185,7 @@ export default class NotificationBackground {
   ) {
     const notificationType = notificationQueueMessage.type;
 
-    const typeData: Record<string, any> = {
+    const typeData: NotificationTypeData = {
       isVaultLocked: notificationQueueMessage.wasVaultLocked,
       theme: await firstValueFrom(this.themeStateService.selectedTheme$),
     };
@@ -228,11 +229,11 @@ export default class NotificationBackground {
    * @param message - The message to add to the queue
    * @param sender - The contextual sender of the message
    */
-  private async addLogin(
+  async addLogin(
     message: NotificationBackgroundExtensionMessage,
     sender: chrome.runtime.MessageSender,
   ) {
-    const authStatus = await this.authService.getAuthStatus();
+    const authStatus = await firstValueFrom(this.authService.activeAccountStatus$);
     if (authStatus === AuthenticationStatus.LoggedOut) {
       return;
     }
@@ -308,7 +309,7 @@ export default class NotificationBackground {
    * @param message - The message to add to the queue
    * @param sender - The contextual sender of the message
    */
-  private async changedPassword(
+  async changedPassword(
     message: NotificationBackgroundExtensionMessage,
     sender: chrome.runtime.MessageSender,
   ) {

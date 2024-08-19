@@ -68,8 +68,8 @@ img {
 
 #close {
   display: block;
-  width: 17px;
-  height: 17px;
+  width: 16px;
+  height: 16px;
 
   > path {
     @include themify($themes) {
@@ -178,5 +178,109 @@ button {
 @media print {
   body {
     display: none;
+  }
+}
+
+.notification-bar-redesign {
+  button {
+    padding: 4px 8px;
+  }
+
+  select {
+    padding: 4px 6px;
+  }
+
+  .outer-wrapper {
+    display: block;
+    position: relative;
+    padding: 8px 8px 8px 10px;
+    border-top: 1px solid transparent;
+    border-left: 1px solid transparent;
+    border-right: 1px solid transparent;
+    border-radius: 4px;
+
+    @include themify($themes) {
+      border-top-color: themed("borderColor");
+      border-left-color: themed("borderColor");
+      border-right-color: themed("borderColor");
+    }
+  }
+
+  .logo {
+    position: absolute;
+    top: 8px;
+    left: 10px;
+    overflow: hidden;
+  }
+
+  .notification-close {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+
+    #close-button {
+      display: flex;
+      align-content: center;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      margin: 0;
+    }
+  }
+
+  #content .inner-wrapper {
+    display: flex;
+    align-items: flex-start;
+    align-content: flex-start;
+    flex-wrap: wrap;
+
+    .notification-body {
+      width: 100%;
+      padding: 4px 38px 24px 40px;
+      font-weight: 400;
+    }
+    .notification-actions {
+      display: flex;
+      align-items: stretch;
+      align-content: stretch;
+      justify-content: flex-end;
+      width: 100%;
+
+      #never-save {
+        margin-right: auto;
+        padding: 0;
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+      }
+
+      #select-folder {
+        display: block;
+        width: 125px;
+        margin-right: 6px;
+        font-size: 12px;
+
+        @include themify($themes) {
+          color: themed("mutedTextColor");
+          border-color: themed("mutedTextColor");
+        }
+      }
+
+      .primary,
+      .secondary {
+        font-size: 12px;
+      }
+
+      .secondary {
+        margin-right: 6px;
+        border-width: 1px;
+      }
+
+      .primary {
+        margin-right: 2px;
+      }
+    }
   }
 }

@@ -10,6 +10,8 @@ import {
   AutoFillConstants,
   CreditCardAutoFillConstants,
   IdentityAutoFillConstants,
+  SubmitChangePasswordButtonNames,
+  SubmitLoginButtonNames,
 } from "./autofill-constants";
 
 export class InlineMenuFieldQualificationService
@@ -31,6 +33,7 @@ export class InlineMenuFieldQualificationService
   private currentPasswordAutocompleteValue = "current-password";
   private newPasswordAutoCompleteValue = "new-password";
   private autofillFieldKeywordsMap: AutofillKeywordsMap = new WeakMap();
+  private submitButtonFieldKeywordsMap: WeakMap<HTMLElement, string> = new WeakMap();
   private autocompleteDisabledValues = new Set(["off", "false"]);
   private newFieldKeywords = new Set(["new", "change", "neue", "ändern"]);
   private accountCreationFieldKeywords = [
@@ -378,7 +381,9 @@ export class InlineMenuFieldQualificationService
     // If the provided field is set with an autocomplete of "username", we should assume that
     // the page developer intends for this field to be interpreted as a username field.
     if (this.fieldContainsAutocompleteValues(field, this.loginUsernameAutocompleteValues)) {
-      const newPasswordFieldsInPageDetails = pageDetails.fields.filter(this.isNewPasswordField);
+      const newPasswordFieldsInPageDetails = pageDetails.fields.filter(
+        (field) => field.viewable && this.isNewPasswordField(field),
+      );
       return newPasswordFieldsInPageDetails.length === 0;
     }
 
@@ -1000,6 +1005,37 @@ export class InlineMenuFieldQualificationService
     }
 
     return false;
+  }
+
+  isElementLoginSubmitButton = (element: HTMLElement): boolean => {
+    const keywordValues = this.getSubmitButtonKeywords(element);
+    return SubmitLoginButtonNames.some((keyword) => keywordValues.indexOf(keyword) > -1);
+  };
+
+  isElementChangePasswordSubmitButton = (element: HTMLElement): boolean => {
+    const keywordValues = this.getSubmitButtonKeywords(element);
+    return SubmitChangePasswordButtonNames.some((keyword) => keywordValues.indexOf(keyword) > -1);
+  };
+
+  private getSubmitButtonKeywords(element: HTMLElement): string {
+    if (!this.submitButtonFieldKeywordsMap.has(element)) {
+      const keywords = [
+        element.textContent,
+        element.getAttribute("value"),
+        element.getAttribute("aria-label"),
+        element.getAttribute("aria-labelledby"),
+        element.getAttribute("aria-describedby"),
+        element.getAttribute("title"),
+        element.getAttribute("id"),
+        element.getAttribute("name"),
+        element.getAttribute("class"),
+      ]
+        .join(",")
+        .toLowerCase();
+      this.submitButtonFieldKeywordsMap.set(element, keywords);
+    }
+
+    return this.submitButtonFieldKeywordsMap.get(element);
   }
 
   /**

@@ -33,8 +33,6 @@ import { DomElementVisibilityService } from "./abstractions/dom-element-visibili
 
 export class CollectAutofillContentService implements CollectAutofillContentServiceInterface {
   private readonly sendExtensionMessage = sendExtensionMessage;
-  private readonly domElementVisibilityService: DomElementVisibilityService;
-  private readonly autofillOverlayContentService: AutofillOverlayContentService;
   private readonly getAttributeBoolean = getAttributeBoolean;
   private readonly getPropertyOrAttribute = getPropertyOrAttribute;
   private noFieldsFound = false;
@@ -61,12 +59,9 @@ export class CollectAutofillContentService implements CollectAutofillContentServ
   private useTreeWalkerStrategyFlagSet = true;
 
   constructor(
-    domElementVisibilityService: DomElementVisibilityService,
-    autofillOverlayContentService?: AutofillOverlayContentService,
+    private domElementVisibilityService: DomElementVisibilityService,
+    private autofillOverlayContentService?: AutofillOverlayContentService,
   ) {
-    this.domElementVisibilityService = domElementVisibilityService;
-    this.autofillOverlayContentService = autofillOverlayContentService;
-
     let inputQuery = "input:not([data-bwignore])";
     for (const type of this.ignoredInputTypes) {
       inputQuery += `:not([type="${type}"])`;
@@ -126,7 +121,7 @@ export class CollectAutofillContentService implements CollectAutofillContentServ
 
     this.domRecentlyMutated = false;
     const pageDetails = this.getFormattedPageDetails(autofillFormsData, autofillFieldsData);
-    this.setupInlineMenuListeners(pageDetails);
+    this.setupOverlayListeners(pageDetails);
 
     return pageDetails;
   }
@@ -290,7 +285,7 @@ export class CollectAutofillContentService implements CollectAutofillContentServ
       autofillField.viewable = await this.domElementVisibilityService.isFormFieldViewable(element);
 
       if (!previouslyViewable && autofillField.viewable) {
-        this.setupInlineMenu(element, autofillField);
+        this.setupOverlayOnField(element, autofillField);
       }
     });
   }
@@ -1394,7 +1389,7 @@ export class CollectAutofillContentService implements CollectAutofillContentServ
       }
 
       cachedAutofillFieldElement.viewable = true;
-      this.setupInlineMenu(formFieldElement, cachedAutofillFieldElement);
+      this.setupOverlayOnField(formFieldElement, cachedAutofillFieldElement);
 
       this.intersectionObserver?.unobserve(entry.target);
     }
@@ -1405,13 +1400,13 @@ export class CollectAutofillContentService implements CollectAutofillContentServ
    *
    * @param pageDetails - The page details to use for the inline menu listeners
    */
-  private setupInlineMenuListeners(pageDetails: AutofillPageDetails) {
+  private setupOverlayListeners(pageDetails: AutofillPageDetails) {
     if (!this.autofillOverlayContentService) {
       return;
     }
 
     this.autofillFieldElements.forEach((autofillField, formFieldElement) => {
-      this.setupInlineMenu(formFieldElement, autofillField, pageDetails);
+      this.setupOverlayOnField(formFieldElement, autofillField, pageDetails);
     });
   }
 
@@ -1422,7 +1417,7 @@ export class CollectAutofillContentService implements CollectAutofillContentServ
    * @param autofillField - The metadata for the form field
    * @param pageDetails - The page details to use for the inline menu listeners
    */
-  private setupInlineMenu(
+  private setupOverlayOnField(
     formFieldElement: ElementWithOpId<FormFieldElement>,
     autofillField: AutofillField,
     pageDetails?: AutofillPageDetails,
@@ -1438,7 +1433,7 @@ export class CollectAutofillContentService implements CollectAutofillContentServ
         this.getFormattedAutofillFieldsData(),
       );
 
-    void this.autofillOverlayContentService.setupInlineMenu(
+    void this.autofillOverlayContentService.setupOverlayListeners(
       formFieldElement,
       autofillField,
       autofillPageDetails,

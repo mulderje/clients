@@ -203,10 +203,12 @@ import {
   VaultExportServiceAbstraction,
 } from "@bitwarden/vault-export-core";
 
+import { OverlayNotificationsBackground as OverlayNotificationsBackgroundInterface } from "../autofill/background/abstractions/overlay-notifications.background";
 import { OverlayBackground as OverlayBackgroundInterface } from "../autofill/background/abstractions/overlay.background";
 import { AutoSubmitLoginBackground } from "../autofill/background/auto-submit-login.background";
 import ContextMenusBackground from "../autofill/background/context-menus.background";
 import NotificationBackground from "../autofill/background/notification.background";
+import { OverlayNotificationsBackground } from "../autofill/background/overlay-notifications.background";
 import { OverlayBackground } from "../autofill/background/overlay.background";
 import TabsBackground from "../autofill/background/tabs.background";
 import WebRequestBackground from "../autofill/background/web-request.background";
@@ -365,6 +367,7 @@ export default class MainBackground {
   private idleBackground: IdleBackground;
   private notificationBackground: NotificationBackground;
   private overlayBackground: OverlayBackgroundInterface;
+  private overlayNotificationsBackground: OverlayNotificationsBackgroundInterface;
   private filelessImporterBackground: FilelessImporterBackground;
   private runtimeBackground: RuntimeBackground;
   private tabsBackground: TabsBackground;
@@ -1095,6 +1098,11 @@ export default class MainBackground {
         this.configService,
       );
 
+      this.overlayNotificationsBackground = new OverlayNotificationsBackground(
+        this.logService,
+        this.notificationBackground,
+      );
+
       this.filelessImporterBackground = new FilelessImporterBackground(
         this.configService,
         this.authService,
@@ -1229,6 +1237,7 @@ export default class MainBackground {
     this.fido2Background.init();
     await this.runtimeBackground.init();
     await this.notificationBackground.init();
+    this.overlayNotificationsBackground.init();
     this.filelessImporterBackground.init();
     await this.commandsBackground.init();
     this.contextMenusBackground?.init();

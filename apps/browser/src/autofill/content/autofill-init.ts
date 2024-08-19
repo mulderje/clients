@@ -2,6 +2,7 @@ import { EVENTS } from "@bitwarden/common/autofill/constants";
 
 import AutofillPageDetails from "../models/autofill-page-details";
 import { AutofillInlineMenuContentService } from "../overlay/inline-menu/abstractions/autofill-inline-menu-content.service";
+import { OverlayNotificationsContentService } from "../overlay/notifications/abstractions/overlay-notifications-content.service";
 import { AutofillOverlayContentService } from "../services/abstractions/autofill-overlay-content.service";
 import { CollectAutofillContentService } from "../services/collect-autofill-content.service";
 import DomElementVisibilityService from "../services/dom-element-visibility.service";
@@ -18,6 +19,9 @@ class AutofillInit implements AutofillInitInterface {
   private readonly sendExtensionMessage = sendExtensionMessage;
   private readonly autofillOverlayContentService: AutofillOverlayContentService | undefined;
   private readonly autofillInlineMenuContentService: AutofillInlineMenuContentService | undefined;
+  private readonly overlayNotificationsContentService:
+    | OverlayNotificationsContentService
+    | undefined;
   private readonly domElementVisibilityService: DomElementVisibilityService;
   private readonly collectAutofillContentService: CollectAutofillContentService;
   private readonly insertAutofillContentService: InsertAutofillContentService;
@@ -33,14 +37,17 @@ class AutofillInit implements AutofillInitInterface {
    * CollectAutofillContentService and InsertAutofillContentService classes.
    *
    * @param autofillOverlayContentService - The autofill overlay content service, potentially undefined.
-   * @param inlineMenuElements - The inline menu elements, potentially undefined.
+   * @param inlineMenuContentService - The inline menu content service, potentially undefined.
+   * @param overlayNotificationsContentService - The overlay notifications content service, potentially undefined.
    */
   constructor(
     autofillOverlayContentService?: AutofillOverlayContentService,
-    inlineMenuElements?: AutofillInlineMenuContentService,
+    inlineMenuContentService?: AutofillInlineMenuContentService,
+    overlayNotificationsContentService?: OverlayNotificationsContentService,
   ) {
     this.autofillOverlayContentService = autofillOverlayContentService;
-    this.autofillInlineMenuContentService = inlineMenuElements;
+    this.autofillInlineMenuContentService = inlineMenuContentService;
+    this.overlayNotificationsContentService = overlayNotificationsContentService;
     this.domElementVisibilityService = new DomElementVisibilityService(
       this.autofillInlineMenuContentService,
     );
@@ -202,6 +209,10 @@ class AutofillInit implements AutofillInitInterface {
 
     if (this.autofillInlineMenuContentService?.messageHandlers?.[command]) {
       return this.autofillInlineMenuContentService.messageHandlers[command];
+    }
+
+    if (this.overlayNotificationsContentService?.messageHandlers?.[command]) {
+      return this.overlayNotificationsContentService.messageHandlers[command];
     }
 
     return this.extensionMessageHandlers[command];
