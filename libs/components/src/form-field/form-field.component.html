@@ -16,6 +16,30 @@
 </ng-template>
 
 <div *ngIf="!readOnly; else readOnlyView" class="tw-w-full tw-relative tw-group/bit-form-field">
+  <div class="tw-absolute tw-w-full tw-h-full tw-top-0 tw-pointer-events-none tw-z-20">
+    <div class="tw-w-full tw-h-full tw-flex">
+      <div
+        class="tw-min-w-3 tw-border-r-0 group-focus-within/bit-form-field:tw-border-r-0 !tw-rounded-l-lg"
+        [ngClass]="inputBorderClasses"
+      ></div>
+      <div
+        class="tw-px-1 tw-shrink tw-min-w-0 tw-mt-px tw-border-x-0 tw-border-t-0 group-focus-within/bit-form-field:tw-border-x-0 group-focus-within/bit-form-field:tw-border-t-0 tw-hidden group-has-[bit-label]/bit-form-field:tw-block"
+        [ngClass]="inputBorderClasses"
+      >
+        <label
+          class="tw-flex tw-gap-1 tw-text-sm tw-text-muted -tw-translate-y-2.5 tw-mb-0 tw-max-w-full tw-pointer-events-auto"
+          [attr.for]="input.labelForId"
+        >
+          <ng-container *ngTemplateOutlet="labelContent"></ng-container>
+          <span *ngIf="input.required" class="tw-text-[0.625rem]"> ({{ "required" | i18n }})</span>
+        </label>
+      </div>
+      <div
+        class="tw-min-w-3 tw-grow tw-border-l-0 group-focus-within/bit-form-field:tw-border-l-0 !tw-rounded-r-lg"
+        [ngClass]="inputBorderClasses"
+      ></div>
+    </div>
+  </div>
   <div
     class="tw-gap-1 tw-bg-background tw-rounded-lg tw-flex tw-min-h-11 [&:not(:has(button:enabled)):has(input:read-only)]:tw-bg-secondary-100 [&:not(:has(button:enabled)):has(textarea:read-only)]:tw-bg-secondary-100"
   >
@@ -41,30 +65,6 @@
       [hidden]="!suffixHasChildren()"
     >
       <ng-container *ngTemplateOutlet="suffixContent"></ng-container>
-    </div>
-  </div>
-  <div class="tw-absolute tw-w-full tw-h-full tw-top-0 tw-pointer-events-none">
-    <div class="tw-w-full tw-h-full tw-flex">
-      <div
-        class="tw-min-w-3 tw-border-r-0 group-focus-within/bit-form-field:tw-border-r-0 !tw-rounded-l-lg"
-        [ngClass]="inputBorderClasses"
-      ></div>
-      <div
-        class="tw-px-1 tw-shrink tw-min-w-0 tw-mt-px tw-border-x-0 tw-border-t-0 group-focus-within/bit-form-field:tw-border-x-0 group-focus-within/bit-form-field:tw-border-t-0 tw-hidden group-has-[bit-label]/bit-form-field:tw-block"
-        [ngClass]="inputBorderClasses"
-      >
-        <label
-          class="tw-flex tw-gap-1 tw-text-sm tw-text-muted -tw-translate-y-2.5 tw-mb-0 tw-max-w-full tw-pointer-events-auto"
-          [attr.for]="input.labelForId"
-        >
-          <ng-container *ngTemplateOutlet="labelContent"></ng-container>
-          <span *ngIf="input.required" class="tw-text-[0.625rem]"> ({{ "required" | i18n }})</span>
-        </label>
-      </div>
-      <div
-        class="tw-min-w-3 tw-grow tw-border-l-0 group-focus-within/bit-form-field:tw-border-l-0 !tw-rounded-r-lg"
-        [ngClass]="inputBorderClasses"
-      ></div>
     </div>
   </div>
 </div>

@@ -300,7 +300,12 @@ export const ButtonInputGroup: Story = {
     props: args,
     template: /*html*/ `
       <bit-form-field>
-        <bit-label>Label</bit-label>
+        <bit-label>
+          Label
+          <a href="#" slot="end" bitLink>
+            <i class="bwi bwi-question-circle" aria-hidden="true"></i>
+          </a>
+        </bit-label>
         <button bitPrefix bitIconButton="bwi-star" aria-label="Favorite"></button>
         <input bitInput placeholder="Placeholder" />
         <button bitSuffix bitIconButton="bwi-eye" aria-label="Hide"></button>
