@@ -28,7 +28,7 @@ typenum = "=1.17.0"
 
 [target.'cfg(windows)'.dependencies]
 widestring = "=1.1.0"
-windows = { version = "=0.57.0", features = [
+windows = { version = "=0.58.0", features = [
   "Foundation",
   "Security_Credentials_UI",
   "Security_Cryptography",
