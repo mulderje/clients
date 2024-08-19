@@ -126,7 +126,7 @@ export class DefaultSyncService extends CoreSyncService {
       await this.syncProfile(response.profile);
       await this.syncFolders(response.folders, response.profile.id);
       await this.syncCollections(response.collections, response.profile.id);
-      await this.syncCiphers(response.ciphers);
+      await this.syncCiphers(response.ciphers, response.profile.id);
       await this.syncSends(response.sends);
       await this.syncSettings(response.domains);
       await this.syncPolicies(response.policies);
@@ -300,12 +300,12 @@ export class DefaultSyncService extends CoreSyncService {
     return await this.collectionService.replace(collections, userId);
   }
 
-  private async syncCiphers(response: CipherResponse[]) {
+  private async syncCiphers(response: CipherResponse[], userId: UserId) {
     const ciphers: { [id: string]: CipherData } = {};
     response.forEach((c) => {
       ciphers[c.id] = new CipherData(c);
     });
-    return await this.cipherService.replace(ciphers);
+    return await this.cipherService.replace(ciphers, userId);
   }
 
   private async syncSends(response: SendResponse[]) {
