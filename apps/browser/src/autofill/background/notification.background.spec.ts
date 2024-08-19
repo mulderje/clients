@@ -87,6 +87,7 @@ describe("NotificationBackground", () => {
         tab: createChromeTabMock(),
         expires: new Date(),
         wasVaultLocked: false,
+        launchTimestamp: 0,
       };
       const cipherView = notificationBackground["convertAddLoginQueueMessageToCipherView"](message);
 
@@ -122,6 +123,7 @@ describe("NotificationBackground", () => {
         tab: createChromeTabMock(),
         expires: new Date(),
         wasVaultLocked: false,
+        launchTimestamp: 0,
       };
       const cipherView = notificationBackground["convertAddLoginQueueMessageToCipherView"](
         message,
