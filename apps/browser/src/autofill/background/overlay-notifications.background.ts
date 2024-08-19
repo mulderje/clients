@@ -9,6 +9,7 @@ import { BrowserApi } from "../../platform/browser/browser-api";
 import {
   ActiveFormSubmissionRequests,
   ModifyLoginCipherFormData,
+  ModifyLoginCipherFormDataForTab,
   OverlayNotificationsBackground as OverlayNotificationsBackgroundInterface,
   OverlayNotificationsExtensionMessage,
   OverlayNotificationsExtensionMessageHandlers,
@@ -19,7 +20,7 @@ import NotificationBackground from "./notification.background";
 export class OverlayNotificationsBackground implements OverlayNotificationsBackgroundInterface {
   private websiteOriginsWithFields: WebsiteOriginsWithFields = new Map();
   private activeFormSubmissionRequests: ActiveFormSubmissionRequests = new Set();
-  private modifyLoginCipherFormData: ModifyLoginCipherFormData = new Map();
+  private modifyLoginCipherFormData: ModifyLoginCipherFormDataForTab = new Map();
   private clearLoginCipherFormDataSubject: Subject<void> = new Subject();
   private readonly clearLoginCipherTimeoutDuration: number = 5000;
   private readonly formSubmissionRequestMethods: Set<string> = new Set(["POST", "PUT", "PATCH"]);
@@ -207,7 +208,28 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
 
     // console.log("submit notification with login data", modifyLoginData);
 
-    const tab = await BrowserApi.getTab(details.tabId);
+    let tab = await BrowserApi.getTab(details.tabId);
+    if (tab.status !== "complete") {
+      // TODO: Clean this up
+      const handleWebNavigationOnCompleted = async () => {
+        tab = await BrowserApi.getTab(details.tabId);
+        if (tab.status === "complete") {
+          chrome.webNavigation.onCompleted.removeListener(handleWebNavigationOnCompleted);
+          await this.triggerNotification(details, modifyLoginData, tab);
+        }
+      };
+      chrome.webNavigation.onCompleted.addListener(handleWebNavigationOnCompleted);
+      return;
+    }
+
+    await this.triggerNotification(details, modifyLoginData, tab);
+  };
+
+  private triggerNotification = async (
+    details: chrome.webRequest.WebResponseDetails,
+    modifyLoginData: ModifyLoginCipherFormData,
+    tab: chrome.tabs.Tab,
+  ) => {
     if (modifyLoginData.newPassword && !modifyLoginData.username) {
       await this.notificationsBackground.changedPassword(
         {

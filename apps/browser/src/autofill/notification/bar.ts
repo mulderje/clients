@@ -230,7 +230,7 @@ function handleSaveCipherAttemptCompletedMessage(message: NotificationBarWindowM
     notificationBarOuterWrapper.classList.add("success-event");
   });
   adjustHeight();
-  // setTimeout(() => sendPlatformMessage({ command: "bgCloseNotificationBar" }), 1250);
+  setTimeout(() => sendPlatformMessage({ command: "bgCloseNotificationBar" }), 5000);
 }
 
 function handleTypeUnlock() {

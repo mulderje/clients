@@ -12,7 +12,14 @@ export type WebsiteOriginsWithFields = Map<chrome.tabs.Tab["id"], string>;
 
 export type ActiveFormSubmissionRequests = Set<chrome.webRequest.ResourceRequest["requestId"]>;
 
-export type ModifyLoginCipherFormData = Map<
+export type ModifyLoginCipherFormData = {
+  uri: string;
+  username: string;
+  password: string;
+  newPassword: string;
+};
+
+export type ModifyLoginCipherFormDataForTab = Map<
   chrome.tabs.Tab["id"],
   { uri: string; username: string; password: string; newPassword: string }
 >;
