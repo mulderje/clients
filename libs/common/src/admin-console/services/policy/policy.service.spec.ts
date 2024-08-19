@@ -103,9 +103,14 @@ describe("PolicyService", () => {
       userId,
     );
 
-    expect(await firstValueFrom(stateProvider.getUser(userId, POLICIES).state$)).toEqual({
-      "2": policyData("2", "test-organization", PolicyType.DisableSend, true),
-    });
+    expect(await firstValueFrom(policyService.policies$)).toEqual([
+      {
+        id: "2",
+        organizationId: "test-organization",
+        type: PolicyType.DisableSend,
+        enabled: true,
+      },
+    ]);
   });
 
   describe("masterPasswordPolicyOptions", () => {
