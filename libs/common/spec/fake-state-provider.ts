@@ -94,7 +94,15 @@ export class FakeSingleUserStateProvider implements SingleUserStateProvider {
     return result as SingleUserState<T>;
   }
 
-  getFake<T>(userId: UserId, userKeyDefinition: UserKeyDefinition<T>): FakeSingleUserState<T> {
+  getFake<T>(
+    userId: UserId,
+    userKeyDefinition: UserKeyDefinition<T>,
+    { allowInit }: { allowInit: boolean } = { allowInit: true },
+  ): FakeSingleUserState<T> {
+    if (!allowInit && this.states.get(this.cacheKey(userId, userKeyDefinition)) == null) {
+      return null;
+    }
+
     return this.get(userId, userKeyDefinition) as FakeSingleUserState<T>;
   }
 
@@ -153,7 +161,13 @@ export class FakeActiveUserStateProvider implements ActiveUserStateProvider {
     return result as ActiveUserState<T>;
   }
 
-  getFake<T>(userKeyDefinition: UserKeyDefinition<T>): FakeActiveUserState<T> {
+  getFake<T>(
+    userKeyDefinition: UserKeyDefinition<T>,
+    { allowInit }: { allowInit: boolean } = { allowInit: true },
+  ): FakeActiveUserState<T> {
+    if (!allowInit && this.states.get(userKeyDefinitionCacheKey(userKeyDefinition)) == null) {
+      return null;
+    }
     return this.get(userKeyDefinition) as FakeActiveUserState<T>;
   }
 
@@ -248,7 +262,8 @@ export class FakeStateProvider implements StateProvider {
     newState: unknown,
   ) {
     if (this.activeUser.accountService.activeUserId === userId) {
-      this.activeUser.getFake(key).nextState(newState, { syncValue: false });
+      const state = this.activeUser.getFake(key, { allowInit: false });
+      state?.nextState(newState, { syncValue: false });
     }
   }
 
@@ -257,7 +272,9 @@ export class FakeStateProvider implements StateProvider {
     userId: UserId,
     newState: unknown,
   ) {
-    this.singleUser.getFake(userId, key).nextState(newState, { syncValue: false });
+    this.singleUser
+      .getFake(userId, key, { allowInit: false })
+      ?.nextState(newState, { syncValue: false });
   }
 
   global: FakeGlobalStateProvider = new FakeGlobalStateProvider();

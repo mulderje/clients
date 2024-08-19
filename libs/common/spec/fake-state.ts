@@ -110,12 +110,12 @@ export class FakeSingleUserState<T> implements SingleUserState<T> {
     this.stateSubject
       .pipe(
         filter((next) => next.syncValue),
-        concatMap(async ({ combinedState: state }) => {
-          await updateSyncCallback?.(...state);
+        concatMap(async ({ combinedState }) => {
+          await updateSyncCallback?.(...combinedState);
         }),
       )
       .subscribe();
-    this.nextState(initialValue ?? null);
+    this.nextState(initialValue ?? null, { syncValue: initialValue != null });
 
     this.combinedState$ = this.stateSubject.pipe(map((v) => v.combinedState));
     this.state$ = this.combinedState$.pipe(map(([_userId, state]) => state));
@@ -186,7 +186,7 @@ export class FakeActiveUserState<T> implements ActiveUserState<T> {
         await updateSyncCallback?.(...combinedState);
       }),
     );
-    this.nextState(initialValue ?? null);
+    this.nextState(initialValue ?? null, { syncValue: initialValue != null });
 
     this.combinedState$ = this.stateSubject.pipe(map((v) => v.combinedState));
     this.state$ = this.combinedState$.pipe(map(([_userId, state]) => state));
