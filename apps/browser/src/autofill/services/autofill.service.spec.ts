@@ -10,6 +10,7 @@ import {
   DefaultDomainSettingsService,
   DomainSettingsService,
 } from "@bitwarden/common/autofill/services/domain-settings.service";
+import { UserNotificationSettingsServiceAbstraction } from "@bitwarden/common/autofill/services/user-notification-settings.service";
 import { InlineMenuVisibilitySetting } from "@bitwarden/common/autofill/types";
 import { BillingAccountProfileStateService } from "@bitwarden/common/billing/abstractions/account/billing-account-profile-state.service";
 import { EventType } from "@bitwarden/common/enums";
@@ -88,6 +89,7 @@ describe("AutofillService", () => {
   let activeAccountStatusMock$: BehaviorSubject<AuthenticationStatus>;
   let authService: MockProxy<AuthService>;
   let configService: MockProxy<ConfigService>;
+  let userNotificationsSettings: MockProxy<UserNotificationSettingsServiceAbstraction>;
   let messageListener: MockProxy<MessageListener>;
 
   beforeEach(() => {
@@ -100,6 +102,7 @@ describe("AutofillService", () => {
     authService.activeAccountStatus$ = activeAccountStatusMock$;
     configService = mock<ConfigService>();
     messageListener = mock<MessageListener>();
+    userNotificationsSettings = mock<UserNotificationSettingsServiceAbstraction>();
     autofillService = new AutofillService(
       cipherService,
       autofillSettingsService,
@@ -113,6 +116,7 @@ describe("AutofillService", () => {
       accountService,
       authService,
       configService,
+      userNotificationsSettings,
       messageListener,
     );
     domainSettingsService = new DefaultDomainSettingsService(fakeStateProvider);

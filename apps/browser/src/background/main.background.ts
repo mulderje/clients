@@ -945,6 +945,7 @@ export default class MainBackground {
       this.accountService,
       this.authService,
       this.configService,
+      this.userNotificationSettingsService,
       messageListener,
     );
     this.auditService = new AuditService(this.cryptoFunctionService, this.apiService);
@@ -1100,6 +1101,7 @@ export default class MainBackground {
 
       this.overlayNotificationsBackground = new OverlayNotificationsBackground(
         this.logService,
+        this.configService,
         this.notificationBackground,
       );
 

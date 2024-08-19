@@ -1,5 +1,7 @@
 import { Subject, switchMap, timer } from "rxjs";
 
+import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
+import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 
 import { BrowserApi } from "../../platform/browser/browser-api";
@@ -29,10 +31,18 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
 
   constructor(
     private logService: LogService,
+    private configService: ConfigService,
     private notificationsBackground: NotificationBackground,
   ) {}
 
-  init() {
+  async init() {
+    const featureFlagActive = await this.configService.getFeatureFlag(
+      FeatureFlag.NotificationBarAddLoginImprovements,
+    );
+    if (!featureFlagActive) {
+      return;
+    }
+
     this.setupExtensionListeners();
     this.clearLoginCipherFormDataSubject
       .pipe(switchMap(() => timer(this.clearLoginCipherTimeoutDuration)))
@@ -198,11 +208,7 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
     // console.log("submit notification with login data", modifyLoginData);
 
     const tab = await BrowserApi.getTab(details.tabId);
-    if (
-      (await this.notificationsBackground.getEnableChangedPasswordPrompt()) &&
-      modifyLoginData.newPassword &&
-      !modifyLoginData.username
-    ) {
+    if (modifyLoginData.newPassword && !modifyLoginData.username) {
       await this.notificationsBackground.changedPassword(
         {
           command: "bgChangedPassword",
@@ -218,11 +224,7 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
       return;
     }
 
-    if (
-      (await this.notificationsBackground.getEnableAddedLoginPrompt()) &&
-      modifyLoginData.username &&
-      (modifyLoginData.password || modifyLoginData.newPassword)
-    ) {
+    if (modifyLoginData.username && (modifyLoginData.password || modifyLoginData.newPassword)) {
       await this.notificationsBackground.addLogin(
         {
           command: "bgAddLogin",

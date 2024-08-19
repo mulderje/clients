@@ -316,6 +316,7 @@ const safeProviders: SafeProvider[] = [
       AccountServiceAbstraction,
       AuthService,
       ConfigService,
+      UserNotificationSettingsServiceAbstraction,
       MessageListener,
     ],
   }),
