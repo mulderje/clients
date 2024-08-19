@@ -1,7 +1,7 @@
 import { EVENTS } from "@bitwarden/common/autofill/constants";
 
 import { NotificationBarIframeInitData } from "../../../notification/abstractions/notification-bar";
-import { sendExtensionMessage, setupExtensionDisconnectAction } from "../../../utils";
+import { sendExtensionMessage } from "../../../utils";
 import {
   NotificationsExtensionMessage,
   OverlayNotificationsContentService as OverlayNotificationsContentServiceInterface,
@@ -12,7 +12,6 @@ export class OverlayNotificationsContentService
   implements OverlayNotificationsContentServiceInterface
 {
   private readonly sendExtensionMessage = sendExtensionMessage;
-  private readonly setupExtensionDisconnectAction = setupExtensionDisconnectAction;
   private notificationBarElement: HTMLElement | null = null;
   private notificationBarIframe: HTMLIFrameElement | null = null;
   private currentNotificationBarType: string | null = null;
@@ -77,11 +76,13 @@ export class OverlayNotificationsContentService
 
     this.notificationBarElement.appendChild(this.notificationBarIframe);
 
-    this.notificationBarIframe.addEventListener(EVENTS.LOAD, () => {
+    const notificationBarOnLoad = () => {
       this.notificationBarIframe.style.transform = "translateX(0)";
       this.notificationBarIframe.style.opacity = "1";
       this.notificationBarElement.style.boxShadow = "2px 4px 6px 0px #0000001A";
-    });
+      this.notificationBarIframe.removeEventListener(EVENTS.LOAD, notificationBarOnLoad);
+    };
+    this.notificationBarIframe.addEventListener(EVENTS.LOAD, notificationBarOnLoad);
 
     this.setupInitNotificationBarMessageListener(initData);
     globalThis.document.body.appendChild(this.notificationBarElement);
@@ -114,7 +115,7 @@ export class OverlayNotificationsContentService
     globalThis.addEventListener("message", handleInitNotificationBarMessage);
   }
 
-  private async closeNotificationBar(closedByUser: boolean = false) {
+  private closeNotificationBar(closedByUser: boolean = false) {
     if (!this.notificationBarElement) {
       return;
     }
@@ -143,5 +144,9 @@ export class OverlayNotificationsContentService
     if (this.notificationBarIframe) {
       this.notificationBarIframe.contentWindow.postMessage(message, "*");
     }
+  }
+
+  destroy() {
+    this.closeNotificationBar(true);
   }
 }

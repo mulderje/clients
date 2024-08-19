@@ -161,6 +161,16 @@ button {
   @include themify($themes) {
     color: themed("successColor");
   }
+
+  svg {
+    margin-right: 8px;
+
+    path {
+      @include themify($themes) {
+        fill: themed("successColor");
+      }
+    }
+  }
 }
 
 .error-message {
@@ -288,30 +298,52 @@ button {
       .primary {
         margin-right: 2px;
       }
+
+      &.success-message,
+      &.error-message {
+        padding-top: 4px;
+        padding-right: 36px;
+        padding-bottom: 6px;
+      }
+    }
+  }
+
+  .success-event,
+  .error-event {
+    .notification-body {
+      display: none;
     }
   }
 }
 
 .theme_light {
-  .notification-bar-redesign #content .inner-wrapper #select-folder {
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHhtbG5zOnhsaW5rPSdodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rJyB3aWR0aD0nMTYnIGhlaWdodD0nMTYnIGZpbGw9J25vbmUnPjxwYXRoIHN0cm9rZT0nIzIxMjUyOScgZD0nbTUgNiAzIDMgMy0zJy8+PC9zdmc+");
+  .notification-bar-redesign #content .inner-wrapper {
+    #select-folder {
+      background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHhtbG5zOnhsaW5rPSdodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rJyB3aWR0aD0nMTYnIGhlaWdodD0nMTYnIGZpbGw9J25vbmUnPjxwYXRoIHN0cm9rZT0nIzIxMjUyOScgZD0nbTUgNiAzIDMgMy0zJy8+PC9zdmc+");
+    }
   }
 }
 
 .theme_dark {
-  .notification-bar-redesign #content .inner-wrapper #select-folder {
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNicgaGVpZ2h0PScxNicgZmlsbD0nbm9uZSc+PHBhdGggc3Ryb2tlPScjZmZmZmZmJyBkPSdtNSA2IDMgMyAzLTMnLz48L3N2Zz4=");
+  .notification-bar-redesign #content .inner-wrapper {
+    #select-folder {
+      background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNicgaGVpZ2h0PScxNicgZmlsbD0nbm9uZSc+PHBhdGggc3Ryb2tlPScjZmZmZmZmJyBkPSdtNSA2IDMgMyAzLTMnLz48L3N2Zz4=");
+    }
   }
 }
 
 .theme_solarizedDark {
-  .notification-bar-redesign #content .inner-wrapper #select-folder {
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNicgaGVpZ2h0PScxNicgZmlsbD0nbm9uZSc+PHBhdGggc3Ryb2tlPScjZWVlOGQ1JyBkPSdtNSA2IDMgMyAzLTMnLz48L3N2Zz4=");
+  .notification-bar-redesign #content .inner-wrapper {
+    #select-folder {
+      background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNicgaGVpZ2h0PScxNicgZmlsbD0nbm9uZSc+PHBhdGggc3Ryb2tlPScjZWVlOGQ1JyBkPSdtNSA2IDMgMyAzLTMnLz48L3N2Zz4=");
+    }
   }
 }
 
 .theme_nord {
-  .notification-bar-redesign #content .inner-wrapper #select-folder {
-    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNicgaGVpZ2h0PScxNicgZmlsbD0nbm9uZSc+PHBhdGggc3Ryb2tlPScjRTVFOUYwJyBkPSdtNSA2IDMgMyAzLTMnLz48L3N2Zz4=");
+  .notification-bar-redesign #content .inner-wrapper {
+    #select-folder {
+      background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPScxNicgaGVpZ2h0PScxNicgZmlsbD0nbm9uZSc+PHBhdGggc3Ryb2tlPScjRTVFOUYwJyBkPSdtNSA2IDMgMyAzLTMnLz48L3N2Zz4=");
+    }
   }
 }

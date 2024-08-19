@@ -228,6 +228,7 @@ class AutofillInit implements AutofillInitInterface {
     this.collectAutofillContentService.destroy();
     this.autofillOverlayContentService?.destroy();
     this.autofillInlineMenuContentService?.destroy();
+    this.overlayNotificationsContentService?.destroy();
   }
 }
 
