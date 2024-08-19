@@ -129,7 +129,7 @@ export class DefaultSyncService extends CoreSyncService {
       await this.syncCiphers(response.ciphers, response.profile.id);
       await this.syncSends(response.sends);
       await this.syncSettings(response.domains, response.profile.id);
-      await this.syncPolicies(response.policies);
+      await this.syncPolicies(response.policies, response.profile.id);
 
       await this.setLastSync(now, userId);
       return this.syncCompleted(true);
@@ -333,13 +333,13 @@ export class DefaultSyncService extends CoreSyncService {
     return this.domainSettingsService.setEquivalentDomains(eqDomains, userId);
   }
 
-  private async syncPolicies(response: PolicyResponse[]) {
+  private async syncPolicies(response: PolicyResponse[], userId: UserId) {
     const policies: { [id: string]: PolicyData } = {};
     if (response != null) {
       response.forEach((p) => {
         policies[p.id] = new PolicyData(p);
       });
     }
-    return await this.policyService.replace(policies);
+    return await this.policyService.replace(policies, userId);
   }
 }

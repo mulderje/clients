@@ -20,6 +20,7 @@ import { POLICIES, PolicyService } from "../../../admin-console/services/policy/
 import { PolicyId, UserId } from "../../../types/guid";
 
 describe("PolicyService", () => {
+  const userId = "userId" as UserId;
   let stateProvider: FakeStateProvider;
   let organizationService: MockProxy<OrganizationService>;
   let activeUserState: FakeActiveUserState<Record<PolicyId, PolicyData>>;
@@ -27,7 +28,7 @@ describe("PolicyService", () => {
   let policyService: PolicyService;
 
   beforeEach(() => {
-    const accountService = mockAccountServiceWith("userId" as UserId);
+    const accountService = mockAccountServiceWith(userId);
     stateProvider = new FakeStateProvider(accountService);
     organizationService = mock<OrganizationService>();
 
@@ -95,18 +96,16 @@ describe("PolicyService", () => {
       ]),
     );
 
-    await policyService.replace({
+    await policyService.replace(
+      {
+        "2": policyData("2", "test-organization", PolicyType.DisableSend, true),
+      },
+      userId,
+    );
+
+    expect(await firstValueFrom(stateProvider.getUser(userId, POLICIES).state$)).toEqual({
       "2": policyData("2", "test-organization", PolicyType.DisableSend, true),
     });
-
-    expect(await firstValueFrom(policyService.policies$)).toEqual([
-      {
-        id: "2",
-        organizationId: "test-organization",
-        type: PolicyType.DisableSend,
-        enabled: true,
-      },
-    ]);
   });
 
   describe("masterPasswordPolicyOptions", () => {
