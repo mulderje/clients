@@ -527,7 +527,7 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
   }
 
   private setupSubmitButtonEventListeners = (submitButton: HTMLElement) => {
-    if (this.submitElements.has(submitButton)) {
+    if (!submitButton || this.submitElements.has(submitButton)) {
       return;
     }
 

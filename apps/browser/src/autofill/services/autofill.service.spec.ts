@@ -14,6 +14,7 @@ import { UserNotificationSettingsServiceAbstraction } from "@bitwarden/common/au
 import { InlineMenuVisibilitySetting } from "@bitwarden/common/autofill/types";
 import { BillingAccountProfileStateService } from "@bitwarden/common/billing/abstractions/account/billing-account-profile-state.service";
 import { EventType } from "@bitwarden/common/enums";
+import { FeatureFlag, FeatureFlagValueType } from "@bitwarden/common/enums/feature-flag.enum";
 import { UriMatchStrategy } from "@bitwarden/common/models/domain/domain-service";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
@@ -89,6 +90,8 @@ describe("AutofillService", () => {
   let activeAccountStatusMock$: BehaviorSubject<AuthenticationStatus>;
   let authService: MockProxy<AuthService>;
   let configService: MockProxy<ConfigService>;
+  let enableChangedPasswordPromptMock$: BehaviorSubject<boolean>;
+  let enableAddedLoginPromptMock$: BehaviorSubject<boolean>;
   let userNotificationsSettings: MockProxy<UserNotificationSettingsServiceAbstraction>;
   let messageListener: MockProxy<MessageListener>;
 
@@ -102,7 +105,11 @@ describe("AutofillService", () => {
     authService.activeAccountStatus$ = activeAccountStatusMock$;
     configService = mock<ConfigService>();
     messageListener = mock<MessageListener>();
+    enableChangedPasswordPromptMock$ = new BehaviorSubject(true);
+    enableAddedLoginPromptMock$ = new BehaviorSubject(true);
     userNotificationsSettings = mock<UserNotificationSettingsServiceAbstraction>();
+    userNotificationsSettings.enableChangedPasswordPrompt$ = enableChangedPasswordPromptMock$;
+    userNotificationsSettings.enableAddedLoginPrompt$ = enableAddedLoginPromptMock$;
     autofillService = new AutofillService(
       cipherService,
       autofillSettingsService,
@@ -353,13 +360,16 @@ describe("AutofillService", () => {
   describe("injectAutofillScripts", () => {
     const autofillBootstrapScript = "bootstrap-autofill.js";
     const autofillOverlayBootstrapScript = "bootstrap-autofill-overlay.js";
+    const autofillOverlayMenuBootstrapScript = "bootstrap-autofill-overlay-menu.js";
     const defaultAutofillScripts = ["autofiller.js", "notificationBar.js", "contextMenuHandler.js"];
     const defaultExecuteScriptOptions = { runAt: "document_start" };
     let tabMock: chrome.tabs.Tab;
     let sender: chrome.runtime.MessageSender;
 
     beforeEach(() => {
-      configService.getFeatureFlag.mockResolvedValue(true);
+      configService.getFeatureFlag.mockImplementation(
+        async (_feature) => true as FeatureFlagValueType<any>,
+      );
       tabMock = createChromeTabMock();
       sender = { tab: tabMock, frameId: 1 };
       jest.spyOn(BrowserApi, "executeScriptInTab").mockImplementation();
@@ -370,9 +380,16 @@ describe("AutofillService", () => {
     });
 
     it("accepts an extension message sender and injects the autofill scripts into the tab of the sender", async () => {
+      configService.getFeatureFlag.mockImplementation(async (_feature) => {
+        if (_feature === FeatureFlag.NotificationBarAddLoginImprovements) {
+          return false as FeatureFlagValueType<any>;
+        }
+
+        return true as FeatureFlagValueType<any>;
+      });
       await autofillService.injectAutofillScripts(sender.tab, sender.frameId, true);
 
-      [autofillOverlayBootstrapScript, ...defaultAutofillScripts].forEach((scriptName) => {
+      [autofillOverlayMenuBootstrapScript, ...defaultAutofillScripts].forEach((scriptName) => {
         expect(BrowserApi.executeScriptInTab).toHaveBeenCalledWith(tabMock.id, {
           file: `content/${scriptName}`,
           frameId: sender.frameId,
@@ -424,6 +441,13 @@ describe("AutofillService", () => {
       jest
         .spyOn(autofillService, "getInlineMenuVisibility")
         .mockResolvedValue(AutofillOverlayVisibility.Off);
+      configService.getFeatureFlag.mockImplementation(async (_feature) => {
+        if (_feature === FeatureFlag.NotificationBarAddLoginImprovements) {
+          return false as FeatureFlagValueType<any>;
+        }
+
+        return true as FeatureFlagValueType<any>;
+      });
 
       await autofillService.injectAutofillScripts(sender.tab, sender.frameId);
 

@@ -131,6 +131,10 @@ export default class NotificationBackground {
     return await firstValueFrom(this.configService.serverConfig$);
   }
 
+  private async getAuthStatus() {
+    return await firstValueFrom(this.authService.activeAccountStatus$);
+  }
+
   /**
    * Checks the notification queue for any messages that need to be sent to the
    * specified tab. If no tab is specified, the current tab will be used.
@@ -234,7 +238,7 @@ export default class NotificationBackground {
     message: NotificationBackgroundExtensionMessage,
     sender: chrome.runtime.MessageSender,
   ) {
-    const authStatus = await firstValueFrom(this.authService.activeAccountStatus$);
+    const authStatus = await this.getAuthStatus();
     if (authStatus === AuthenticationStatus.LoggedOut) {
       return;
     }
@@ -322,7 +326,7 @@ export default class NotificationBackground {
       return;
     }
 
-    if ((await this.authService.getAuthStatus()) < AuthenticationStatus.Unlocked) {
+    if ((await this.getAuthStatus()) < AuthenticationStatus.Unlocked) {
       await this.pushChangePasswordToQueue(
         null,
         loginDomain,
@@ -382,7 +386,7 @@ export default class NotificationBackground {
       return;
     }
 
-    const currentAuthStatus = await this.authService.getAuthStatus();
+    const currentAuthStatus = await this.getAuthStatus();
     if (currentAuthStatus !== AuthenticationStatus.Locked || this.notificationQueue.length) {
       return;
     }
@@ -401,7 +405,7 @@ export default class NotificationBackground {
    * @param importType - The type of import that is being requested
    */
   async requestFilelessImport(tab: chrome.tabs.Tab, importType: string) {
-    const currentAuthStatus = await this.authService.getAuthStatus();
+    const currentAuthStatus = await this.getAuthStatus();
     if (currentAuthStatus !== AuthenticationStatus.Unlocked || this.notificationQueue.length) {
       return;
     }
@@ -492,7 +496,7 @@ export default class NotificationBackground {
     message: NotificationBackgroundExtensionMessage,
     sender: chrome.runtime.MessageSender,
   ) {
-    if ((await this.authService.getAuthStatus()) < AuthenticationStatus.Unlocked) {
+    if ((await this.getAuthStatus()) < AuthenticationStatus.Unlocked) {
       await BrowserApi.tabSendMessageData(sender.tab, "addToLockedVaultPendingNotifications", {
         commandToRetry: {
           message: {
