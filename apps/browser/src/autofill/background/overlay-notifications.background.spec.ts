@@ -1,5 +1,6 @@
 import { mock, MockProxy } from "jest-mock-extended";
 
+import { CLEAR_NOTIFICATION_LOGIN_DATA_DURATION } from "@bitwarden/common/autofill/constants";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { ServerConfig } from "@bitwarden/common/platform/abstractions/config/server-config";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
@@ -21,6 +22,7 @@ describe("OverlayNotificationsBackground", () => {
   let overlayNotificationsBackground: OverlayNotificationsBackground;
 
   beforeEach(async () => {
+    jest.useFakeTimers();
     logService = mock<LogService>();
     configService = mock<ConfigService>();
     notificationBackground = mock<NotificationBackground>();
@@ -41,6 +43,7 @@ describe("OverlayNotificationsBackground", () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.clearAllTimers();
   });
 
   describe("setting up the form submission listeners", () => {
@@ -68,6 +71,7 @@ describe("OverlayNotificationsBackground", () => {
 
       describe("when the sender is from an excluded domain", () => {
         const senderHost = "example.com";
+        const senderUrl = `https://${senderHost}`;
 
         beforeEach(() => {
           jest.spyOn(notificationBackground, "getExcludedDomains").mockResolvedValue({
@@ -91,7 +95,7 @@ describe("OverlayNotificationsBackground", () => {
         });
 
         it("skips setting up listeners when the sender is an excluded domain", async () => {
-          const sender = mock<chrome.runtime.MessageSender>({ origin: senderHost });
+          const sender = mock<chrome.runtime.MessageSender>({ origin: senderUrl });
 
           sendMockExtensionMessage({ command: "collectPageDetailsResponse", details }, sender);
           await flushPromises();
@@ -147,6 +151,50 @@ describe("OverlayNotificationsBackground", () => {
       await flushPromises();
 
       expect(chrome.webRequest.onCompleted.addListener).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe("storing the modified login form data", () => {
+    const sender = mock<chrome.runtime.MessageSender>({ tab: { id: 1 } });
+
+    it("stores the modified login cipher form data", async () => {
+      sendMockExtensionMessage(
+        {
+          command: "formFieldSubmitted",
+          uri: "example.com",
+          username: "username",
+          password: "password",
+          newPassword: "newPassword",
+        },
+        sender,
+      );
+      await flushPromises();
+
+      expect(
+        overlayNotificationsBackground["modifyLoginCipherFormData"].get(sender.tab.id),
+      ).toEqual({
+        uri: "example.com",
+        username: "username",
+        password: "password",
+        newPassword: "newPassword",
+      });
+    });
+
+    it("clears the modified login cipher form data after 5 seconds", () => {
+      sendMockExtensionMessage(
+        {
+          command: "formFieldSubmitted",
+          uri: "example.com",
+          username: "username",
+          password: "password",
+          newPassword: "newPassword",
+        },
+        sender,
+      );
+
+      jest.advanceTimersByTime(CLEAR_NOTIFICATION_LOGIN_DATA_DURATION);
+
+      expect(overlayNotificationsBackground["modifyLoginCipherFormData"].size).toBe(0);
     });
   });
 });
