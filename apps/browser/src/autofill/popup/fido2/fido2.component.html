@@ -20,12 +20,12 @@
   </popup-header>
 
   <div class="tw-p-2">
-    <bit-section *ngIf="passkeyAction === PasskeyActions.Register">
+    <bit-section *ngIf="data.message.type === BrowserFido2MessageTypes.ConfirmNewCredentialRequest">
       <bit-search
         appAutofocus
         autocomplete="off"
         id="search"
-        placeholder="{{ 'searchVault' | i18n }}"
+        placeholder="{{ 'search' | i18n }}"
         (ngModelChange)="search()"
         [(ngModel)]="searchText"
       ></bit-search>

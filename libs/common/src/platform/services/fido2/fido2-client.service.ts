@@ -68,8 +68,9 @@ export class Fido2ClientService implements Fido2ClientServiceAbstraction {
     private requestManager: Fido2ActiveRequestManager,
     private logService?: LogService,
   ) {
-    this.taskSchedulerService.registerTaskHandler(ScheduledTaskNames.fido2ClientAbortTimeout, () =>
-      this.timeoutAbortController?.abort(),
+    this.taskSchedulerService.registerTaskHandler(
+      ScheduledTaskNames.fido2ClientAbortTimeout,
+      () => {}, // this.timeoutAbortController?.abort(),
     );
   }
 

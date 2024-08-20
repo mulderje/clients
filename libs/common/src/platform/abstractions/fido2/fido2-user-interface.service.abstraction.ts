@@ -98,7 +98,7 @@ export abstract class Fido2UserInterfaceSession {
    *
    * @param existingCipherIds The IDs of the excluded credentials.
    */
-  informExcludedCredential: (existingCipherIds: string[]) => Promise<void>;
+  informExcludedCredential: (existingCipherIds: string[], userVerification: NewCredentialParams['userVerification']) => Promise<void>;
 
   /**
    * Inform the user that the operation was cancelled because their vault does not contain any useable credentials.

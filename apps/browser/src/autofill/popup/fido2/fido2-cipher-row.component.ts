@@ -34,6 +34,7 @@ export class Fido2CipherRowComponent {
   @Output() onSelected = new EventEmitter<CipherView>();
   @Input() cipher: CipherView;
   @Input() last: boolean;
+  @Input() noInteractions: boolean = false;
   @Input() title: string;
 
   protected selectCipher(c: CipherView) {

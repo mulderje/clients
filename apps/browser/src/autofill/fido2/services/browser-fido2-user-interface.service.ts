@@ -38,6 +38,7 @@ export const BrowserFido2MessageTypes = {
   ConfirmNewCredentialRequest: "ConfirmNewCredentialRequest",
   ConfirmNewCredentialResponse: "ConfirmNewCredentialResponse",
   InformExcludedCredentialRequest: "InformExcludedCredentialRequest",
+  InformExcludedCredentialResponse: "InformExcludedCredentialResponse",
   InformCredentialNotFoundRequest: "InformCredentialNotFoundRequest",
   AbortRequest: "AbortRequest",
   AbortResponse: "AbortResponse",
@@ -69,7 +70,7 @@ export type BrowserFido2Message = { sessionId: string } & (
   | {
       type: typeof BrowserFido2MessageTypes.PickCredentialRequest;
       cipherIds: string[];
-      userVerification: boolean;
+      userVerification: NewCredentialParams['userVerification'];
       fallbackSupported: boolean;
     }
   | {
@@ -79,12 +80,12 @@ export type BrowserFido2Message = { sessionId: string } & (
     }
   | {
       type: typeof BrowserFido2MessageTypes.ConfirmNewCredentialRequest;
-      credentialName: string;
-      userName: string;
-      userHandle: string;
-      userVerification: boolean;
+      credentialName: NewCredentialParams['credentialName'];
+      userName: NewCredentialParams['userName'];
+      userHandle: NewCredentialParams['userHandle'];
+      userVerification: NewCredentialParams['userVerification'];
       fallbackSupported: boolean;
-      rpId: string;
+      rpId: NewCredentialParams['rpId'];
     }
   | {
       type: typeof BrowserFido2MessageTypes.ConfirmNewCredentialResponse;
@@ -95,6 +96,12 @@ export type BrowserFido2Message = { sessionId: string } & (
       type: typeof BrowserFido2MessageTypes.InformExcludedCredentialRequest;
       existingCipherIds: string[];
       fallbackSupported: boolean;
+      userVerification: NewCredentialParams['userVerification'];
+    }
+  | {
+      type: typeof BrowserFido2MessageTypes.InformExcludedCredentialResponse;
+      cipherId?: string;
+      userVerified: boolean;
     }
   | {
       type: typeof BrowserFido2MessageTypes.InformCredentialNotFoundRequest;
@@ -280,12 +287,13 @@ export class BrowserFido2UserInterfaceSession implements Fido2UserInterfaceSessi
     return { cipherId: response.cipherId, userVerified: response.userVerified };
   }
 
-  async informExcludedCredential(existingCipherIds: string[]): Promise<void> {
+  async informExcludedCredential(existingCipherIds: string[], userVerification: NewCredentialParams['userVerification']): Promise<void> {
     const data: BrowserFido2Message = {
       type: BrowserFido2MessageTypes.InformExcludedCredentialRequest,
       sessionId: this.sessionId,
       existingCipherIds,
       fallbackSupported: this.fallbackSupported,
+      userVerification
     };
 
     await this.send(data);

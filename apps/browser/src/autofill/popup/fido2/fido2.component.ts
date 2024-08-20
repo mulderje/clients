@@ -260,11 +260,16 @@ export class Fido2Component implements OnInit, OnDestroy {
 
   protected async submit() {
     const data = this.message$.value;
+    console.log('submit data:', data);
+    // console.log('selected cipher:', this.cipher);
 
-    if (data?.type === BrowserFido2MessageTypes.PickCredentialRequest) {
+    if (
+    data?.type === BrowserFido2MessageTypes.PickCredentialRequest
+    ) {
       // TODO: Revert to use fido2 user verification service once user verification for passkeys is approved for production.
       // PM-4577 - https://github.com/bitwarden/clients/pull/8746
       const userVerified = await this.handleUserVerification(data.userVerification, this.cipher);
+      console.log('PickCredentialRequest userVerified:', userVerified);
 
       this.send({
         sessionId: this.sessionId,
@@ -272,7 +277,31 @@ export class Fido2Component implements OnInit, OnDestroy {
         type: BrowserFido2MessageTypes.PickCredentialResponse,
         userVerified,
       });
-    } else if (data?.type === BrowserFido2MessageTypes.ConfirmNewCredentialRequest) {
+    // } else if () {
+    //   if (this.cipher.login.hasFido2Credentials) {
+    //     const confirmed = await this.dialogService.openSimpleDialog({
+    //       title: { key: "overwritePasskey" },
+    //       content: { key: "overwritePasskeyAlert" },
+    //       type: "info",
+    //     });
+
+    //     if (!confirmed) {
+    //       return false;
+    //     }
+    //   }
+
+    //   // TODO: Revert to use fido2 user verification service once user verification for passkeys is approved for production.
+    //   // PM-4577 - https://github.com/bitwarden/clients/pull/8746
+    //   const userVerified = await this.handleUserVerification(data.userVerification, this.cipher);
+    //   console.log('InformExcludedCredentialRequest userVerified:', userVerified);
+
+    //   // this.send({
+    //   //   sessionId: this.sessionId,
+    //   //   cipherId: this.cipher.id,
+    //   //   type: BrowserFido2MessageTypes.InformExcludedCredentialResponse,
+    //   //   userVerified,
+    //   // });
+    } else if (data?.type === BrowserFido2MessageTypes.InformExcludedCredentialRequest || data?.type === BrowserFido2MessageTypes.ConfirmNewCredentialRequest) {
       if (this.cipher.login.hasFido2Credentials) {
         const confirmed = await this.dialogService.openSimpleDialog({
           title: { key: "overwritePasskey" },
@@ -288,6 +317,7 @@ export class Fido2Component implements OnInit, OnDestroy {
       // TODO: Revert to use fido2 user verification service once user verification for passkeys is approved for production.
       // PM-4577 - https://github.com/bitwarden/clients/pull/8746
       const userVerified = await this.handleUserVerification(data.userVerification, this.cipher);
+      console.log('ConfirmNewCredentialRequest userVerified:', userVerified);
 
       this.send({
         sessionId: this.sessionId,
@@ -322,6 +352,7 @@ export class Fido2Component implements OnInit, OnDestroy {
   }
 
   async handleCipherItemSelect(item: CipherView) {
+    console.log('handleCipherItemSelect item:', item);
     this.cipher = item;
 
     await this.submit();
