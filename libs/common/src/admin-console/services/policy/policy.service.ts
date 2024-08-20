@@ -220,7 +220,7 @@ export class PolicyService implements InternalPolicyServiceAbstraction {
   }
 
   async replace(policies: { [id: string]: PolicyData }, userId: UserId): Promise<void> {
-    await this.stateProvider.getUser(userId, POLICIES).update(() => policies);
+    await this.stateProvider.setUserState(POLICIES, policies, userId);
   }
 
   /**
