@@ -3,6 +3,7 @@ import { mock, MockProxy } from "jest-mock-extended";
 import AutofillPageDetails from "../models/autofill-page-details";
 import AutofillScript from "../models/autofill-script";
 import { AutofillInlineMenuContentService } from "../overlay/inline-menu/content/autofill-inline-menu-content.service";
+import { OverlayNotificationsContentService } from "../overlay/notifications/abstractions/overlay-notifications-content.service";
 import { AutofillOverlayContentService } from "../services/autofill-overlay-content.service";
 import {
   flushPromises,
@@ -14,6 +15,7 @@ import { AutofillExtensionMessage } from "./abstractions/autofill-init";
 import AutofillInit from "./autofill-init";
 
 describe("AutofillInit", () => {
+  let overlayNotificationsContentService: MockProxy<OverlayNotificationsContentService>;
   let inlineMenuElements: MockProxy<AutofillInlineMenuContentService>;
   let autofillOverlayContentService: MockProxy<AutofillOverlayContentService>;
   let autofillInit: AutofillInit;
@@ -27,9 +29,14 @@ describe("AutofillInit", () => {
         addListener: jest.fn(),
       },
     });
+    overlayNotificationsContentService = mock<OverlayNotificationsContentService>();
     inlineMenuElements = mock<AutofillInlineMenuContentService>();
     autofillOverlayContentService = mock<AutofillOverlayContentService>();
-    autofillInit = new AutofillInit(autofillOverlayContentService, inlineMenuElements);
+    autofillInit = new AutofillInit(
+      autofillOverlayContentService,
+      inlineMenuElements,
+      overlayNotificationsContentService,
+    );
     sendExtensionMessageSpy = jest
       .spyOn(autofillInit as any, "sendExtensionMessage")
       .mockImplementation();
@@ -172,11 +179,13 @@ describe("AutofillInit", () => {
       });
 
       it("triggers extension message handlers from the OverlayNotificationsContentService", () => {
-        autofillOverlayContentService.messageHandlers.messageHandler = jest.fn();
+        overlayNotificationsContentService.messageHandlers.messageHandler = jest.fn();
 
         sendMockExtensionMessage({ command: "messageHandler" }, sender, sendResponse);
 
-        expect(autofillOverlayContentService.messageHandlers.messageHandler).toHaveBeenCalled();
+        expect(
+          overlayNotificationsContentService.messageHandlers.messageHandler,
+        ).toHaveBeenCalled();
       });
 
       describe("collectPageDetails", () => {
