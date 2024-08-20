@@ -676,8 +676,32 @@ describe("TokenService", () => {
     });
 
     describe("decodeAccessToken", () => {
+      it("retrieves the requested user's token when the passed in parameter is a Guid", async () => {
+        // Arrange
+        tokenService.getAccessToken = jest.fn().mockResolvedValue(accessTokenJwt);
+
+        // Act
+        const result = await tokenService.decodeAccessToken(userIdFromAccessToken);
+
+        // Assert
+        expect(result).toEqual(accessTokenDecoded);
+        expect(tokenService.getAccessToken).toHaveBeenCalledWith(userIdFromAccessToken);
+      });
+
+      it("decodes the given token when a string is passed in that is not a Guid", async () => {
+        // Arrange
+        tokenService.getAccessToken = jest.fn();
+
+        // Act
+        const result = await tokenService.decodeAccessToken(accessTokenJwt);
+
+        // Assert
+        expect(result).toEqual(accessTokenDecoded);
+        expect(tokenService.getAccessToken).not.toHaveBeenCalled();
+      });
+
       it("throws an error when no access token is provided or retrievable from state", async () => {
-        // Access
+        // Arrange
         tokenService.getAccessToken = jest.fn().mockResolvedValue(null);
 
         // Act
@@ -1182,7 +1206,7 @@ describe("TokenService", () => {
 
           // Act
           // note: don't await here because we want to test the error
-          const result = tokenService.getIsExternal();
+          const result = tokenService.getIsExternal(null);
           // Assert
           await expect(result).rejects.toThrow("Failed to decode access token: Mock error");
         });
@@ -1198,7 +1222,7 @@ describe("TokenService", () => {
             .mockResolvedValue(accessTokenDecodedWithoutExternalAmr);
 
           // Act
-          const result = await tokenService.getIsExternal();
+          const result = await tokenService.getIsExternal(null);
 
           // Assert
           expect(result).toEqual(false);
@@ -1215,10 +1239,21 @@ describe("TokenService", () => {
             .mockResolvedValue(accessTokenDecodedWithExternalAmr);
 
           // Act
-          const result = await tokenService.getIsExternal();
+          const result = await tokenService.getIsExternal(null);
 
           // Assert
           expect(result).toEqual(true);
+        });
+
+        it("passes the requested userId to decode", async () => {
+          // Arrange
+          tokenService.decodeAccessToken = jest.fn().mockResolvedValue(accessTokenDecoded);
+
+          // Act
+          await tokenService.getIsExternal(userIdFromAccessToken);
+
+          // Assert
+          expect(tokenService.decodeAccessToken).toHaveBeenCalledWith(userIdFromAccessToken);
         });
       });
     });
