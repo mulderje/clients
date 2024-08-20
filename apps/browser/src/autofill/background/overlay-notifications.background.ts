@@ -386,8 +386,10 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
    */
   private handleTabRemoved = (tabId: number) => {
     this.modifyLoginCipherFormData.delete(tabId);
-    this.websiteOriginsWithFields.delete(tabId);
-    this.setupWebRequestsListeners();
+    if (this.websiteOriginsWithFields.has(tabId)) {
+      this.websiteOriginsWithFields.delete(tabId);
+      this.setupWebRequestsListeners();
+    }
   };
 
   /**
