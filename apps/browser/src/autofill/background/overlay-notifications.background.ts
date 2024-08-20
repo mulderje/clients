@@ -1,5 +1,6 @@
 import { Subject, switchMap, timer } from "rxjs";
 
+import { CLEAR_NOTIFICATION_LOGIN_DATA_DURATION } from "@bitwarden/common/autofill/constants";
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
@@ -22,10 +23,9 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
   private activeFormSubmissionRequests: ActiveFormSubmissionRequests = new Set();
   private modifyLoginCipherFormData: ModifyLoginCipherFormDataForTab = new Map();
   private clearLoginCipherFormDataSubject: Subject<void> = new Subject();
-  private readonly clearLoginCipherTimeoutDuration: number = 5000;
   private readonly formSubmissionRequestMethods: Set<string> = new Set(["POST", "PUT", "PATCH"]);
   private readonly extensionMessageHandlers: OverlayNotificationsExtensionMessageHandlers = {
-    formFieldSubmitted: ({ message, sender }) => this.handleFormFieldSubmitted(message, sender),
+    formFieldSubmitted: ({ message, sender }) => this.storeModifiedLoginFormData(message, sender),
     collectPageDetailsResponse: ({ message, sender }) =>
       this.handleCollectPageDetailsResponse(message, sender),
   };
@@ -36,6 +36,9 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
     private notificationsBackground: NotificationBackground,
   ) {}
 
+  /**
+   * Initialize the overlay notifications background service.
+   */
   async init() {
     const featureFlagActive = await this.configService.getFeatureFlag(
       FeatureFlag.NotificationBarAddLoginImprovements,
@@ -46,26 +49,91 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
 
     this.setupExtensionListeners();
     this.clearLoginCipherFormDataSubject
-      .pipe(switchMap(() => timer(this.clearLoginCipherTimeoutDuration)))
-      .subscribe(() => this.clearLoginCipherFormData());
+      .pipe(switchMap(() => timer(CLEAR_NOTIFICATION_LOGIN_DATA_DURATION)))
+      .subscribe(() => this.modifyLoginCipherFormData.clear());
   }
 
-  private handleFormFieldSubmitted(
+  /**
+   * Handles the response from the content script with the page details. Triggers an initialization
+   * of the add login or change password notification if the conditions are met.
+   *
+   * @param message - The message from the content script
+   * @param sender - The sender of the message
+   */
+  private async handleCollectPageDetailsResponse(
     message: OverlayNotificationsExtensionMessage,
     sender: chrome.runtime.MessageSender,
   ) {
-    // console.log("form field submitted", message, sender);
-    this.storeModifiedLoginFormData(message, sender.tab.id);
+    if (await this.shouldInitAddLoginOrChangePasswordNotification(message, sender)) {
+      this.websiteOriginsWithFields.set(sender.tab.id, this.getTabOriginMatchPattern(sender.url));
+      this.setupWebRequestsListeners();
+    }
   }
 
+  /**
+   * Determines if the add login or change password notification should be initialized. This depends
+   * on whether the user has enabled the notification, the sender is not from an excluded domain, the
+   * tab's page details contains fillable fields, and the website origin has not been previously stored.
+   *
+   * @param message - The message from the content script
+   * @param sender - The sender of the message
+   */
+  private async shouldInitAddLoginOrChangePasswordNotification(
+    message: OverlayNotificationsExtensionMessage,
+    sender: chrome.runtime.MessageSender,
+  ) {
+    return (
+      (await this.isAddLoginOrChangePasswordNotificationEnabled()) &&
+      !(await this.isSenderFromExcludedDomain(sender)) &&
+      message.details?.fields?.length > 0 &&
+      !this.websiteOriginsWithFields.has(sender.tab.id)
+    );
+  }
+
+  /**
+   * Determines if the add login or change password notification is enabled.
+   * This is based on the user's settings for the notification.
+   */
+  private async isAddLoginOrChangePasswordNotificationEnabled() {
+    if (await this.notificationsBackground.getEnableChangedPasswordPrompt()) {
+      return true;
+    }
+
+    return await this.notificationsBackground.getEnableAddedLoginPrompt();
+  }
+
+  /**
+   * Returns the match pattern for the tab's origin URL.
+   *
+   * @param url - The URL of the tab
+   */
+  private getTabOriginMatchPattern(url: string) {
+    try {
+      if (!url.startsWith("http")) {
+        url = `https://${url}`;
+      }
+
+      return `${new URL(url).origin}/*`;
+    } catch {
+      return "";
+    }
+  }
+
+  /**
+   * Stores the login form data that was modified by the user in the content script. This data is
+   * used to trigger the add login or change password notification when the form is submitted.
+   *
+   * @param message - The message from the content script
+   * @param sender - The sender of the message
+   */
   private storeModifiedLoginFormData = (
     message: OverlayNotificationsExtensionMessage,
-    tabId: chrome.tabs.Tab["id"],
+    sender: chrome.runtime.MessageSender,
   ) => {
     this.clearLoginCipherFormDataSubject.next();
 
     const { uri, username, password, newPassword } = message;
-    this.modifyLoginCipherFormData.set(tabId, {
+    this.modifyLoginCipherFormData.set(sender.tab.id, {
       uri: uri,
       username: username,
       password: password,
@@ -73,34 +141,13 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
     });
   };
 
-  private clearLoginCipherFormData = () => {
-    this.modifyLoginCipherFormData.clear();
-  };
-
-  private async handleCollectPageDetailsResponse(
-    message: OverlayNotificationsExtensionMessage,
-    sender: chrome.runtime.MessageSender,
-  ) {
-    // console.log("collect page details response", message, sender);
-    if (
-      !(await this.isAddLoginOrChangePasswordNotificationEnabled()) ||
-      (await this.isSenderFromExcludedDomain(sender))
-    ) {
-      return;
-    }
-
-    if (!message.details?.fields?.length) {
-      return;
-    }
-
-    if (this.websiteOriginsWithFields.has(sender.tab.id)) {
-      return;
-    }
-
-    this.websiteOriginsWithFields.set(sender.tab.id, this.getTabOriginMatchPattern(sender.url));
-    this.resetWebRequestsListeners();
-  }
-
+  /**
+   * Determines if the sender of the message is from an excluded domain. This is used to prevent the
+   * add login or change password notification from being triggered on the user's vault domain or
+   * other excluded domains.
+   *
+   * @param sender - The sender of the message
+   */
   private async isSenderFromExcludedDomain(sender: chrome.runtime.MessageSender): Promise<boolean> {
     try {
       const senderOrigin = sender.origin;
@@ -122,115 +169,22 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
     }
   }
 
-  private async isAddLoginOrChangePasswordNotificationEnabled() {
-    if (await this.notificationsBackground.getEnableChangedPasswordPrompt()) {
-      return true;
-    }
-
-    return await this.notificationsBackground.getEnableAddedLoginPrompt();
-  }
-
-  private clearWebRequestsListenersOnWebsiteOrigin(tabId: chrome.tabs.Tab["id"]) {
-    if (!this.websiteOriginsWithFields.has(tabId)) {
-      return;
-    }
-
-    this.websiteOriginsWithFields.delete(tabId);
-    this.resetWebRequestsListeners();
-  }
-
-  private resetWebRequestsListeners() {
-    chrome.webRequest.onBeforeRequest.removeListener(this.handleOnBeforeRequestEvent);
-    chrome.webRequest.onCompleted.removeListener(this.handleOnCompletedRequestEvent);
-    // console.log("rest web", this.websiteOriginsWithFields);
-    if (!this.websiteOriginsWithFields.size) {
-      return;
-    }
-
-    const requestFilter: chrome.webRequest.RequestFilter = {
-      urls: Array.from(this.websiteOriginsWithFields.values()),
-      types: ["main_frame", "sub_frame", "xmlhttprequest"],
-    };
-    chrome.webRequest.onBeforeRequest.addListener(this.handleOnBeforeRequestEvent, requestFilter);
-    chrome.webRequest.onCompleted.addListener(this.handleOnCompletedRequestEvent, requestFilter);
-  }
-
-  private setupExtensionListeners() {
-    BrowserApi.messageListener("overlay-notifications", this.handleExtensionMessage);
-    chrome.tabs.onRemoved.addListener(this.handleTabRemoved);
-    chrome.tabs.onUpdated.addListener(this.handleTabUpdated);
-  }
-
-  private handleTabRemoved = (tabId: number) => {
-    this.modifyLoginCipherFormData.delete(tabId);
-    this.websiteOriginsWithFields.delete(tabId);
-    this.resetWebRequestsListeners();
-  };
-
-  private handleTabUpdated = (
-    tabId: number,
-    changeInfo: chrome.tabs.TabChangeInfo,
-    tab: chrome.tabs.Tab,
-  ) => {
-    if (changeInfo.status === "loading") {
-      this.clearWebRequestsListenersOnWebsiteOrigin(tabId);
-    }
-  };
-
-  private handleOnBeforeRequestEvent = (details: chrome.webRequest.WebRequestDetails) => {
-    // console.log("onBefore", details);
-    if (this.requestHostIsInvalid(details) || !this.isFormSubmissionRequest(details)) {
-      return;
-    }
-
-    this.activeFormSubmissionRequests.add(details.requestId);
-  };
-
-  private isFormSubmissionRequest = (details: chrome.webRequest.WebRequestDetails) => {
-    return this.formSubmissionRequestMethods.has(details.method?.toUpperCase());
-  };
-
-  private handleOnCompletedRequestEvent = async (details: chrome.webRequest.WebResponseDetails) => {
-    // console.log("onCompleted", details);
-
-    if (
-      this.requestHostIsInvalid(details) ||
-      this.isInvalidStatusCode(details.statusCode) ||
-      !this.activeFormSubmissionRequests.has(details.requestId)
-    ) {
-      return;
-    }
-
-    const modifyLoginData = this.modifyLoginCipherFormData.get(details.tabId);
-    if (!modifyLoginData) {
-      return;
-    }
-
-    // console.log("submit notification with login data", modifyLoginData);
-
-    let tab = await BrowserApi.getTab(details.tabId);
-    if (tab.status !== "complete") {
-      // TODO: Clean this up
-      const handleWebNavigationOnCompleted = async () => {
-        tab = await BrowserApi.getTab(details.tabId);
-        if (tab.status === "complete") {
-          chrome.webNavigation.onCompleted.removeListener(handleWebNavigationOnCompleted);
-          await this.triggerNotification(details, modifyLoginData, tab);
-        }
-      };
-      chrome.webNavigation.onCompleted.addListener(handleWebNavigationOnCompleted);
-      return;
-    }
-
-    await this.triggerNotification(details, modifyLoginData, tab);
-  };
-
-  private triggerNotification = async (
+  /**
+   * Initializes the add login or change password notification based on the modified login form data
+   * and the tab details. This will trigger the notification to be displayed to the user.
+   *
+   * @param details - The details of the web response
+   * @param modifyLoginData  - The modified login form data
+   * @param tab - The tab details
+   */
+  private triggerNotificationInit = async (
     details: chrome.webRequest.WebResponseDetails,
     modifyLoginData: ModifyLoginCipherFormData,
     tab: chrome.tabs.Tab,
   ) => {
     if (modifyLoginData.newPassword && !modifyLoginData.username) {
+      // These notifications are temporarily setup as "messages" to the notification background.
+      // This will be structured differently in a future refactor.
       await this.notificationsBackground.changedPassword(
         {
           command: "bgChangedPassword",
@@ -262,14 +216,105 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
     }
   };
 
-  private isInvalidStatusCode = (statusCode: number) => {
-    return statusCode < 200 || statusCode >= 300;
+  /**
+   * Removes and resets the onBeforeRequest and onCompleted listeners for web requests. This ensures
+   * that we are only listening for form submission requests on the tabs that have fillable form fields.
+   */
+  private setupWebRequestsListeners() {
+    chrome.webRequest.onBeforeRequest.removeListener(this.handleOnBeforeRequestEvent);
+    chrome.webRequest.onCompleted.removeListener(this.handleOnCompletedRequestEvent);
+    if (!this.websiteOriginsWithFields.size) {
+      return;
+    }
+
+    const requestFilter: chrome.webRequest.RequestFilter = {
+      urls: Array.from(this.websiteOriginsWithFields.values()),
+      types: ["main_frame", "sub_frame", "xmlhttprequest"],
+    };
+    chrome.webRequest.onBeforeRequest.addListener(this.handleOnBeforeRequestEvent, requestFilter);
+    chrome.webRequest.onCompleted.addListener(this.handleOnCompletedRequestEvent, requestFilter);
+  }
+
+  /**
+   * Handles the onBeforeRequest event for web requests. This is used to ensures that the following
+   * onCompleted event is only triggered for form submission requests.
+   *
+   * @param details - The details of the web request
+   */
+  private handleOnBeforeRequestEvent = (details: chrome.webRequest.WebRequestDetails) => {
+    if (this.isValidFormSubmissionRequest(details)) {
+      this.activeFormSubmissionRequests.add(details.requestId);
+    }
   };
 
-  private requestHostIsInvalid = (details: chrome.webRequest.ResourceRequest) => {
-    return !details.url?.startsWith("http") || details.tabId < 0;
+  /**
+   * Determines if the web request is a valid form submission request. A valid web request
+   * is a POST, PUT, or PATCH request that is not from an invalid host.
+   *
+   * @param details - The details of the web request
+   */
+  private isValidFormSubmissionRequest = (details: chrome.webRequest.WebRequestDetails) => {
+    return (
+      !this.requestHostIsInvalid(details) &&
+      this.formSubmissionRequestMethods.has(details.method?.toUpperCase())
+    );
   };
 
+  /**
+   * Handles the onCompleted event for web requests. This is used to trigger the add login or change
+   * password notification when a form submission request is completed.
+   *
+   * @param details - The details of the web response
+   */
+  private handleOnCompletedRequestEvent = async (details: chrome.webRequest.WebResponseDetails) => {
+    if (
+      this.requestHostIsInvalid(details) ||
+      this.isInvalidStatusCode(details.statusCode) ||
+      !this.activeFormSubmissionRequests.has(details.requestId)
+    ) {
+      return;
+    }
+
+    const modifyLoginData = this.modifyLoginCipherFormData.get(details.tabId);
+    if (!modifyLoginData) {
+      return;
+    }
+
+    const tab = await BrowserApi.getTab(details.tabId);
+    if (tab.status !== "complete") {
+      await this.delayNotificationInitUntilTabIsComplete(details, modifyLoginData);
+      return;
+    }
+
+    await this.triggerNotificationInit(details, modifyLoginData, tab);
+  };
+
+  /**
+   * Delays the initialization of the add login or change password notification
+   * until the tab is complete. This is used to ensure that the notification is
+   * triggered after the tab has finished loading.
+   *
+   * @param details - The details of the web response
+   * @param modifyLoginData - The modified login form data
+   */
+  private delayNotificationInitUntilTabIsComplete = async (
+    details: chrome.webRequest.WebResponseDetails,
+    modifyLoginData: ModifyLoginCipherFormData,
+  ) => {
+    const handleWebNavigationOnCompleted = async () => {
+      chrome.webNavigation.onCompleted.removeListener(handleWebNavigationOnCompleted);
+      const tab = await BrowserApi.getTab(details.tabId);
+      await this.triggerNotificationInit(details, modifyLoginData, tab);
+    };
+    chrome.webNavigation.onCompleted.addListener(handleWebNavigationOnCompleted);
+  };
+
+  /**
+   * Clears the completed web request and removes the modified login form data for the tab.
+   *
+   * @param details - The details of the web response
+   * @param tab - The tab details
+   */
   private clearCompletedWebRequest = (
     details: chrome.webRequest.WebResponseDetails,
     tab: chrome.tabs.Tab,
@@ -277,22 +322,45 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
     this.activeFormSubmissionRequests.delete(details.requestId);
     this.modifyLoginCipherFormData.delete(tab.id);
     this.websiteOriginsWithFields.delete(tab.id);
-    this.resetWebRequestsListeners();
+    this.setupWebRequestsListeners();
   };
 
-  private getTabOriginMatchPattern(url: string) {
-    try {
-      if (!url.startsWith("http")) {
-        url = `https://${url}`;
-      }
+  /**
+   * Determines if the status code of the web response is invalid. An invalid status code is
+   * any status code that is not in the 200-299 range.
+   *
+   * @param statusCode - The status code of the web response
+   */
+  private isInvalidStatusCode = (statusCode: number) => {
+    return statusCode < 200 || statusCode >= 300;
+  };
 
-      const parsedUrl = new URL(url);
-      return `${parsedUrl.origin}/*`;
-    } catch {
-      return "";
-    }
+  /**
+   * Determines if the host of the web request is invalid. An invalid host is any host that does not
+   * start with "http" or a tab id that is less than 0.
+   *
+   * @param details - The details of the web request
+   */
+  private requestHostIsInvalid = (details: chrome.webRequest.ResourceRequest) => {
+    return !details.url?.startsWith("http") || details.tabId < 0;
+  };
+
+  /**
+   * Sets up the listeners for the extension messages and the tab events.
+   */
+  private setupExtensionListeners() {
+    BrowserApi.messageListener("overlay-notifications", this.handleExtensionMessage);
+    chrome.tabs.onRemoved.addListener(this.handleTabRemoved);
+    chrome.tabs.onUpdated.addListener(this.handleTabUpdated);
   }
 
+  /**
+   * Handles messages that are sent to the extension background.
+   *
+   * @param message - The message from the content script
+   * @param sender - The sender of the message
+   * @param sendResponse - The response to send back to the content script
+   */
   private handleExtensionMessage = (
     message: OverlayNotificationsExtensionMessage,
     sender: chrome.runtime.MessageSender,
@@ -312,5 +380,30 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
       .then((response) => sendResponse(response))
       .catch((error) => this.logService.error(error));
     return true;
+  };
+
+  /**
+   * Handles the removal of a tab. This is used to remove the modified login form data for the tab.
+   *
+   * @param tabId - The id of the tab that was removed
+   */
+  private handleTabRemoved = (tabId: number) => {
+    this.modifyLoginCipherFormData.delete(tabId);
+    this.websiteOriginsWithFields.delete(tabId);
+    this.setupWebRequestsListeners();
+  };
+
+  /**
+   * Handles the update of a tab. This is used to remove the modified
+   * login form  data for the tab when the tab is loading.
+   *
+   * @param tabId - The id of the tab that was updated
+   * @param changeInfo - The change info of the tab
+   */
+  private handleTabUpdated = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo) => {
+    if (changeInfo.status === "loading" && this.websiteOriginsWithFields.has(tabId)) {
+      this.websiteOriginsWithFields.delete(tabId);
+      this.setupWebRequestsListeners();
+    }
   };
 }
