@@ -202,7 +202,7 @@ export class DefaultSyncService extends CoreSyncService {
 
     await this.providerService.save(providers);
 
-    await this.syncProfileOrganizations(response);
+    await this.syncProfileOrganizations(response, response.id);
 
     if (await this.keyConnectorService.userNeedsMigration()) {
       await this.keyConnectorService.setConvertAccountRequired(true);
@@ -261,7 +261,7 @@ export class DefaultSyncService extends CoreSyncService {
     }
   }
 
-  private async syncProfileOrganizations(response: ProfileResponse) {
+  private async syncProfileOrganizations(response: ProfileResponse, userId: UserId) {
     const organizations: { [id: string]: OrganizationData } = {};
     response.organizations.forEach((o) => {
       organizations[o.id] = new OrganizationData(o, {
@@ -281,7 +281,7 @@ export class DefaultSyncService extends CoreSyncService {
       }
     });
 
-    await this.organizationService.replace(organizations);
+    await this.organizationService.replace(organizations, userId);
   }
 
   private async syncFolders(response: FolderResponse[], userId: UserId) {
