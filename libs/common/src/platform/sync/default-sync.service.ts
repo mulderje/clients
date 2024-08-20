@@ -192,7 +192,7 @@ export class DefaultSyncService extends CoreSyncService {
       response.premiumFromOrganization,
       response.id,
     );
-    await this.keyConnectorService.setUsesKeyConnector(response.usesKeyConnector);
+    await this.keyConnectorService.setUsesKeyConnector(response.usesKeyConnector, response.id);
 
     await this.setForceSetPasswordReasonIfNeeded(response);
 

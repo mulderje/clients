@@ -69,8 +69,8 @@ export class KeyConnectorService implements KeyConnectorServiceAbstraction {
     );
   }
 
-  async setUsesKeyConnector(usesKeyConnector: boolean) {
-    await this.usesKeyConnectorState.update(() => usesKeyConnector);
+  async setUsesKeyConnector(usesKeyConnector: boolean, userId: UserId) {
+    await this.stateProvider.getUser(userId, USES_KEY_CONNECTOR).update(() => usesKeyConnector);
   }
 
   getUsesKeyConnector(): Promise<boolean> {

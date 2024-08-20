@@ -13,7 +13,7 @@ export abstract class KeyConnectorService {
     orgId: string,
     userId: UserId,
   ) => Promise<void>;
-  setUsesKeyConnector: (enabled: boolean) => Promise<void>;
+  setUsesKeyConnector: (enabled: boolean, userId: UserId) => Promise<void>;
   setConvertAccountRequired: (status: boolean) => Promise<void>;
   getConvertAccountRequired: () => Promise<boolean>;
   removeConvertAccountRequired: () => Promise<void>;
