@@ -5,6 +5,7 @@ import { sendExtensionMessage } from "../utils";
 import {
   AutofillKeywordsMap,
   InlineMenuFieldQualificationService as InlineMenuFieldQualificationServiceInterface,
+  SubmitButtonKeywordsMap,
 } from "./abstractions/inline-menu-field-qualifications.service";
 import {
   AutoFillConstants,
@@ -33,7 +34,7 @@ export class InlineMenuFieldQualificationService
   private currentPasswordAutocompleteValue = "current-password";
   private newPasswordAutoCompleteValue = "new-password";
   private autofillFieldKeywordsMap: AutofillKeywordsMap = new WeakMap();
-  private submitButtonFieldKeywordsMap: WeakMap<HTMLElement, string> = new WeakMap();
+  private submitButtonKeywordsMap: SubmitButtonKeywordsMap = new WeakMap();
   private autocompleteDisabledValues = new Set(["off", "false"]);
   private newFieldKeywords = new Set(["new", "change", "neue", "ändern"]);
   private accountCreationFieldKeywords = [
@@ -1007,18 +1008,33 @@ export class InlineMenuFieldQualificationService
     return false;
   }
 
+  /**
+   * Validates the provided field to indicate if the field is a submit button for a login form.
+   *
+   * @param element - The element to validate
+   */
   isElementLoginSubmitButton = (element: HTMLElement): boolean => {
     const keywordValues = this.getSubmitButtonKeywords(element);
     return SubmitLoginButtonNames.some((keyword) => keywordValues.indexOf(keyword) > -1);
   };
 
+  /**
+   * Validates the provided field to indicate if the field is a submit button for a change password form.
+   *
+   * @param element - The element to validate
+   */
   isElementChangePasswordSubmitButton = (element: HTMLElement): boolean => {
     const keywordValues = this.getSubmitButtonKeywords(element);
     return SubmitChangePasswordButtonNames.some((keyword) => keywordValues.indexOf(keyword) > -1);
   };
 
+  /**
+   * Gather the keywords from the provided element to validate the submit button.
+   *
+   * @param element - The element to validate
+   */
   private getSubmitButtonKeywords(element: HTMLElement): string {
-    if (!this.submitButtonFieldKeywordsMap.has(element)) {
+    if (!this.submitButtonKeywordsMap.has(element)) {
       const keywords = [
         element.textContent,
         element.getAttribute("value"),
@@ -1029,13 +1045,28 @@ export class InlineMenuFieldQualificationService
         element.getAttribute("id"),
         element.getAttribute("name"),
         element.getAttribute("class"),
-      ]
-        .join(",")
-        .toLowerCase();
-      this.submitButtonFieldKeywordsMap.set(element, keywords);
+      ];
+
+      const keywordsSet = new Set<string>();
+      for (let i = 0; i < keywords.length; i++) {
+        if (typeof keywords[i] === "string") {
+          keywords[i]
+            .toLowerCase()
+            .replace(/[-\s]/g, "")
+            .replace(/[^a-zA-Z0-9]+/g, "|")
+            .split("|")
+            .forEach((keyword) => {
+              if (keyword) {
+                keywordsSet.add(keyword);
+              }
+            });
+        }
+      }
+
+      this.submitButtonKeywordsMap.set(element, Array.from(keywordsSet).join(","));
     }
 
-    return this.submitButtonFieldKeywordsMap.get(element);
+    return this.submitButtonKeywordsMap.get(element);
   }
 
   /**

@@ -9,6 +9,8 @@ export type AutofillKeywordsMap = WeakMap<
   }
 >;
 
+export type SubmitButtonKeywordsMap = WeakMap<HTMLElement, string>;
+
 export interface InlineMenuFieldQualificationService {
   isUsernameField(field: AutofillField): boolean;
   isNewPasswordField(field: AutofillField): boolean;
