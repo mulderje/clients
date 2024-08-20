@@ -9,15 +9,15 @@ defaults:
     shell: bash
 
 jobs:
-  browser-build:
-    name: Browser Build
-    uses: ./.github/workflows/build-browser.yml
-    secrets: inherit
+  # browser-build:
+  #   name: Browser Build
+  #   uses: ./.github/workflows/build-browser.yml
+  #   secrets: inherit
 
   macos-package-dev:
     name: MacOS Package Dev Release Asset
     runs-on: macos-13
-    needs: browser-build
+    # needs: browser-build
     env:
       _PACKAGE_VERSION: "2024.7.1"
       _NODE_VERSION: "20"
