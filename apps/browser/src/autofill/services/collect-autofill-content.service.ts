@@ -70,10 +70,10 @@ export class CollectAutofillContentService implements CollectAutofillContentServ
     }
     this.formFieldQueryString = `${inputQuery}, textarea:not([data-bwignore]), select:not([data-bwignore]), span[data-bwautofill]`;
 
-    void sendExtensionMessage("getUseTreeWalkerApiForPageDetailsCollectionFeatureFlag").then(
-      (useTreeWalkerStrategyFlag) =>
-        (this.useTreeWalkerStrategyFlagSet = !!useTreeWalkerStrategyFlag?.result),
-    );
+    // void sendExtensionMessage("getUseTreeWalkerApiForPageDetailsCollectionFeatureFlag").then(
+    //   (useTreeWalkerStrategyFlag) =>
+    //     (this.useTreeWalkerStrategyFlagSet = !!useTreeWalkerStrategyFlag?.result),
+    // );
   }
 
   get autofillFormElements(): AutofillFormElements {
