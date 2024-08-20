@@ -606,7 +606,7 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
    *
    * @param event - The keyup event.
    */
-  private handleFormFieldKeyupEvent = async (event: KeyboardEvent) => {
+  private handleFormFieldKeyupEvent = async (event: globalThis.KeyboardEvent) => {
     const eventCode = event.code;
     if (eventCode === "Escape") {
       void this.sendExtensionMessage("closeAutofillInlineMenu", {
