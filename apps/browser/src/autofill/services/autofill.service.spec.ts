@@ -29,6 +29,7 @@ import {
   subscribeTo,
 } from "@bitwarden/common/spec";
 import { UserId } from "@bitwarden/common/types/guid";
+import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
 import { FieldType, LinkedIdType, LoginLinkedId, CipherType } from "@bitwarden/common/vault/enums";
 import { CipherRepromptType } from "@bitwarden/common/vault/enums/cipher-reprompt-type";
 import { CardView } from "@bitwarden/common/vault/models/view/card.view";
@@ -37,7 +38,6 @@ import { FieldView } from "@bitwarden/common/vault/models/view/field.view";
 import { IdentityView } from "@bitwarden/common/vault/models/view/identity.view";
 import { LoginUriView } from "@bitwarden/common/vault/models/view/login-uri.view";
 import { LoginView } from "@bitwarden/common/vault/models/view/login.view";
-import { CipherService } from "@bitwarden/common/vault/services/cipher.service";
 import { TotpService } from "@bitwarden/common/vault/services/totp.service";
 
 import { BrowserApi } from "../../platform/browser/browser-api";
@@ -361,6 +361,8 @@ describe("AutofillService", () => {
     const autofillBootstrapScript = "bootstrap-autofill.js";
     const autofillOverlayBootstrapScript = "bootstrap-autofill-overlay.js";
     const autofillOverlayMenuBootstrapScript = "bootstrap-autofill-overlay-menu.js";
+    const autofillOverlayNotificationsBootstrapScript =
+      "bootstrap-autofill-overlay-notifications.js";
     const defaultAutofillScripts = ["autofiller.js", "notificationBar.js", "contextMenuHandler.js"];
     const defaultExecuteScriptOptions = { runAt: "document_start" };
     let tabMock: chrome.tabs.Tab;
@@ -458,6 +460,21 @@ describe("AutofillService", () => {
       });
       expect(BrowserApi.executeScriptInTab).not.toHaveBeenCalledWith(tabMock.id, {
         file: `content/${autofillOverlayBootstrapScript}`,
+        frameId: sender.frameId,
+        ...defaultExecuteScriptOptions,
+      });
+    });
+
+    it("will inject the bootstrap-autofill-overlay-notifications script if the user has the notification bar turned on but does not have the inline menu turned on", async () => {
+      jest
+        .spyOn(autofillService, "getInlineMenuVisibility")
+        .mockResolvedValue(AutofillOverlayVisibility.Off);
+      enableChangedPasswordPromptMock$.next(true);
+
+      await autofillService.injectAutofillScripts(sender.tab, sender.frameId);
+
+      expect(BrowserApi.executeScriptInTab).toHaveBeenCalledWith(tabMock.id, {
+        file: `content/${autofillOverlayNotificationsBootstrapScript}`,
         frameId: sender.frameId,
         ...defaultExecuteScriptOptions,
       });

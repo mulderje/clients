@@ -209,6 +209,14 @@ export default class AutofillService implements AutofillServiceInterface {
     }
   }
 
+  /**
+   * Identifies the correct autofill script to inject based on whether the
+   * inline menu is enabled, and whether the user has the notification bar
+   * enabled.
+   *
+   * @param activeAccount - The active account
+   * @param addLoginImprovementsFlagActive - Whether the add login improvements feature flag is active
+   */
   private async getBootstrapAutofillContentScript(
     activeAccount: { id: UserId | undefined } & AccountInfo,
     addLoginImprovementsFlagActive = false,
