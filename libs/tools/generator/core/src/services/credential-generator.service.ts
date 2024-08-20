@@ -1,4 +1,16 @@
-import { filter, firstValueFrom, map, mergeMap, Observable } from "rxjs";
+import {
+  combineLatest,
+  distinctUntilChanged,
+  endWith,
+  filter,
+  firstValueFrom,
+  ignoreElements,
+  map,
+  mergeMap,
+  Observable,
+  switchMap,
+  takeUntil,
+} from "rxjs";
 
 import { PolicyService } from "@bitwarden/common/admin-console/abstractions/policy/policy.service.abstraction";
 import { StateProvider } from "@bitwarden/common/platform/state";
@@ -10,7 +22,7 @@ import { PolicyEvaluator } from "../abstractions";
 import { mapPolicyToEvaluatorV2 } from "../rx";
 import { CredentialGeneratorConfiguration as Configuration } from "../types/credential-generator-configuration";
 
-type PolicyDependencies = UserDependency;
+type Policy$Dependencies = UserDependency;
 type Settings$Dependencies = Partial<UserDependency>;
 // FIXME: once the modernization is complete, switch the type parameters
 // in `PolicyEvaluator<P, S>` and bake-in the constraints type.
@@ -35,15 +47,31 @@ export class CredentialGeneratorService {
     dependencies?: Settings$Dependencies,
   ) {
     const userId$ = dependencies?.userId$ ?? this.stateProvider.activeUserId$;
+    const completion$ = userId$.pipe(ignoreElements(), endWith(true));
 
     const state$ = userId$.pipe(
-      filter((userId) => userId !== null),
-      // TODO: like `this.settings`, the observable needs to apply policy
-      // when the settings are read
-      map((userId) => this.stateProvider.getUserState$(configuration.settings.account, userId)),
+      filter((userId) => !!userId),
+      distinctUntilChanged(),
+      switchMap((userId) => {
+        const state$ = this.stateProvider
+          .getUserState$(configuration.settings.account, userId)
+          .pipe(takeUntil(completion$));
+
+        return state$;
+      }),
+      map((settings) => settings ?? structuredClone(configuration.settings.initial)),
     );
 
-    return state$;
+    const settings$ = combineLatest([state$, this.policy$(configuration, { userId$ })]).pipe(
+      map(([settings, policy]) => {
+        // FIXME: create `onLoadApply` that wraps these operations
+        const applied = policy.applyPolicy(settings);
+        const sanitized = policy.sanitize(applied);
+        return sanitized;
+      }),
+    );
+
+    return settings$;
   }
 
   /** Get a subject bound to a specific user's settings
@@ -57,10 +85,12 @@ export class CredentialGeneratorService {
     configuration: Configuration<Settings, Policy>,
     dependencies: SingleUserDependency,
   ) {
-    const userId = await firstValueFrom(dependencies.singleUserId$);
+    const userId = await firstValueFrom(
+      dependencies.singleUserId$.pipe(filter((userId) => !!userId)),
+    );
     const state = this.stateProvider.getUser(userId, configuration.settings.account);
 
-    // TODO: apply policy to the settings - this should happen *within* the subject.
+    // FIXME: apply policy to the settings - this should happen *within* the subject.
     // Note that policies could be evaluated when the settings are saved or when they
     // are loaded. The existing subject presently could only apply settings on save
     // (by wiring the policy in as a dependency and applying with "nextState"), and
@@ -78,10 +108,18 @@ export class CredentialGeneratorService {
    */
   policy$<Settings, Policy>(
     configuration: Configuration<Settings, Policy>,
-    dependencies: PolicyDependencies,
+    dependencies: Policy$Dependencies,
   ): Observable<Evaluator<Settings, Policy>> {
+    const completion$ = dependencies.userId$.pipe(ignoreElements(), endWith(true));
+
     const policy$ = dependencies.userId$.pipe(
-      mergeMap((userId) => this.policyService.getAll$(configuration.policy.type, userId)),
+      mergeMap((userId) => {
+        // complete policy emissions otherwise `mergeMap` holds `policy$` open indefinitely
+        const policies$ = this.policyService
+          .getAll$(configuration.policy.type, userId)
+          .pipe(takeUntil(completion$));
+        return policies$;
+      }),
       mapPolicyToEvaluatorV2(configuration.policy),
     );
 

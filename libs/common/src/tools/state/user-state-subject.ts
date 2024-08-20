@@ -121,6 +121,12 @@ export class UserStateSubject<State, Dependencies = null>
       });
   }
 
+  /** The userId to which the subject is bound.
+   */
+  get userId() {
+    return this.state.userId;
+  }
+
   next(value: State) {
     this.input?.next(value);
   }

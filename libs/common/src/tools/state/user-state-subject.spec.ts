@@ -464,4 +464,14 @@ describe("UserStateSubject", () => {
       expect(actual).toEqual(expected);
     });
   });
+
+  describe("userId", () => {
+    it("returns the userId to which the subject is bound", () => {
+      const state = new FakeSingleUserState<TestType>(SomeUser, { foo: "init" });
+      const singleUserId$ = new Subject<UserId>();
+      const subject = new UserStateSubject(state, { singleUserId$ });
+
+      expect(subject.userId).toEqual(SomeUser);
+    });
+  });
 });
