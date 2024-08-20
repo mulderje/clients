@@ -1433,6 +1433,187 @@ describe("AutofillOverlayContentService", () => {
       });
     });
 
+    describe("sets up form submission event listeners", () => {
+      describe("listeners set up on a fields with a form", () => {
+        let form: HTMLFormElement;
+
+        beforeEach(() => {
+          form = document.getElementById("validFormId") as HTMLFormElement;
+        });
+
+        it("sends a `formFieldSubmitted` message to the background on submission of the form", async () => {
+          await autofillOverlayContentService.setupOverlayListeners(
+            autofillFieldElement,
+            autofillFieldData,
+            pageDetailsMock,
+          );
+          form.dispatchEvent(new Event("submit"));
+
+          expect(sendExtensionMessageSpy).toHaveBeenCalledWith("formFieldSubmitted", {
+            uri: globalThis.document.URL,
+            username: "",
+            password: "",
+            newPassword: "",
+          });
+        });
+
+        describe("triggering submission through interaction of a generic input element", () => {
+          let genericSubmitElement: HTMLInputElement;
+
+          beforeEach(() => {
+            genericSubmitElement = document.createElement("input");
+            genericSubmitElement.type = "submit";
+            genericSubmitElement.value = "Login In";
+            form.appendChild(genericSubmitElement);
+          });
+
+          it("ignores keyup events triggered on a generic input element if the key is not `Enter` or `Space`", async () => {
+            await autofillOverlayContentService.setupOverlayListeners(
+              autofillFieldElement,
+              autofillFieldData,
+              pageDetailsMock,
+            );
+            genericSubmitElement.dispatchEvent(new KeyboardEvent("keyup", { code: "Tab" }));
+
+            expect(sendExtensionMessageSpy).not.toHaveBeenCalledWith(
+              "formFieldSubmitted",
+              expect.any(Object),
+            );
+          });
+
+          it("sends a `formFieldSubmitted` message to the background on interaction of a generic input element", async () => {
+            await autofillOverlayContentService.setupOverlayListeners(
+              autofillFieldElement,
+              autofillFieldData,
+              pageDetailsMock,
+            );
+            genericSubmitElement.dispatchEvent(new KeyboardEvent("keyup", { code: "Enter" }));
+
+            expect(sendExtensionMessageSpy).toHaveBeenCalledWith(
+              "formFieldSubmitted",
+              expect.any(Object),
+            );
+          });
+        });
+      });
+
+      describe("listeners set up on a fields without a form", () => {
+        let autofillFieldElement: ElementWithOpId<FormFieldElement>;
+        let autofillFieldData: AutofillField;
+        let pageDetailsMock: AutofillPageDetails;
+
+        beforeEach(() => {
+          document.body.innerHTML = `
+          <div id="form-div">
+            <div>
+              <input type="password" id="password-field-1" placeholder="new password" />
+            </div>
+            <div>
+              <input type="password" id="password-field-2" placeholder="confirm new password" />
+            </div>
+            <button id="button-el">Change Password</button>
+          </div>
+          `;
+
+          autofillFieldElement = document.getElementById(
+            "password-field-1",
+          ) as ElementWithOpId<FormFieldElement>;
+          autofillFieldElement.opid = "op-1";
+          jest.spyOn(autofillFieldElement, "addEventListener");
+          jest.spyOn(autofillFieldElement, "removeEventListener");
+          autofillFieldData = createAutofillFieldMock({
+            opid: "new-password-field",
+            placeholder: "new password",
+            autoCompleteType: "new-password",
+            elementNumber: 1,
+            form: "",
+          });
+          const passwordFieldData = createAutofillFieldMock({
+            opid: "confirm-new-password-field",
+            elementNumber: 2,
+            autoCompleteType: "new-password",
+            type: "password",
+            form: "",
+          });
+          pageDetailsMock = mock<AutofillPageDetails>({
+            forms: {},
+            fields: [autofillFieldData, passwordFieldData],
+          });
+        });
+
+        it("skips triggering submission if a button is not found", async () => {
+          const submitButton = document.querySelector("button");
+          submitButton.remove();
+
+          await autofillOverlayContentService.setupOverlayListeners(
+            autofillFieldElement,
+            autofillFieldData,
+            pageDetailsMock,
+          );
+          submitButton.dispatchEvent(new KeyboardEvent("keyup", { code: "Enter" }));
+
+          expect(sendExtensionMessageSpy).not.toHaveBeenCalledWith(
+            "formFieldSubmitted",
+            expect.any(Object),
+          );
+        });
+
+        it("triggers submission through interaction of a submit button", async () => {
+          const submitButton = document.querySelector("button");
+          await autofillOverlayContentService.setupOverlayListeners(
+            autofillFieldElement,
+            autofillFieldData,
+            pageDetailsMock,
+          );
+          submitButton.dispatchEvent(new KeyboardEvent("keyup", { code: "Enter" }));
+
+          expect(sendExtensionMessageSpy).toHaveBeenCalledWith(
+            "formFieldSubmitted",
+            expect.any(Object),
+          );
+        });
+
+        it("captures submit buttons when the field is structured within a shadow DOM", async () => {
+          document.body.innerHTML = `<div id="form-div">
+            <div id="shadow-root"></div>
+            <button id="button-el">Change Password</button>
+          </div>`;
+          const shadowRoot = document.getElementById("shadow-root").attachShadow({ mode: "open" });
+          shadowRoot.innerHTML = `
+            <input type="password" id="password-field-1" placeholder="new password" />
+          `;
+          autofillFieldElement = shadowRoot.getElementById(
+            "password-field-1",
+          ) as ElementWithOpId<FormFieldElement>;
+          autofillFieldElement.opid = "op-1";
+          autofillFieldData = createAutofillFieldMock({
+            opid: "new-password-field",
+            placeholder: "new password",
+            autoCompleteType: "new-password",
+            elementNumber: 1,
+            form: "",
+          });
+          pageDetailsMock = mock<AutofillPageDetails>({
+            forms: {},
+            fields: [autofillFieldData],
+          });
+          const buttonElement = document.getElementById("button-el");
+
+          await autofillOverlayContentService.setupOverlayListeners(
+            autofillFieldElement,
+            autofillFieldData,
+            pageDetailsMock,
+          );
+          buttonElement.dispatchEvent(new KeyboardEvent("keyup", { code: "Enter" }));
+
+          expect(sendExtensionMessageSpy).toHaveBeenCalledWith(
+            "formFieldSubmitted",
+            expect.any(Object),
+          );
+        });
+      });
+    });
+
     it("skips triggering the form field focused handler if the document is not focused", async () => {
       jest.spyOn(globalThis.document, "hasFocus").mockReturnValue(false);
       const documentRoot = autofillFieldElement.getRootNode() as Document;

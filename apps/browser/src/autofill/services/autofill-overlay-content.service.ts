@@ -571,7 +571,7 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
    *
    * @param event - The event that triggered the submit button interaction.
    */
-  private handleSubmitButtonInteraction = async (event: PointerEvent) => {
+  private handleSubmitButtonInteraction = (event: PointerEvent) => {
     if (
       !this.submitElements.has(event.target as HTMLElement) ||
       (event.type === "keyup" &&
