@@ -1,10 +1,11 @@
 import { DatePipe, NgIf } from "@angular/common";
-import { Component, inject, OnInit, Optional } from "@angular/core";
+import { Component, inject, Injector, OnInit, Optional } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormBuilder, ReactiveFormsModule } from "@angular/forms";
 import { map } from "rxjs";
 
 import { JslibModule } from "@bitwarden/angular/jslib.module";
+import { ViewCacheService } from "@bitwarden/angular/platform/services/view-cache.service";
 import { AuditService } from "@bitwarden/common/abstractions/audit.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { Fido2CredentialView } from "@bitwarden/common/vault/models/view/fido2-credential.view";
@@ -46,6 +47,9 @@ import { AutofillOptionsComponent } from "../autofill-options/autofill-options.c
   ],
 })
 export class LoginDetailsSectionComponent implements OnInit {
+  private viewCacheService = inject(ViewCacheService);
+  private injector = inject(Injector);
+
   loginDetailsForm = this.formBuilder.group({
     username: [""],
     password: [""],
@@ -129,6 +133,12 @@ export class LoginDetailsSectionComponent implements OnInit {
     } else {
       await this.initNewCipher();
     }
+
+    this.viewCacheService.formGroup({
+      key: "vault-login-details-form",
+      control: this.loginDetailsForm,
+      injector: this.injector,
+    });
 
     if (this.cipherFormContainer.config.mode === "partial-edit") {
       this.loginDetailsForm.disable();
