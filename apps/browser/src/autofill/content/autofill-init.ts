@@ -4,6 +4,7 @@ import AutofillPageDetails from "../models/autofill-page-details";
 import { AutofillInlineMenuContentService } from "../overlay/inline-menu/abstractions/autofill-inline-menu-content.service";
 import { OverlayNotificationsContentService } from "../overlay/notifications/abstractions/overlay-notifications-content.service";
 import { AutofillOverlayContentService } from "../services/abstractions/autofill-overlay-content.service";
+import { DomQueryService } from "../services/abstractions/dom-query.service";
 import { CollectAutofillContentService } from "../services/collect-autofill-content.service";
 import DomElementVisibilityService from "../services/dom-element-visibility.service";
 import InsertAutofillContentService from "../services/insert-autofill-content.service";
@@ -17,11 +18,6 @@ import {
 
 class AutofillInit implements AutofillInitInterface {
   private readonly sendExtensionMessage = sendExtensionMessage;
-  private readonly autofillOverlayContentService: AutofillOverlayContentService | undefined;
-  private readonly autofillInlineMenuContentService: AutofillInlineMenuContentService | undefined;
-  private readonly overlayNotificationsContentService:
-    | OverlayNotificationsContentService
-    | undefined;
   private readonly domElementVisibilityService: DomElementVisibilityService;
   private readonly collectAutofillContentService: CollectAutofillContentService;
   private readonly insertAutofillContentService: InsertAutofillContentService;
@@ -36,23 +32,23 @@ class AutofillInit implements AutofillInitInterface {
    * AutofillInit constructor. Initializes the DomElementVisibilityService,
    * CollectAutofillContentService and InsertAutofillContentService classes.
    *
+   * @param domQueryService - Service used to handle DOM queries.
    * @param autofillOverlayContentService - The autofill overlay content service, potentially undefined.
-   * @param inlineMenuContentService - The inline menu content service, potentially undefined.
+   * @param autofillInlineMenuContentService - The inline menu content service, potentially undefined.
    * @param overlayNotificationsContentService - The overlay notifications content service, potentially undefined.
    */
   constructor(
-    autofillOverlayContentService?: AutofillOverlayContentService,
-    inlineMenuContentService?: AutofillInlineMenuContentService,
-    overlayNotificationsContentService?: OverlayNotificationsContentService,
+    private domQueryService: DomQueryService,
+    private autofillOverlayContentService?: AutofillOverlayContentService,
+    private autofillInlineMenuContentService?: AutofillInlineMenuContentService,
+    private overlayNotificationsContentService?: OverlayNotificationsContentService,
   ) {
-    this.autofillOverlayContentService = autofillOverlayContentService;
-    this.autofillInlineMenuContentService = inlineMenuContentService;
-    this.overlayNotificationsContentService = overlayNotificationsContentService;
     this.domElementVisibilityService = new DomElementVisibilityService(
       this.autofillInlineMenuContentService,
     );
     this.collectAutofillContentService = new CollectAutofillContentService(
       this.domElementVisibilityService,
+      domQueryService,
       this.autofillOverlayContentService,
     );
     this.insertAutofillContentService = new InsertAutofillContentService(

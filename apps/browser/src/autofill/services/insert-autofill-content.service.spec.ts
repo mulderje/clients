@@ -77,6 +77,7 @@ describe("InsertAutofillContentService", () => {
   );
   const collectAutofillContentService = new CollectAutofillContentService(
     domElementVisibilityService,
+    domQueryService,
     autofillOverlayContentService,
   );
   let insertAutofillContentService: InsertAutofillContentService;
