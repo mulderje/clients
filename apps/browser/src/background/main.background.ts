@@ -204,6 +204,7 @@ import {
 } from "@bitwarden/vault-export-core";
 
 import { OverlayBackground as OverlayBackgroundInterface } from "../autofill/background/abstractions/overlay.background";
+import { AutoSubmitLoginBackground } from "../autofill/background/auto-submit-login.background";
 import ContextMenusBackground from "../autofill/background/context-menus.background";
 import NotificationBackground from "../autofill/background/notification.background";
 import { OverlayBackground } from "../autofill/background/overlay.background";
@@ -353,6 +354,7 @@ export default class MainBackground {
   offscreenDocumentService: OffscreenDocumentService;
   syncServiceListener: SyncServiceListener;
   themeStateService: DefaultThemeStateService;
+  autoSubmitLoginBackground: AutoSubmitLoginBackground;
 
   onUpdatedRan: boolean;
   onReplacedRan: boolean;
@@ -955,6 +957,7 @@ export default class MainBackground {
       this.collectionService,
       this.cryptoService,
       this.pinService,
+      this.accountService,
     );
 
     this.individualVaultExportService = new IndividualVaultExportService(
@@ -974,6 +977,7 @@ export default class MainBackground {
       this.cryptoFunctionService,
       this.collectionService,
       this.kdfConfigService,
+      this.accountService,
     );
 
     this.exportService = new VaultExportService(
@@ -999,6 +1003,7 @@ export default class MainBackground {
       this.cipherService,
       this.fido2UserInterfaceService,
       this.syncService,
+      this.accountService,
       this.logService,
     );
     const fido2ActiveRequestManager = new Fido2ActiveRequestManager();
@@ -1068,7 +1073,6 @@ export default class MainBackground {
         this.messagingService,
         this.appIdService,
         this.platformUtilsService,
-        this.stateService,
         this.logService,
         this.authService,
         this.biometricStateService,
@@ -1093,6 +1097,7 @@ export default class MainBackground {
         this.logService,
         this.themeStateService,
         this.configService,
+        this.accountService,
       );
 
       this.filelessImporterBackground = new FilelessImporterBackground(
@@ -1103,6 +1108,16 @@ export default class MainBackground {
         this.importService,
         this.syncService,
         this.scriptInjectorService,
+      );
+
+      this.autoSubmitLoginBackground = new AutoSubmitLoginBackground(
+        this.logService,
+        this.autofillService,
+        this.scriptInjectorService,
+        this.authService,
+        this.configService,
+        this.platformUtilsService,
+        this.policyService,
       );
 
       const contextMenuClickedHandler = new ContextMenuClickedHandler(
@@ -1225,6 +1240,7 @@ export default class MainBackground {
     await this.idleBackground.init();
     this.webRequestBackground?.startListening();
     this.syncServiceListener?.listener$().subscribe();
+    await this.autoSubmitLoginBackground.init();
 
     if (
       BrowserApi.isManifestVersion(2) &&

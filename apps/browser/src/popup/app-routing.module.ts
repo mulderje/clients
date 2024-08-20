@@ -46,6 +46,7 @@ import { ExcludedDomainsV1Component } from "../autofill/popup/settings/excluded-
 import { ExcludedDomainsComponent } from "../autofill/popup/settings/excluded-domains.component";
 import { NotificationsSettingsV1Component } from "../autofill/popup/settings/notifications-v1.component";
 import { NotificationsSettingsComponent } from "../autofill/popup/settings/notifications.component";
+import { PremiumV2Component } from "../billing/popup/settings/premium-v2.component";
 import { PremiumComponent } from "../billing/popup/settings/premium.component";
 import BrowserPopupUtils from "../platform/popup/browser-popup-utils";
 import { popupRouterCacheGuard } from "../platform/popup/view-cache/popup-router-cache.service";
@@ -54,6 +55,7 @@ import { PasswordGeneratorHistoryComponent } from "../tools/popup/generator/pass
 import { SendAddEditComponent } from "../tools/popup/send/send-add-edit.component";
 import { SendGroupingsComponent } from "../tools/popup/send/send-groupings.component";
 import { SendTypeComponent } from "../tools/popup/send/send-type.component";
+import { SendCreatedComponent } from "../tools/popup/send-v2/send-created/send-created.component";
 import { SendV2Component } from "../tools/popup/send-v2/send-v2.component";
 import { AboutPageV2Component } from "../tools/popup/settings/about-page/about-page-v2.component";
 import { AboutPageComponent } from "../tools/popup/settings/about-page/about-page.component";
@@ -336,12 +338,12 @@ const routes: Routes = [
     canActivate: [authGuard],
     data: { state: "excluded-domains" },
   }),
-  {
+  ...extensionRefreshSwap(PremiumComponent, PremiumV2Component, {
     path: "premium",
     component: PremiumComponent,
     canActivate: [authGuard],
     data: { state: "premium" },
-  },
+  }),
   ...extensionRefreshSwap(AppearanceComponent, AppearanceV2Component, {
     path: "appearance",
     canActivate: [authGuard],
@@ -369,6 +371,12 @@ const routes: Routes = [
     component: SendAddEditComponent,
     canActivate: [authGuard],
     data: { state: "edit-send" },
+  },
+  {
+    path: "send-created",
+    component: SendCreatedComponent,
+    canActivate: [authGuard],
+    data: { state: "send" },
   },
   {
     path: "update-temp-password",
