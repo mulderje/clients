@@ -171,6 +171,14 @@ describe("AutofillInit", () => {
         expect(inlineMenuElements.messageHandlers.messageHandler).toHaveBeenCalled();
       });
 
+      it("triggers extension message handlers from the OverlayNotificationsContentService", () => {
+        autofillOverlayContentService.messageHandlers.messageHandler = jest.fn();
+
+        sendMockExtensionMessage({ command: "messageHandler" }, sender, sendResponse);
+
+        expect(autofillOverlayContentService.messageHandlers.messageHandler).toHaveBeenCalled();
+      });
+
       describe("collectPageDetails", () => {
         it("sends the collected page details for autofill using a background script message", async () => {
           const pageDetails: AutofillPageDetails = {
