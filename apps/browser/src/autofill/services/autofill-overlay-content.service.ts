@@ -439,6 +439,7 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
 
     this.submitElements.add(closesSubmitButton);
     globalThis.document.addEventListener(EVENTS.CLICK, this.handleSubmitButtonClickedEvent);
+    globalThis.document.addEventListener(EVENTS.MOUSEUP, this.handleSubmitButtonClickedEvent);
   }
 
   private findSubmitButton(element: HTMLElement): HTMLElement | null {
@@ -503,6 +504,7 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
 
     this.submitElements.add(closesSubmitButton);
     globalThis.document.addEventListener(EVENTS.CLICK, this.handleSubmitButtonClickedEvent);
+    globalThis.document.addEventListener(EVENTS.MOUSEUP, this.handleSubmitButtonClickedEvent);
   }
 
   private findClosestFormlessSubmitButton(

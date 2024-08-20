@@ -23,6 +23,7 @@ export const EVENTS = {
   VISIBILITYCHANGE: "visibilitychange",
   MOUSEENTER: "mouseenter",
   MOUSELEAVE: "mouseleave",
+  MOUSEUP: "mouseup",
   SUBMIT: "submit",
 } as const;
 
