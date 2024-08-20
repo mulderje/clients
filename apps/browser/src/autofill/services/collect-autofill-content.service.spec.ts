@@ -461,52 +461,6 @@ describe("CollectAutofillContentService", () => {
     });
   });
 
-  // TODO: Migrate this to the new DomQueryService
-  // describe("deepQueryElements", () => {
-  //   beforeEach(() => {
-  //     collectAutofillContentService["mutationObserver"] = mock<MutationObserver>();
-  //   });
-  //
-  //   it("queries form field elements that are nested within a ShadowDOM", () => {
-  //     const root = document.createElement("div");
-  //     const shadowRoot = root.attachShadow({ mode: "open" });
-  //     const form = document.createElement("form");
-  //     const input = document.createElement("input");
-  //     input.type = "text";
-  //     form.appendChild(input);
-  //     shadowRoot.appendChild(form);
-  //
-  //     const formFieldElements = collectAutofillContentService.deepQueryElements(
-  //       shadowRoot,
-  //       "input",
-  //       true,
-  //     );
-  //
-  //     expect(formFieldElements).toStrictEqual([input]);
-  //   });
-  //
-  //   it("queries form field elements that are nested within multiple ShadowDOM elements", () => {
-  //     const root = document.createElement("div");
-  //     const shadowRoot1 = root.attachShadow({ mode: "open" });
-  //     const root2 = document.createElement("div");
-  //     const shadowRoot2 = root2.attachShadow({ mode: "open" });
-  //     const form = document.createElement("form");
-  //     const input = document.createElement("input");
-  //     input.type = "text";
-  //     form.appendChild(input);
-  //     shadowRoot2.appendChild(form);
-  //     shadowRoot1.appendChild(root2);
-  //
-  //     const formFieldElements = collectAutofillContentService.deepQueryElements(
-  //       shadowRoot1,
-  //       "input",
-  //       true,
-  //     );
-  //
-  //     expect(formFieldElements).toStrictEqual([input]);
-  //   });
-  // });
-
   describe("buildAutofillFormsData", () => {
     it("will not attempt to gather data from a cached form element", () => {
       const documentTitle = "Test Page";
