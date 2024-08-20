@@ -428,74 +428,20 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
 
   private setupSubmitListenerOnFieldWithForms(formFieldElement: FillableFormFieldElement) {
     const formElement = formFieldElement.form;
-    if (!formElement || this.formElements.has(formElement)) {
-      return;
+    if (formElement && !this.formElements.has(formElement)) {
+      this.formElements.add(formElement);
+      formElement.addEventListener(EVENTS.SUBMIT, this.handleFormFieldSubmitEvent);
+
+      const closesSubmitButton = this.findSubmitButton(formElement);
+      this.setupSubmitButtonEventListeners(closesSubmitButton);
     }
-
-    this.formElements.add(formElement);
-
-    formElement.addEventListener(EVENTS.SUBMIT, this.handleFormFieldSubmitEvent);
-    const closesSubmitButton = this.findSubmitButton(formElement);
-    this.setupSubmitButtonEventListeners(closesSubmitButton);
-  }
-
-  private findSubmitButton(element: HTMLElement): HTMLElement | null {
-    const genericSubmitElement = this.foundGenericSubmitButtonElement(element);
-    if (genericSubmitElement) {
-      return genericSubmitElement;
-    }
-
-    const submitButtonElement = this.foundSubmitButtonElement(element);
-    if (submitButtonElement) {
-      return submitButtonElement;
-    }
-  }
-
-  private foundGenericSubmitButtonElement(element: HTMLElement) {
-    const genericSubmitElements = this.domQueryService.deepQueryElements<HTMLButtonElement>(
-      element,
-      "[type='submit']",
-    );
-    const genericSubmitElement = this.foundSubmitElement(genericSubmitElements);
-    if (genericSubmitElement) {
-      return genericSubmitElement;
-    }
-  }
-
-  private foundSubmitButtonElement(element: HTMLElement) {
-    const buttons = this.domQueryService.deepQueryElements<HTMLButtonElement>(
-      element,
-      "button, [type='button']",
-    );
-    const submitButtonElement = this.foundSubmitElement(buttons);
-    if (submitButtonElement) {
-      return submitButtonElement;
-    }
-  }
-
-  private foundSubmitElement(elements: HTMLElement[]) {
-    for (let index = 0; index < elements.length; index++) {
-      const submitElement = elements[index];
-      if (this.isElementSubmitButton(submitElement)) {
-        return submitElement;
-      }
-    }
-  }
-
-  private isElementSubmitButton(element: HTMLElement) {
-    return (
-      this.inlineMenuFieldQualificationService.isElementLoginSubmitButton(element) ||
-      this.inlineMenuFieldQualificationService.isElementChangePasswordSubmitButton(element)
-    );
   }
 
   private setupSubmitListenerOnFormlessField(formFieldElement: FillableFormFieldElement) {
-    if (this.fieldsWithSubmitElements.has(formFieldElement)) {
-      return;
+    if (formFieldElement && !this.fieldsWithSubmitElements.has(formFieldElement)) {
+      const closesSubmitButton = this.findClosestFormlessSubmitButton(formFieldElement);
+      this.setupSubmitButtonEventListeners(closesSubmitButton);
     }
-
-    const closesSubmitButton = this.findClosestFormlessSubmitButton(formFieldElement);
-    this.setupSubmitButtonEventListeners(closesSubmitButton);
   }
 
   private findClosestFormlessSubmitButton(
@@ -526,6 +472,38 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
     return null;
   }
 
+  private findSubmitButton(element: HTMLElement): HTMLElement | null {
+    const genericSubmitElement = this.querySubmitButtonElement(element, "[type='submit']");
+    if (genericSubmitElement) {
+      return genericSubmitElement;
+    }
+
+    const submitButtonElement = this.querySubmitButtonElement(element, "button, [type='button']");
+    if (submitButtonElement) {
+      return submitButtonElement;
+    }
+  }
+
+  private querySubmitButtonElement(element: HTMLElement, selector: string) {
+    const submitButtonElements = this.domQueryService.deepQueryElements<HTMLButtonElement>(
+      element,
+      selector,
+    );
+    for (let index = 0; index < submitButtonElements.length; index++) {
+      const submitElement = submitButtonElements[index];
+      if (this.isElementSubmitButton(submitElement)) {
+        return submitElement;
+      }
+    }
+  }
+
+  private isElementSubmitButton(element: HTMLElement) {
+    return (
+      this.inlineMenuFieldQualificationService.isElementLoginSubmitButton(element) ||
+      this.inlineMenuFieldQualificationService.isElementChangePasswordSubmitButton(element)
+    );
+  }
+
   private setupSubmitButtonEventListeners = (submitButton: HTMLElement) => {
     if (!submitButton || this.submitElements.has(submitButton)) {
       return;
@@ -534,7 +512,7 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
     this.submitElements.add(submitButton);
 
     const handler = this.useEventHandlersMemo(
-      throttle(this.handleSubmitButtonClickedEvent, 150),
+      throttle(this.handleSubmitButtonInteraction, 150),
       AUTOFILL_TRIGGER_FORM_FIELD_SUBMIT,
     );
     submitButton.addEventListener(EVENTS.KEYUP, handler);
@@ -542,16 +520,7 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
     globalThis.document.addEventListener(EVENTS.MOUSEUP, handler);
   };
 
-  private handleFormFieldSubmitEvent = () => {
-    void this.sendExtensionMessage("formFieldSubmitted", {
-      uri: globalThis.document.URL,
-      username: this.userFilledFields["username"]?.value || "",
-      password: this.userFilledFields["password"]?.value || "",
-      newPassword: this.userFilledFields["newPassword"]?.value || "",
-    });
-  };
-
-  private handleSubmitButtonClickedEvent = async (event: PointerEvent) => {
+  private handleSubmitButtonInteraction = async (event: PointerEvent) => {
     if (
       !this.submitElements.has(event.target as HTMLElement) ||
       (event.type === "keyup" &&
@@ -561,6 +530,15 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
     }
 
     this.handleFormFieldSubmitEvent();
+  };
+
+  private handleFormFieldSubmitEvent = () => {
+    void this.sendExtensionMessage("formFieldSubmitted", {
+      uri: globalThis.document.URL,
+      username: this.userFilledFields["username"]?.value || "",
+      password: this.userFilledFields["password"]?.value || "",
+      newPassword: this.userFilledFields["newPassword"]?.value || "",
+    });
   };
 
   /**
