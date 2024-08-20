@@ -201,17 +201,17 @@ export class DefaultSyncService extends CoreSyncService {
       providers[p.id] = new ProviderData(p);
     });
 
-    await this.providerService.save(providers);
+    await this.providerService.save(providers, response.id);
 
     await this.syncProfileOrganizations(response, response.id);
 
-    if (await this.keyConnectorService.userNeedsMigration()) {
-      await this.keyConnectorService.setConvertAccountRequired(true);
+    if (await this.keyConnectorService.userNeedsMigration(response.id)) {
+      await this.keyConnectorService.setConvertAccountRequired(true, response.id);
       this.messageSender.send("convertAccountToKeyConnector");
     } else {
       // FIXME: Verify that this floating promise is intentional. If it is, add an explanatory comment and ensure there is proper error handling.
       // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      this.keyConnectorService.removeConvertAccountRequired();
+      this.keyConnectorService.removeConvertAccountRequired(response.id);
     }
   }
 
