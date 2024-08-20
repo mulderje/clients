@@ -190,6 +190,7 @@ export class DefaultSyncService extends CoreSyncService {
     await this.billingAccountProfileStateService.setHasPremium(
       response.premiumPersonally,
       response.premiumFromOrganization,
+      response.id,
     );
     await this.keyConnectorService.setUsesKeyConnector(response.usesKeyConnector);
 
