@@ -1668,7 +1668,6 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
     });
     Object.keys(this.userFilledFields).forEach((key) => {
       if (this.userFilledFields[key]) {
-        this.userFilledFields[key].remove();
         delete this.userFilledFields[key];
       }
     });

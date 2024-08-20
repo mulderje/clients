@@ -2644,5 +2644,15 @@ describe("AutofillOverlayContentService", () => {
         autofillOverlayContentService["closeInlineMenuOnRedirectTimeout"],
       );
     });
+
+    it("deletes all cached user filled field DOM elements", () => {
+      autofillOverlayContentService["userFilledFields"] = {
+        username: autofillFieldElement as FillableFormFieldElement,
+      };
+
+      autofillOverlayContentService.destroy();
+
+      expect(autofillOverlayContentService["userFilledFields"]).toEqual(null);
+    });
   });
 });
