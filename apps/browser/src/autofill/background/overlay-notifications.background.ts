@@ -33,7 +33,7 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
   constructor(
     private logService: LogService,
     private configService: ConfigService,
-    private notificationsBackground: NotificationBackground,
+    private notificationBackground: NotificationBackground,
   ) {}
 
   /**
@@ -95,11 +95,10 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
    * This is based on the user's settings for the notification.
    */
   private async isAddLoginOrChangePasswordNotificationEnabled() {
-    if (await this.notificationsBackground.getEnableChangedPasswordPrompt()) {
-      return true;
-    }
-
-    return await this.notificationsBackground.getEnableAddedLoginPrompt();
+    return (
+      (await this.notificationBackground.getEnableChangedPasswordPrompt()) ||
+      (await this.notificationBackground.getEnableAddedLoginPrompt())
+    );
   }
 
   /**
@@ -151,13 +150,13 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
   private async isSenderFromExcludedDomain(sender: chrome.runtime.MessageSender): Promise<boolean> {
     try {
       const senderOrigin = sender.origin;
-      const serverConfig = await this.notificationsBackground.getActiveUserServerConfig();
+      const serverConfig = await this.notificationBackground.getActiveUserServerConfig();
       const activeUserVault = serverConfig?.environment?.vault;
       if (activeUserVault === senderOrigin) {
         return true;
       }
 
-      const excludedDomains = await this.notificationsBackground.getExcludedDomains();
+      const excludedDomains = await this.notificationBackground.getExcludedDomains();
       if (!excludedDomains) {
         return false;
       }
@@ -185,7 +184,7 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
     if (modifyLoginData.newPassword && !modifyLoginData.username) {
       // These notifications are temporarily setup as "messages" to the notification background.
       // This will be structured differently in a future refactor.
-      await this.notificationsBackground.changedPassword(
+      await this.notificationBackground.changedPassword(
         {
           command: "bgChangedPassword",
           data: {
@@ -201,7 +200,7 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
     }
 
     if (modifyLoginData.username && (modifyLoginData.password || modifyLoginData.newPassword)) {
-      await this.notificationsBackground.addLogin(
+      await this.notificationBackground.addLogin(
         {
           command: "bgAddLogin",
           login: {
