@@ -52,9 +52,9 @@ export class SSOLocalhostCallbackService {
         if (code != null && receivedState != null && this.checkState(receivedState, state)) {
           res.writeHead(200);
           res.end(
-            "<html><head><title>Success | Bitwarden CLI</title></head><body>" +
-              "<h1>Successfully authenticated with the Bitwarden CLI</h1>" +
-              "<p>You may now close this tab and return to the terminal.</p>" +
+            "<html><head><title>Success | Bitwarden Desktop</title></head><body>" +
+              "<h1>Successfully authenticated with the Bitwarden desktop app</h1>" +
+              "<p>You may now close this tab and return to the app.</p>" +
               "</body></html>",
           );
           callbackServer.close(() =>
@@ -66,9 +66,9 @@ export class SSOLocalhostCallbackService {
         } else {
           res.writeHead(400);
           res.end(
-            "<html><head><title>Failed | Bitwarden CLI</title></head><body>" +
-              "<h1>Something went wrong logging into the Bitwarden CLI</h1>" +
-              "<p>You may now close this tab and return to the terminal.</p>" +
+            "<html><head><title>Failed | Bitwarden Desktop</title></head><body>" +
+              "<h1>Something went wrong logging into the Bitwarden desktop app</h1>" +
+              "<p>You may now close this tab and return to the app.</p>" +
               "</body></html>",
           );
           callbackServer.close(() => reject());
