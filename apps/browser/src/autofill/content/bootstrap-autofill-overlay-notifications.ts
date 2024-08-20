@@ -21,6 +21,7 @@ import AutofillInit from "./autofill-init";
     }
 
     windowContext.bitwardenAutofillInit = new AutofillInit(
+      domQueryService,
       autofillOverlayContentService,
       null,
       overlayNotificationsContentService,
