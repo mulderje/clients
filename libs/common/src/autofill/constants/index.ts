@@ -60,6 +60,8 @@ export const AUTOFILL_OVERLAY_HANDLE_REPOSITION = "autofill-overlay-handle-repos
 
 export const UPDATE_PASSKEYS_HEADINGS_ON_SCROLL = "update-passkeys-headings-on-scroll";
 
+export const AUTOFILL_TRIGGER_FORM_FIELD_SUBMIT = "autofill-trigger-form-field-submit";
+
 export const AutofillOverlayVisibility = {
   Off: 0,
   OnButtonClick: 1,

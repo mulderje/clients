@@ -7,6 +7,7 @@ import {
   EVENTS,
   AutofillOverlayVisibility,
   AUTOFILL_OVERLAY_HANDLE_REPOSITION,
+  AUTOFILL_TRIGGER_FORM_FIELD_SUBMIT,
 } from "@bitwarden/common/autofill/constants";
 import { CipherType } from "@bitwarden/common/vault/enums";
 
@@ -438,8 +439,14 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
     }
 
     this.submitElements.add(closesSubmitButton);
-    globalThis.document.addEventListener(EVENTS.CLICK, this.handleSubmitButtonClickedEvent);
-    globalThis.document.addEventListener(EVENTS.MOUSEUP, this.handleSubmitButtonClickedEvent);
+
+    const handler = this.useEventHandlersMemo(
+      throttle(this.handleSubmitButtonClickedEvent, 150),
+      AUTOFILL_TRIGGER_FORM_FIELD_SUBMIT,
+    );
+    closesSubmitButton.addEventListener(EVENTS.KEYUP, handler);
+    globalThis.document.addEventListener(EVENTS.CLICK, handler);
+    globalThis.document.addEventListener(EVENTS.MOUSEUP, handler);
   }
 
   private findSubmitButton(element: HTMLElement): HTMLElement | null {
@@ -503,8 +510,14 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
     }
 
     this.submitElements.add(closesSubmitButton);
-    globalThis.document.addEventListener(EVENTS.CLICK, this.handleSubmitButtonClickedEvent);
-    globalThis.document.addEventListener(EVENTS.MOUSEUP, this.handleSubmitButtonClickedEvent);
+
+    const handler = this.useEventHandlersMemo(
+      throttle(this.handleSubmitButtonClickedEvent, 150),
+      AUTOFILL_TRIGGER_FORM_FIELD_SUBMIT,
+    );
+    closesSubmitButton.addEventListener(EVENTS.KEYUP, handler);
+    globalThis.document.addEventListener(EVENTS.CLICK, handler);
+    globalThis.document.addEventListener(EVENTS.MOUSEUP, handler);
   }
 
   private findClosestFormlessSubmitButton(
