@@ -46,6 +46,8 @@ import { DomQueryService } from "./abstractions/dom-query.service";
 import { InlineMenuFieldQualificationService } from "./abstractions/inline-menu-field-qualifications.service";
 import { AutoFillConstants } from "./autofill-constants";
 
+import KeyboardEvent = chrome.input.ime.KeyboardEvent;
+
 export class AutofillOverlayContentService implements AutofillOverlayContentServiceInterface {
   pageDetailsUpdateRequired = false;
   inlineMenuVisibility: number;
@@ -434,19 +436,7 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
 
     formElement.addEventListener(EVENTS.SUBMIT, this.handleFormFieldSubmitEvent);
     const closesSubmitButton = this.findSubmitButton(formElement);
-    if (!closesSubmitButton || this.submitElements.has(closesSubmitButton)) {
-      return;
-    }
-
-    this.submitElements.add(closesSubmitButton);
-
-    const handler = this.useEventHandlersMemo(
-      throttle(this.handleSubmitButtonClickedEvent, 150),
-      AUTOFILL_TRIGGER_FORM_FIELD_SUBMIT,
-    );
-    closesSubmitButton.addEventListener(EVENTS.KEYUP, handler);
-    globalThis.document.addEventListener(EVENTS.CLICK, handler);
-    globalThis.document.addEventListener(EVENTS.MOUSEUP, handler);
+    this.setupSubmitButtonEventListeners(closesSubmitButton);
   }
 
   private findSubmitButton(element: HTMLElement): HTMLElement | null {
@@ -505,19 +495,7 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
     }
 
     const closesSubmitButton = this.findClosestFormlessSubmitButton(formFieldElement);
-    if (!closesSubmitButton || this.submitElements.has(closesSubmitButton)) {
-      return;
-    }
-
-    this.submitElements.add(closesSubmitButton);
-
-    const handler = this.useEventHandlersMemo(
-      throttle(this.handleSubmitButtonClickedEvent, 150),
-      AUTOFILL_TRIGGER_FORM_FIELD_SUBMIT,
-    );
-    closesSubmitButton.addEventListener(EVENTS.KEYUP, handler);
-    globalThis.document.addEventListener(EVENTS.CLICK, handler);
-    globalThis.document.addEventListener(EVENTS.MOUSEUP, handler);
+    this.setupSubmitButtonEventListeners(closesSubmitButton);
   }
 
   private findClosestFormlessSubmitButton(
@@ -548,6 +526,22 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
     return null;
   }
 
+  private setupSubmitButtonEventListeners = (submitButton: HTMLElement) => {
+    if (this.submitElements.has(submitButton)) {
+      return;
+    }
+
+    this.submitElements.add(submitButton);
+
+    const handler = this.useEventHandlersMemo(
+      throttle(this.handleSubmitButtonClickedEvent, 150),
+      AUTOFILL_TRIGGER_FORM_FIELD_SUBMIT,
+    );
+    submitButton.addEventListener(EVENTS.KEYUP, handler);
+    globalThis.document.addEventListener(EVENTS.CLICK, handler);
+    globalThis.document.addEventListener(EVENTS.MOUSEUP, handler);
+  };
+
   private handleFormFieldSubmitEvent = () => {
     void this.sendExtensionMessage("formFieldSubmitted", {
       uri: globalThis.document.URL,
@@ -557,8 +551,12 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
     });
   };
 
-  private handleSubmitButtonClickedEvent = async (event: MouseEvent) => {
-    if (!this.submitElements.has(event.target as HTMLElement)) {
+  private handleSubmitButtonClickedEvent = async (event: PointerEvent) => {
+    if (
+      !this.submitElements.has(event.target as HTMLElement) ||
+      (event.type === "keyup" &&
+        !["Enter", "Space"].includes((event as unknown as KeyboardEvent).code))
+    ) {
       return;
     }
 
