@@ -119,22 +119,34 @@ describe("OverlayNotificationsBackground", () => {
 
         expect(chrome.webRequest.onCompleted.addListener).not.toHaveBeenCalled();
       });
+    });
 
-      it("skips setting up duplicate listeners when the website origin has been previously encountered with fields", async () => {
-        const sender = mock<chrome.runtime.MessageSender>({
-          tab: { id: 1 },
-          url: "example.com",
-        });
-
-        sendMockExtensionMessage({ command: "collectPageDetailsResponse", details }, sender);
-        await flushPromises();
-        sendMockExtensionMessage({ command: "collectPageDetailsResponse", details }, sender);
-        await flushPromises();
-        sendMockExtensionMessage({ command: "collectPageDetailsResponse", details }, sender);
-        await flushPromises();
-
-        expect(chrome.webRequest.onCompleted.addListener).toHaveBeenCalledTimes(1);
+    it("sets up the web request listeners", async () => {
+      const sender = mock<chrome.runtime.MessageSender>({
+        tab: { id: 1 },
+        url: "example.com",
       });
+
+      sendMockExtensionMessage({ command: "collectPageDetailsResponse", details }, sender);
+      await flushPromises();
+
+      expect(chrome.webRequest.onCompleted.addListener).toHaveBeenCalled();
+    });
+
+    it("skips setting up duplicate listeners when the website origin has been previously encountered with fields", async () => {
+      const sender = mock<chrome.runtime.MessageSender>({
+        tab: { id: 1 },
+        url: "example.com",
+      });
+
+      sendMockExtensionMessage({ command: "collectPageDetailsResponse", details }, sender);
+      await flushPromises();
+      sendMockExtensionMessage({ command: "collectPageDetailsResponse", details }, sender);
+      await flushPromises();
+      sendMockExtensionMessage({ command: "collectPageDetailsResponse", details }, sender);
+      await flushPromises();
+
+      expect(chrome.webRequest.onCompleted.addListener).toHaveBeenCalledTimes(1);
     });
   });
 });

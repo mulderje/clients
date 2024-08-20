@@ -222,16 +222,14 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
   private setupWebRequestsListeners() {
     chrome.webRequest.onBeforeRequest.removeListener(this.handleOnBeforeRequestEvent);
     chrome.webRequest.onCompleted.removeListener(this.handleOnCompletedRequestEvent);
-    if (!this.websiteOriginsWithFields.size) {
-      return;
+    if (this.websiteOriginsWithFields.size) {
+      const requestFilter: chrome.webRequest.RequestFilter = {
+        urls: Array.from(this.websiteOriginsWithFields.values()),
+        types: ["main_frame", "sub_frame", "xmlhttprequest"],
+      };
+      chrome.webRequest.onBeforeRequest.addListener(this.handleOnBeforeRequestEvent, requestFilter);
+      chrome.webRequest.onCompleted.addListener(this.handleOnCompletedRequestEvent, requestFilter);
     }
-
-    const requestFilter: chrome.webRequest.RequestFilter = {
-      urls: Array.from(this.websiteOriginsWithFields.values()),
-      types: ["main_frame", "sub_frame", "xmlhttprequest"],
-    };
-    chrome.webRequest.onBeforeRequest.addListener(this.handleOnBeforeRequestEvent, requestFilter);
-    chrome.webRequest.onCompleted.addListener(this.handleOnCompletedRequestEvent, requestFilter);
   }
 
   /**
