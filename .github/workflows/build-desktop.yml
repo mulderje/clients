@@ -9,9 +9,16 @@ defaults:
     shell: bash
 
 jobs:
+  browser-build:
+    name: Browser Build
+    needs: setup
+    uses: ./.github/workflows/build-browser.yml
+    secrets: inherit
+
   macos-package-dev:
     name: MacOS Package Dev Release Asset
     runs-on: macos-13
+    needs: browser-build
     env:
       _PACKAGE_VERSION: "2024.7.1"
       _NODE_VERSION: "20"
@@ -180,7 +187,6 @@ jobs:
         uses: actions/download-artifact@c850b930e6ba138125429b7e5c93fc707a7f8427 # v4.1.4
         with:
           path: ${{ github.workspace }}/browser-build-artifacts
-          run-id: 10473940127
 
       - name: Unzip Safari artifact
         run: |
