@@ -1401,13 +1401,11 @@ export class CollectAutofillContentService implements CollectAutofillContentServ
    * @param pageDetails - The page details to use for the inline menu listeners
    */
   private setupOverlayListeners(pageDetails: AutofillPageDetails) {
-    if (!this.autofillOverlayContentService) {
-      return;
+    if (this.autofillOverlayContentService) {
+      this.autofillFieldElements.forEach((autofillField, formFieldElement) => {
+        this.setupOverlayOnField(formFieldElement, autofillField, pageDetails);
+      });
     }
-
-    this.autofillFieldElements.forEach((autofillField, formFieldElement) => {
-      this.setupOverlayOnField(formFieldElement, autofillField, pageDetails);
-    });
   }
 
   /**
@@ -1422,22 +1420,20 @@ export class CollectAutofillContentService implements CollectAutofillContentServ
     autofillField: AutofillField,
     pageDetails?: AutofillPageDetails,
   ) {
-    if (!this.autofillOverlayContentService) {
-      return;
-    }
+    if (this.autofillOverlayContentService) {
+      const autofillPageDetails =
+        pageDetails ||
+        this.getFormattedPageDetails(
+          this.getFormattedAutofillFormsData(),
+          this.getFormattedAutofillFieldsData(),
+        );
 
-    const autofillPageDetails =
-      pageDetails ||
-      this.getFormattedPageDetails(
-        this.getFormattedAutofillFormsData(),
-        this.getFormattedAutofillFieldsData(),
+      void this.autofillOverlayContentService.setupOverlayListeners(
+        formFieldElement,
+        autofillField,
+        autofillPageDetails,
       );
-
-    void this.autofillOverlayContentService.setupOverlayListeners(
-      formFieldElement,
-      autofillField,
-      autofillPageDetails,
-    );
+    }
   }
 
   /**
