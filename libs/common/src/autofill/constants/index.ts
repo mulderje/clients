@@ -105,3 +105,5 @@ export const ExtensionCommand = {
 } as const;
 
 export type ExtensionCommandType = (typeof ExtensionCommand)[keyof typeof ExtensionCommand];
+
+export const CLEAR_NOTIFICATION_LOGIN_DATA_DURATION = 5000;
