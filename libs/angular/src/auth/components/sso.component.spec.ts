@@ -24,10 +24,10 @@ import { CryptoFunctionService } from "@bitwarden/common/platform/abstractions/c
 import { EnvironmentService } from "@bitwarden/common/platform/abstractions/environment.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
-import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { StateService } from "@bitwarden/common/platform/abstractions/state.service";
 import { FakeAccountService, mockAccountServiceWith } from "@bitwarden/common/spec";
 import { UserId } from "@bitwarden/common/types/guid";
+import { ToastService } from "@bitwarden/components";
 import { PasswordGenerationServiceAbstraction } from "@bitwarden/generator-legacy";
 
 import { SsoComponent } from "./sso.component";
@@ -65,7 +65,7 @@ describe("SsoComponent", () => {
 
   let mockSsoLoginService: MockProxy<SsoLoginServiceAbstraction>;
   let mockStateService: MockProxy<StateService>;
-  let mockPlatformUtilsService: MockProxy<PlatformUtilsService>;
+  let mockToastService: MockProxy<ToastService>;
   let mockApiService: MockProxy<ApiService>;
   let mockCryptoFunctionService: MockProxy<CryptoFunctionService>;
   let mockEnvironmentService: MockProxy<EnvironmentService>;
@@ -117,7 +117,7 @@ describe("SsoComponent", () => {
 
     mockSsoLoginService = mock();
     mockStateService = mock();
-    mockPlatformUtilsService = mock();
+    mockToastService = mock();
     mockApiService = mock();
     mockCryptoFunctionService = mock();
     mockEnvironmentService = mock();
@@ -196,7 +196,7 @@ describe("SsoComponent", () => {
         { provide: I18nService, useValue: mockI18nService },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
         { provide: StateService, useValue: mockStateService },
-        { provide: PlatformUtilsService, useValue: mockPlatformUtilsService },
+        { provide: ToastService, useValue: mockToastService },
 
         { provide: ApiService, useValue: mockApiService },
         { provide: CryptoFunctionService, useValue: mockCryptoFunctionService },
@@ -594,8 +594,8 @@ describe("SsoComponent", () => {
       expect(mockLogService.error).toHaveBeenCalledTimes(1);
       expect(mockLogService.error).toHaveBeenCalledWith(error);
 
-      expect(mockPlatformUtilsService.showToast).toHaveBeenCalledTimes(1);
-      expect(mockPlatformUtilsService.showToast).toHaveBeenCalledWith(
+      expect(mockToastService.showToast).toHaveBeenCalledTimes(1);
+      expect(mockToastService.showToast).toHaveBeenCalledWith(
         "error",
         null,
         "ssoKeyConnectorError",

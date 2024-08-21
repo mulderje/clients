@@ -24,6 +24,7 @@ import { MessagingService } from "@bitwarden/common/platform/abstractions/messag
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { StateService } from "@bitwarden/common/platform/abstractions/state.service";
 import { SyncService } from "@bitwarden/common/vault/abstractions/sync/sync.service.abstraction";
+import { ToastService } from "@bitwarden/components";
 import { PasswordGenerationServiceAbstraction } from "@bitwarden/generator-legacy";
 
 import { EnvironmentComponent } from "../environment.component";
@@ -73,6 +74,7 @@ export class LoginComponent extends BaseLoginComponent implements OnInit, OnDest
     ssoLoginService: SsoLoginServiceAbstraction,
     webAuthnLoginService: WebAuthnLoginServiceAbstraction,
     registerRouteService: RegisterRouteService,
+    toastService: ToastService,
   ) {
     super(
       devicesApiService,
@@ -94,6 +96,7 @@ export class LoginComponent extends BaseLoginComponent implements OnInit, OnDest
       ssoLoginService,
       webAuthnLoginService,
       registerRouteService,
+      toastService,
     );
     super.onSuccessfulLogin = () => {
       return syncService.fullSync(true);
@@ -161,7 +164,7 @@ export class LoginComponent extends BaseLoginComponent implements OnInit, OnDest
   async continue() {
     await super.validateEmail();
     if (!this.formGroup.controls.email.valid) {
-      this.platformUtilsService.showToast(
+      this.toastService.showToast(
         "error",
         this.i18nService.t("errorOccured"),
         this.i18nService.t("invalidEmail"),
