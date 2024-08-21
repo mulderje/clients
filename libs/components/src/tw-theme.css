@@ -184,10 +184,6 @@
   --tw-ring-offset-color: #002b36;
 }
 
-.theme_solarizedDark {
-  --color-marketing-logo: 255 255 255;
-}
-
 @import "./popover/popover.component.css";
 @import "./search/search.component.css";
 
