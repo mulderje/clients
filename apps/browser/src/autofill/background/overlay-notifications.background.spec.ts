@@ -8,7 +8,15 @@ import { EnvironmentServerConfigData } from "@bitwarden/common/platform/models/d
 
 import AutofillField from "../models/autofill-field";
 import AutofillPageDetails from "../models/autofill-page-details";
-import { flushPromises, sendMockExtensionMessage } from "../spec/testing-utils";
+import {
+  flushPromises,
+  sendMockExtensionMessage,
+  triggerTabOnRemovedEvent,
+  triggerTabOnUpdatedEvent,
+  triggerWebNavigationOnCompletedEvent,
+  triggerWebRequestOnBeforeRequestEvent,
+  triggerWebRequestOnCompletedEvent,
+} from "../spec/testing-utils";
 
 import NotificationBackground from "./notification.background";
 import { OverlayNotificationsBackground } from "./overlay-notifications.background";
@@ -195,6 +203,260 @@ describe("OverlayNotificationsBackground", () => {
       jest.advanceTimersByTime(CLEAR_NOTIFICATION_LOGIN_DATA_DURATION);
 
       expect(overlayNotificationsBackground["modifyLoginCipherFormData"].size).toBe(0);
+    });
+  });
+
+  describe("web request listeners", () => {
+    let sender: MockProxy<chrome.runtime.MessageSender>;
+    const pageDetails = mock<AutofillPageDetails>({ fields: [mock<AutofillField>()] });
+    let notificationChangedPasswordSpy: jest.SpyInstance;
+    let notificationAddLoginSpy: jest.SpyInstance;
+
+    beforeEach(async () => {
+      sender = mock<chrome.runtime.MessageSender>({
+        tab: { id: 1 },
+        url: "https://example.com",
+      });
+      notificationChangedPasswordSpy = jest.spyOn(notificationBackground, "changedPassword");
+      notificationAddLoginSpy = jest.spyOn(notificationBackground, "addLogin");
+
+      sendMockExtensionMessage(
+        { command: "collectPageDetailsResponse", details: pageDetails },
+        sender,
+      );
+      await flushPromises();
+    });
+
+    describe("ignored web requests", () => {
+      it("ignores requests from urls that do not start with a valid protocol", async () => {
+        sender.url = "chrome-extension://extension-id";
+
+        triggerWebRequestOnBeforeRequestEvent(
+          mock<chrome.webRequest.WebRequestDetails>({
+            url: sender.url,
+            tabId: sender.tab.id,
+          }),
+        );
+
+        expect(overlayNotificationsBackground["activeFormSubmissionRequests"].size).toBe(0);
+      });
+
+      it("ignores requests from urls that do not have a valid tabId", async () => {
+        sender.tab = mock<chrome.tabs.Tab>({ id: -1 });
+
+        triggerWebRequestOnBeforeRequestEvent(
+          mock<chrome.webRequest.WebRequestDetails>({
+            url: sender.url,
+            tabId: sender.tab.id,
+          }),
+        );
+
+        expect(overlayNotificationsBackground["activeFormSubmissionRequests"].size).toBe(0);
+      });
+
+      it("ignores requests from urls that do not have a valid request method", async () => {
+        triggerWebRequestOnBeforeRequestEvent(
+          mock<chrome.webRequest.WebRequestDetails>({
+            url: sender.url,
+            tabId: sender.tab.id,
+            method: "GET",
+          }),
+        );
+
+        expect(overlayNotificationsBackground["activeFormSubmissionRequests"].size).toBe(0);
+      });
+
+      it("ignores requests that are not part of an active form submission", async () => {
+        triggerWebRequestOnCompletedEvent(
+          mock<chrome.webRequest.WebRequestDetails>({
+            url: sender.url,
+            tabId: sender.tab.id,
+            method: "POST",
+            requestId: "123345",
+          }),
+        );
+
+        expect(notificationChangedPasswordSpy).not.toHaveBeenCalled();
+        expect(notificationAddLoginSpy).not.toHaveBeenCalled();
+      });
+
+      it("ignores requests for tabs that do not contain stored login data", async () => {
+        const requestId = "123345";
+        triggerWebRequestOnBeforeRequestEvent(
+          mock<chrome.webRequest.WebRequestDetails>({
+            url: sender.url,
+            tabId: sender.tab.id,
+            method: "POST",
+            requestId,
+          }),
+        );
+        await flushPromises();
+
+        triggerWebRequestOnCompletedEvent(
+          mock<chrome.webRequest.WebRequestDetails>({
+            url: sender.url,
+            tabId: sender.tab.id,
+            method: "POST",
+            requestId,
+          }),
+        );
+
+        expect(notificationChangedPasswordSpy).not.toHaveBeenCalled();
+        expect(notificationAddLoginSpy).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("web requests that trigger notifications", () => {
+      const requestId = "123345";
+
+      beforeEach(async () => {
+        triggerWebRequestOnBeforeRequestEvent(
+          mock<chrome.webRequest.WebRequestDetails>({
+            url: sender.url,
+            tabId: sender.tab.id,
+            method: "POST",
+            requestId,
+          }),
+        );
+        sendMockExtensionMessage(
+          {
+            command: "formFieldSubmitted",
+            uri: "example.com",
+            username: "username",
+            password: "password",
+            newPassword: "newPassword",
+          },
+          sender,
+        );
+        await flushPromises();
+      });
+
+      it("waits for the tab's navigation to complete using the web navigation API before initializing the notification", async () => {
+        chrome.tabs.get = jest.fn().mockImplementationOnce((tabId, callback) => {
+          callback(
+            mock<chrome.tabs.Tab>({
+              status: "loading",
+              url: sender.url,
+            }),
+          );
+        });
+        triggerWebRequestOnCompletedEvent(
+          mock<chrome.webRequest.WebRequestDetails>({
+            url: sender.url,
+            tabId: sender.tab.id,
+            method: "POST",
+            requestId,
+          }),
+        );
+        await flushPromises();
+
+        chrome.tabs.get = jest.fn().mockImplementationOnce((tabId, callback) => {
+          callback(
+            mock<chrome.tabs.Tab>({
+              status: "complete",
+              url: sender.url,
+            }),
+          );
+        });
+        triggerWebNavigationOnCompletedEvent(
+          mock<chrome.webNavigation.WebNavigationFramedCallbackDetails>({
+            tabId: sender.tab.id,
+            url: sender.url,
+          }),
+        );
+        await flushPromises();
+
+        expect(notificationAddLoginSpy).toHaveBeenCalled();
+      });
+
+      it("initializes the notification immediately when the tab's navigation is complete", async () => {
+        sendMockExtensionMessage(
+          {
+            command: "formFieldSubmitted",
+            uri: "example.com",
+            username: "",
+            password: "password",
+            newPassword: "newPassword",
+          },
+          sender,
+        );
+        await flushPromises();
+        chrome.tabs.get = jest.fn().mockImplementationOnce((tabId, callback) => {
+          callback(
+            mock<chrome.tabs.Tab>({
+              status: "complete",
+              url: sender.url,
+            }),
+          );
+        });
+
+        triggerWebRequestOnCompletedEvent(
+          mock<chrome.webRequest.WebRequestDetails>({
+            url: sender.url,
+            tabId: sender.tab.id,
+            method: "POST",
+            requestId,
+          }),
+        );
+        await flushPromises();
+
+        expect(notificationChangedPasswordSpy).toHaveBeenCalled();
+      });
+    });
+  });
+
+  describe("tab listeners", () => {
+    let sender: MockProxy<chrome.runtime.MessageSender>;
+    const pageDetails = mock<AutofillPageDetails>({ fields: [mock<AutofillField>()] });
+    const requestId = "123345";
+
+    beforeEach(async () => {
+      sender = mock<chrome.runtime.MessageSender>({
+        tab: { id: 1 },
+        url: "https://example.com",
+      });
+
+      sendMockExtensionMessage(
+        { command: "collectPageDetailsResponse", details: pageDetails },
+        sender,
+      );
+      await flushPromises();
+      triggerWebRequestOnBeforeRequestEvent(
+        mock<chrome.webRequest.WebRequestDetails>({
+          url: sender.url,
+          tabId: sender.tab.id,
+          method: "POST",
+          requestId,
+        }),
+      );
+      await flushPromises();
+      sendMockExtensionMessage(
+        {
+          command: "formFieldSubmitted",
+          uri: "example.com",
+          username: "username",
+          password: "password",
+          newPassword: "newPassword",
+        },
+        sender,
+      );
+      await flushPromises();
+    });
+
+    it("clears all associated data with a removed tab", () => {
+      triggerTabOnRemovedEvent(sender.tab.id, mock<chrome.tabs.TabRemoveInfo>());
+
+      expect(overlayNotificationsBackground["websiteOriginsWithFields"].size).toBe(0);
+    });
+
+    it("clears all associated data with a tab that is entering a `loading` state", () => {
+      triggerTabOnUpdatedEvent(
+        sender.tab.id,
+        mock<chrome.tabs.TabChangeInfo>({ status: "loading" }),
+        mock<chrome.tabs.Tab>({ status: "loading" }),
+      );
+
+      expect(overlayNotificationsBackground["websiteOriginsWithFields"].size).toBe(0);
     });
   });
 });

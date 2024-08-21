@@ -169,53 +169,6 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
   }
 
   /**
-   * Initializes the add login or change password notification based on the modified login form data
-   * and the tab details. This will trigger the notification to be displayed to the user.
-   *
-   * @param details - The details of the web response
-   * @param modifyLoginData  - The modified login form data
-   * @param tab - The tab details
-   */
-  private triggerNotificationInit = async (
-    details: chrome.webRequest.WebResponseDetails,
-    modifyLoginData: ModifyLoginCipherFormData,
-    tab: chrome.tabs.Tab,
-  ) => {
-    if (modifyLoginData.newPassword && !modifyLoginData.username) {
-      // These notifications are temporarily setup as "messages" to the notification background.
-      // This will be structured differently in a future refactor.
-      await this.notificationBackground.changedPassword(
-        {
-          command: "bgChangedPassword",
-          data: {
-            url: modifyLoginData.uri,
-            currentPassword: modifyLoginData.password,
-            newPassword: modifyLoginData.newPassword,
-          },
-        },
-        { tab },
-      );
-      this.clearCompletedWebRequest(details, tab);
-      return;
-    }
-
-    if (modifyLoginData.username && (modifyLoginData.password || modifyLoginData.newPassword)) {
-      await this.notificationBackground.addLogin(
-        {
-          command: "bgAddLogin",
-          login: {
-            url: modifyLoginData.uri,
-            username: modifyLoginData.username,
-            password: modifyLoginData.password || modifyLoginData.newPassword,
-          },
-        },
-        { tab },
-      );
-      this.clearCompletedWebRequest(details, tab);
-    }
-  };
-
-  /**
    * Removes and resets the onBeforeRequest and onCompleted listeners for web requests. This ensures
    * that we are only listening for form submission requests on the tabs that have fillable form fields.
    */
@@ -304,6 +257,53 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
       await this.triggerNotificationInit(details, modifyLoginData, tab);
     };
     chrome.webNavigation.onCompleted.addListener(handleWebNavigationOnCompleted);
+  };
+
+  /**
+   * Initializes the add login or change password notification based on the modified login form data
+   * and the tab details. This will trigger the notification to be displayed to the user.
+   *
+   * @param details - The details of the web response
+   * @param modifyLoginData  - The modified login form data
+   * @param tab - The tab details
+   */
+  private triggerNotificationInit = async (
+    details: chrome.webRequest.WebResponseDetails,
+    modifyLoginData: ModifyLoginCipherFormData,
+    tab: chrome.tabs.Tab,
+  ) => {
+    if (modifyLoginData.newPassword && !modifyLoginData.username) {
+      // These notifications are temporarily setup as "messages" to the notification background.
+      // This will be structured differently in a future refactor.
+      await this.notificationBackground.changedPassword(
+        {
+          command: "bgChangedPassword",
+          data: {
+            url: modifyLoginData.uri,
+            currentPassword: modifyLoginData.password,
+            newPassword: modifyLoginData.newPassword,
+          },
+        },
+        { tab },
+      );
+      this.clearCompletedWebRequest(details, tab);
+      return;
+    }
+
+    if (modifyLoginData.username && (modifyLoginData.password || modifyLoginData.newPassword)) {
+      await this.notificationBackground.addLogin(
+        {
+          command: "bgAddLogin",
+          login: {
+            url: modifyLoginData.uri,
+            username: modifyLoginData.username,
+            password: modifyLoginData.password || modifyLoginData.newPassword,
+          },
+        },
+        { tab },
+      );
+      this.clearCompletedWebRequest(details, tab);
+    }
   };
 
   /**
