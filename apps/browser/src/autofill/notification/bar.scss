@@ -158,6 +158,11 @@ button {
 }
 
 .success-message {
+  display: flex;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
+
   @include themify($themes) {
     color: themed("successColor");
   }
@@ -301,10 +306,7 @@ button {
 
       &.success-message,
       &.error-message {
-        padding-top: 4px;
-        padding-right: 36px;
-        padding-left: 42px;
-        padding-bottom: 6px;
+        padding: 4px 36px 6px 42px;
       }
     }
   }
