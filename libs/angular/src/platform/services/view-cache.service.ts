@@ -35,7 +35,11 @@ export type FormCacheOptions<TFormGroup extends FormGroup> = BaseCacheOptions<
 };
 
 /**
- * Persist state when opening/closing the extension popup
+ * Cache for temporary component state
+ *
+ * #### Implementations
+ * - browser extension popup: used to persist UI between popup open and close
+ * - all other clients: noop
  */
 @Injectable({
   providedIn: "root",
@@ -43,6 +47,8 @@ export type FormCacheOptions<TFormGroup extends FormGroup> = BaseCacheOptions<
 export class ViewCacheService {
   /**
    * Create a signal from a previously cached value. Whenever the signal is updated, the new value is saved to the cache.
+   *
+   * Non browser extension implementations are noop and return a normal signal.
    *
    * @returns the created signal
    *
@@ -62,6 +68,19 @@ export class ViewCacheService {
    * - Initialize a form from a cached value
    * - Save form value to cache when it changes
    * - The form is marked dirty if the restored value is not `undefined`.
+   *
+   * Non browser extension implementations are noop and return the original form group.
+   *
+   * @example
+   * ```ts
+   * this.loginDetailsForm = this.viewCacheService.formGroup({
+   *   key: "vault-login-details-form",
+   *   control: this.formBuilder.group({
+   *     username: [""],
+   *     email: [""],
+   *   })
+   * });
+   * ```
    **/
   formGroup<TFormGroup extends FormGroup>(options: FormCacheOptions<TFormGroup>): TFormGroup {
     return options.control;
