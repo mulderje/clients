@@ -228,6 +228,7 @@ describe("NotificationBackground", () => {
         expect(BrowserApi.tabSendMessageData).toHaveBeenCalledWith(
           sender.tab,
           "closeNotificationBar",
+          { fadeOutNotification: false },
         );
       });
     });

@@ -759,7 +759,7 @@ export default class NotificationBackground {
     sender: chrome.runtime.MessageSender,
   ) {
     await BrowserApi.tabSendMessageData(sender.tab, "closeNotificationBar", {
-      fadeOutNotification: message.fadeOutNotification,
+      fadeOutNotification: !!message.fadeOutNotification,
     });
   }
 
