@@ -13,6 +13,7 @@ export type NotificationsExtensionMessage = {
     typeData?: NotificationTypeData;
     height?: number;
     error?: string;
+    fadeOutNotification?: boolean;
   };
 };
 
@@ -27,8 +28,8 @@ export type OverlayNotificationsExtensionMessageParams = OverlayNotificationsExt
 
 export type OverlayNotificationsExtensionMessageHandlers = {
   [key: string]: ({ message, sender }: OverlayNotificationsExtensionMessageParams) => any;
-  openNotificationBar: ({ message }: OverlayNotificationsExtensionMessageParam) => Promise<void>;
-  closeNotificationBar: () => void;
+  openNotificationBar: ({ message }: OverlayNotificationsExtensionMessageParam) => void;
+  closeNotificationBar: ({ message }: OverlayNotificationsExtensionMessageParam) => void;
   adjustNotificationBar: ({ message }: OverlayNotificationsExtensionMessageParam) => void;
   saveCipherAttemptCompleted: ({ message }: OverlayNotificationsExtensionMessageParam) => void;
 };

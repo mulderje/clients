@@ -89,6 +89,7 @@ type NotificationBackgroundExtensionMessage = {
   tab?: chrome.tabs.Tab;
   sender?: string;
   notificationType?: string;
+  fadeOutNotification?: boolean;
 };
 
 type BackgroundMessageParam = { message: NotificationBackgroundExtensionMessage };
@@ -99,7 +100,7 @@ type NotificationBackgroundExtensionMessageHandlers = {
   [key: string]: CallableFunction;
   unlockCompleted: ({ message, sender }: BackgroundOnMessageHandlerParams) => Promise<void>;
   bgGetFolderData: ({ message, sender }: BackgroundOnMessageHandlerParams) => Promise<FolderView[]>;
-  bgCloseNotificationBar: ({ sender }: BackgroundSenderParam) => Promise<void>;
+  bgCloseNotificationBar: ({ message, sender }: BackgroundOnMessageHandlerParams) => Promise<void>;
   bgAdjustNotificationBar: ({ message, sender }: BackgroundOnMessageHandlerParams) => Promise<void>;
   bgAddLogin: ({ message, sender }: BackgroundOnMessageHandlerParams) => Promise<void>;
   bgChangedPassword: ({ message, sender }: BackgroundOnMessageHandlerParams) => Promise<void>;

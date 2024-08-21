@@ -59,7 +59,8 @@ export default class NotificationBackground {
   private readonly extensionMessageHandlers: NotificationBackgroundExtensionMessageHandlers = {
     unlockCompleted: ({ message, sender }) => this.handleUnlockCompleted(message, sender),
     bgGetFolderData: () => this.getFolderData(),
-    bgCloseNotificationBar: ({ sender }) => this.handleCloseNotificationBarMessage(sender),
+    bgCloseNotificationBar: ({ message, sender }) =>
+      this.handleCloseNotificationBarMessage(message, sender),
     bgAdjustNotificationBar: ({ message, sender }) =>
       this.handleAdjustNotificationBarMessage(message, sender),
     bgAddLogin: ({ message, sender }) => this.addLogin(message, sender),
@@ -750,10 +751,16 @@ export default class NotificationBackground {
    * Sends a message back to the sender tab which
    * triggers closure of the notification bar.
    *
+   * @param message - The extension message
    * @param sender - The contextual sender of the message
    */
-  private async handleCloseNotificationBarMessage(sender: chrome.runtime.MessageSender) {
-    await BrowserApi.tabSendMessageData(sender.tab, "closeNotificationBar");
+  private async handleCloseNotificationBarMessage(
+    message: NotificationBackgroundExtensionMessage,
+    sender: chrome.runtime.MessageSender,
+  ) {
+    await BrowserApi.tabSendMessageData(sender.tab, "closeNotificationBar", {
+      fadeOutNotification: message.fadeOutNotification,
+    });
   }
 
   /**
