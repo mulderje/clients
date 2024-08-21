@@ -16,9 +16,9 @@ import { TokenizedPaymentMethod } from "@bitwarden/common/billing/models/domain"
   templateUrl: "./select-payment-method.component.html",
 })
 export class SelectPaymentMethodComponent implements OnInit, OnDestroy {
-  @Input() protected showAccountCredit: boolean = true;
-  @Input() protected showBankAccount: boolean = true;
-  @Input() protected showPayPal: boolean = true;
+  @Input() showAccountCredit: boolean = true;
+  @Input() showBankAccount: boolean = true;
+  @Input() showPayPal: boolean = true;
   @Input() private startWith: PaymentMethodType = PaymentMethodType.Card;
   @Input() protected onSubmit: (tokenizedPaymentMethod: TokenizedPaymentMethod) => Promise<void>;
 
@@ -81,6 +81,10 @@ export class SelectPaymentMethodComponent implements OnInit, OnDestroy {
     return null;
   }
 
+  select = (selected: PaymentMethodType) => {
+    this.formGroup.value.paymentMethod = selected;
+  };
+
   submit = async () => {
     const tokenizedPaymentMethod = await this.tokenizePaymentMethod();
     await this.onSubmit(tokenizedPaymentMethod);
@@ -120,6 +124,10 @@ export class SelectPaymentMethodComponent implements OnInit, OnDestroy {
     }
   }
 
+  get selected(): PaymentMethodType {
+    return this.formGroup.value.paymentMethod;
+  }
+
   private onPaymentMethodChange(type: PaymentMethodType): void {
     switch (type) {
       case PaymentMethodType.Card: {
@@ -131,10 +139,6 @@ export class SelectPaymentMethodComponent implements OnInit, OnDestroy {
         break;
       }
     }
-  }
-
-  private get selected(): PaymentMethodType {
-    return this.formGroup.value.paymentMethod;
   }
 
   protected get usingAccountCredit(): boolean {

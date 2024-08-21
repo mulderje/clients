@@ -1,0 +1,34 @@
+<bit-dialog
+  dialogSize="large"
+  [title]="
+    (dialogParams.existingPaymentMethodType != null ? 'changePaymentMethod' : 'addPaymentMethod')
+      | i18n
+  "
+>
+  <ng-container bitDialogContent>
+    <app-select-payment-method
+      [showAccountCredit]="false"
+      [showBankAccount]="!!dialogParams.organizationId"
+      [startWith]="dialogParams.existingPaymentMethodType ?? PaymentMethodType.Card"
+    ></app-select-payment-method>
+    <app-manage-tax-information
+      (countrySelected)="onCountrySelected($event)"
+      [startWith]="dialogParams.existingTaxInformation"
+    >
+    </app-manage-tax-information>
+  </ng-container>
+  <ng-container bitDialogFooter>
+    <button type="submit" bitButton bitFormButton buttonType="primary" [bitAction]="submit">
+      {{ "submit" }}
+    </button>
+    <button
+      type="button"
+      bitButton
+      bitFormButton
+      buttonType="secondary"
+      [bitDialogClose]="ResultType.Closed"
+    >
+      {{ "cancel" | i18n }}
+    </button>
+  </ng-container>
+</bit-dialog>

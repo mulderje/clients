@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { FormBuilder, FormControl, Validators } from "@angular/forms";
 import { ActivatedRoute, Router } from "@angular/router";
-import { lastValueFrom } from "rxjs";
+import { firstValueFrom, lastValueFrom } from "rxjs";
 
 import { ApiService } from "@bitwarden/common/abstractions/api.service";
 import { OrganizationApiServiceAbstraction } from "@bitwarden/common/admin-console/abstractions/organization/organization-api.service.abstraction";
@@ -9,17 +9,22 @@ import { PaymentMethodType } from "@bitwarden/common/billing/enums";
 import { BillingPaymentResponse } from "@bitwarden/common/billing/models/response/billing-payment.response";
 import { OrganizationSubscriptionResponse } from "@bitwarden/common/billing/models/response/organization-subscription.response";
 import { SubscriptionResponse } from "@bitwarden/common/billing/models/response/subscription.response";
+import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { VerifyBankRequest } from "@bitwarden/common/models/request/verify-bank.request";
+import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
-import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
 import { DialogService, ToastService } from "@bitwarden/components";
 
 import { AddCreditDialogResult, openAddCreditDialog } from "./add-credit-dialog.component";
 import {
+  AdjustPaymentDialogV2Component,
+  AdjustPaymentDialogV2ResultType,
+} from "./adjust-payment-dialog/adjust-payment-dialog-v2.component";
+import {
   AdjustPaymentDialogResult,
   openAdjustPaymentDialog,
-} from "./adjust-payment-dialog.component";
+} from "./adjust-payment-dialog/adjust-payment-dialog.component";
 import { TaxInfoComponent } from "./tax-info.component";
 
 @Component({
@@ -53,17 +58,19 @@ export class PaymentMethodComponent implements OnInit {
 
   taxForm = this.formBuilder.group({});
 
+  protected deprecateStripeSourcesAPI: boolean;
+
   constructor(
     protected apiService: ApiService,
     protected organizationApiService: OrganizationApiServiceAbstraction,
     protected i18nService: I18nService,
     protected platformUtilsService: PlatformUtilsService,
     private router: Router,
-    private logService: LogService,
     private route: ActivatedRoute,
     private formBuilder: FormBuilder,
     private dialogService: DialogService,
     private toastService: ToastService,
+    private configService: ConfigService,
   ) {}
 
   async ngOnInit() {
@@ -88,6 +95,10 @@ export class PaymentMethodComponent implements OnInit {
       return;
     }
     this.loading = true;
+
+    this.deprecateStripeSourcesAPI = await firstValueFrom(
+      this.configService.getFeatureFlag$(FeatureFlag.AC2476_DeprecateStripeSourcesAPI),
+    );
 
     if (this.forOrganization) {
       const billingPromise = this.organizationApiService.getBilling(this.organizationId);
@@ -124,15 +135,33 @@ export class PaymentMethodComponent implements OnInit {
   };
 
   changePayment = async () => {
-    const dialogRef = openAdjustPaymentDialog(this.dialogService, {
-      data: {
-        organizationId: this.organizationId,
-        currentType: this.paymentSource !== null ? this.paymentSource.type : null,
-      },
-    });
-    const result = await lastValueFrom(dialogRef.closed);
-    if (result === AdjustPaymentDialogResult.Adjusted) {
-      await this.load();
+    if (!this.deprecateStripeSourcesAPI) {
+      const dialogRef = openAdjustPaymentDialog(this.dialogService, {
+        data: {
+          organizationId: this.organizationId,
+          currentType: this.paymentSource !== null ? this.paymentSource.type : null,
+        },
+      });
+      const result = await lastValueFrom(dialogRef.closed);
+      if (result === AdjustPaymentDialogResult.Adjusted) {
+        await this.load();
+      }
+    } else {
+      const dialogRef = AdjustPaymentDialogV2Component.open(this.dialogService, {
+        data: {
+          existingPaymentMethodType: this.paymentSource?.type,
+          existingTaxInformation: {
+            ...this.taxInfo.taxInfo,
+          },
+          organizationId: this.organizationId,
+        },
+      });
+
+      const result = await lastValueFrom(dialogRef.closed);
+
+      if (result === AdjustPaymentDialogV2ResultType.Submitted) {
+        await this.load();
+      }
     }
   };
 
@@ -176,10 +205,6 @@ export class PaymentMethodComponent implements OnInit {
 
   get forOrganization() {
     return this.organizationId != null;
-  }
-
-  get headerClass() {
-    return this.forOrganization ? ["page-header"] : ["tabbed-header"];
   }
 
   get paymentSourceClasses() {
