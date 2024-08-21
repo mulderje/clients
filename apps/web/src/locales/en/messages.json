@@ -8954,5 +8954,9 @@
   },
   "additionalStorageGbMessage": {
     "message": "GB additional storage"
+  },
+  "publicApi": {
+    "message": "Public API",
+    "description": "The text, 'API', is an acronymn and should not be translated."
   }
 }
