@@ -50,8 +50,10 @@ export class ToggleComponent<TValue> implements AfterContentChecked {
   get labelClasses() {
     return [
       "tw-h-full",
+      "tw-w-full",
       "tw-flex",
       "tw-items-center",
+      "tw-justify-center",
       "tw-gap-1.5",
       "!tw-font-semibold",
       "tw-leading-5",

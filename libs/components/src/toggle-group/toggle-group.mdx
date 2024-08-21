@@ -15,21 +15,34 @@ Toggle groups function as radio buttons and a radio group under the hood.
 A button in a toggle group can have a badge counter added to show the number of items existing
 within that filter.
 
+## Default
+
+<Canvas of={stories.Default} />
+
+<Controls />
+
+## Label wrap
+
 If the labels in a toggle group would overflow the width of the toggle group container, then the
 labels will wrap to 2 lines and truncate with an ellipsis past that. The full label text is
 accessible via the `title` prop (i.e. visible on hover).
 
-<Canvas>
-  <Story of={stories.Default} />
-</Canvas>
+<Canvas of={stories.LabelWrap} />
 
-<Canvas>
-  <Story of={stories.LabelWrap} />
-</Canvas>
+## Full width
 
-<Controls />
+If a toggle group should span the width of its container, pass the `fullWidth` input to the toggle
+group.
 
-## Accessibility
+```
+<bit-toggle-group fullWidth>
+...toggle components here...
+</bit-toggle-group>
+```
+
+<Canvas of={stories.FullWidth} />
+
+# Accessibility
 
 - Since only 1 button can be selected at a time, the toggle group acts similarly to a radio group.
 - The user may navigate the options via left/right arrow keys.
