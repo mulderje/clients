@@ -11,7 +11,7 @@
         <div class="box-content">
           <div class="box-content-row" *ngIf="!editMode" appBoxRow>
             <label for="type">{{ "type" | i18n }}</label>
-            <select id="type" name="Type" [(ngModel)]="cipher.type">
+            <select id="type" name="Type" [(ngModel)]="cipher.type" (change)="typeChange()">
               <option *ngFor="let o of typeOptions" [ngValue]="o.value">{{ o.name }}</option>
             </select>
           </div>
@@ -506,6 +506,16 @@
                     [ngClass]="{ 'bwi-eye': !showPrivateKey, 'bwi-eye-slash': showPrivateKey }"
                   ></i>
                 </button>
+                <button
+                  type="button"
+                  class="row-btn"
+                  appStopClick
+                  appA11yTitle="{{ 'generateSSHKey' | i18n }}"
+                  (click)="generateSSHKey()"
+                  *ngIf="!(!cipher.edit && editMode)"
+                >
+                  <i class="bwi bwi-lg bwi-generate" aria-hidden="true"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -766,3 +776,4 @@
     </div>
   </div>
 </form>
+<ng-template #sshGenerator></ng-template>

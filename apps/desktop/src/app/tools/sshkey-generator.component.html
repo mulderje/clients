@@ -1,0 +1,116 @@
+<div class="modal fade" role="dialog" aria-modal="true" aria-labelledby="generatorTitle">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <h1 class="modal-title" id="generatorTitle">
+          {{ "generator" | i18n }}
+        </h1>
+        <div class="generated-block">
+          <div
+            class="generated-wrapper"
+            [innerHTML]="
+              truncatedSSHPrivateKey(privateKeyVisibilityFilter(privateKey, showPrivateKey))
+            "
+            [appCopyText]="privateKey"
+          ></div>
+          <div class="action-buttons">
+            <button
+              type="button"
+              class="row-btn"
+              appStopClick
+              appA11yTitle="{{ 'toggleVisibility' | i18n }}"
+              (click)="togglePrivateKeyVisibility()"
+            >
+              <i
+                class="bwi bwi-lg"
+                aria-hidden="true"
+                [ngClass]="{ 'bwi-eye': !showPrivateKey, 'bwi-eye-slash': showPrivateKey }"
+              ></i>
+            </button>
+
+            <button
+              type="button"
+              class="icon-btn"
+              appStopClick
+              appA11yTitle="{{ 'copySSHPrivateKey' | i18n }}"
+              (click)="copy(privateKey, 'sshPrivateKey', 'SSHPrivateKey')"
+            >
+              <i class="bwi bwi-lg bwi-clone" aria-hidden="true"></i>
+            </button>
+            <button
+              type="button"
+              class="icon-btn"
+              appStopClick
+              appA11yTitle="{{ 'regenerateSSHKey' | i18n }}"
+              (click)="regenerate(true)"
+            >
+              <i class="bwi bwi-lg bwi-generate" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+        <ng-container>
+          <div class="box">
+            <h2 class="box-header">
+              <button type="button" (click)="toggleOptions()" [attr.aria-expanded]="showOptions">
+                <i
+                  class="bwi bwi-lg"
+                  aria-hidden="true"
+                  [ngClass]="{ 'bwi-angle-right': !showOptions, 'bwi-angle-down': showOptions }"
+                ></i>
+                {{ "options" | i18n }}
+              </button>
+            </h2>
+            <div class="box-content condensed" [hidden]="!showOptions">
+              <div
+                class="box-content-row box-content-row-radio"
+                role="radiogroup"
+                aria-labelledby="sshKeyTypeHeading"
+              >
+                <label id="sshKeyTypeHeading" class="radio-header">{{
+                  "sshKeyAlgorithm" | i18n
+                }}</label>
+                <div
+                  class="radio-group text-default"
+                  appBoxRow
+                  name="PassTypeOptions"
+                  *ngFor="let o of sshKeyTypes"
+                >
+                  <input
+                    type="radio"
+                    class="radio"
+                    [(ngModel)]="selectedKeyType"
+                    name="KeyType"
+                    id="keyType_{{ o }}"
+                    [value]="o"
+                    [checked]="selectedKeyType === o"
+                    (change)="regenerate(true)"
+                  />
+                  <label
+                    class="unstyled"
+                    for="keyType_{{ o }}"
+                    (click)="selectedKeyType = o; regenerate(true)"
+                  >
+                    {{ i18nSSHKeyType(o) }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="primary"
+          appA11yTitle="{{ 'select' | i18n }}"
+          (click)="select()"
+        >
+          <i class="bwi bwi-lg bwi-fw bwi-check" aria-hidden="true"></i>
+        </button>
+        <button type="button" data-dismiss="modal">
+          {{ "cancel" | i18n }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

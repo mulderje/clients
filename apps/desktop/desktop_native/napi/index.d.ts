@@ -42,6 +42,23 @@ export namespace clipboards {
   export function read(): Promise<string>
   export function write(text: string, password: boolean): Promise<void>
 }
+export namespace sshagent {
+  export interface PrivateKey {
+    privateKey: string
+    name: string
+    uuid: string
+  }
+  export interface SshKey {
+    privateKey: string
+    publicKey: string
+    keyAlgorithm: string
+    keyFingerprint: string
+  }
+  export function serve(callback: (err: Error | null, arg: string) => any): Promise<void>
+  export function setKeys(newKeys: Array<PrivateKey>): Promise<void>
+  export function lock(): Promise<void>
+  export function generateKeypair(keyAlgorithm: string): Promise<SshKey>
+}
 export namespace processisolations {
   export function disableCoredumps(): Promise<void>
   export function isCoreDumpingDisabled(): Promise<boolean>

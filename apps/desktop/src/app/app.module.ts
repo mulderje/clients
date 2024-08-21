@@ -22,6 +22,7 @@ import { SsoComponent } from "../auth/sso.component";
 import { TwoFactorOptionsComponent } from "../auth/two-factor-options.component";
 import { TwoFactorComponent } from "../auth/two-factor.component";
 import { UpdateTempPasswordComponent } from "../auth/update-temp-password.component";
+import { SSHAgentService } from "../platform/services/renderer-ssh-agent.service";
 import { PremiumComponent } from "../vault/app/accounts/premium.component";
 import { AddEditCustomFieldsComponent } from "../vault/app/vault/add-edit-custom-fields.component";
 import { AddEditComponent } from "../vault/app/vault/add-edit.component";
@@ -50,6 +51,7 @@ import { GeneratorComponent } from "./tools/generator.component";
 import { PasswordGeneratorHistoryComponent } from "./tools/password-generator-history.component";
 import { AddEditComponent as SendAddEditComponent } from "./tools/send/add-edit.component";
 import { SendComponent } from "./tools/send/send.component";
+import { SSHGeneratorComponent } from "./tools/sshkey-generator.component";
 
 @NgModule({
   imports: [
@@ -80,6 +82,7 @@ import { SendComponent } from "./tools/send/send.component";
     LockComponent,
     NavComponent,
     GeneratorComponent,
+    SSHGeneratorComponent,
     PasswordGeneratorHistoryComponent,
     PasswordHistoryComponent,
     PremiumComponent,
@@ -100,6 +103,7 @@ import { SendComponent } from "./tools/send/send.component";
     ViewComponent,
     ViewCustomFieldsComponent,
   ],
+  providers: [SSHAgentService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

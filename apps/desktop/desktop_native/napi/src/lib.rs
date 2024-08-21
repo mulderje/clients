@@ -149,6 +149,128 @@ pub mod clipboards {
 }
 
 #[napi]
+pub mod sshagent {
+    use std::sync::Arc;
+
+    use napi::{
+        bindgen_prelude::Promise,
+        threadsafe_function::{ErrorStrategy::CalleeHandled, ThreadsafeFunction},
+    };
+    use russh_keys::{key::SignatureHash, PublicKeyBase64};
+    use tokio::{self, sync::Mutex};
+
+    #[napi(object)]
+    pub struct PrivateKey {
+        pub private_key: String,
+        pub name: String,
+        pub uuid: String,
+    }
+
+    #[napi(object)]
+    pub struct SSHKey {
+        pub private_key: String,
+        pub public_key: String,
+        pub key_algorithm: String,
+        pub key_fingerprint: String,
+    }
+
+    #[napi]
+    pub async fn serve(callback: ThreadsafeFunction<String, CalleeHandled>) -> napi::Result<()> {
+        let (auth_request_tx, mut auth_request_rx) = tokio::sync::mpsc::channel::<String>(32);
+        let (auth_response_tx, auth_response_rx) = tokio::sync::mpsc::channel::<bool>(32);
+        tokio::spawn(async move {
+            while let Some(message) = auth_request_rx.recv().await {
+                let promise_result: Result<Promise<bool>, napi::Error> = callback.call_async(Ok(message)).await;
+                if let Err(e) = promise_result {
+                    println!("[SSH Agent Native Module] calling UI callback could not create promise: {}", e);
+                    let _ = auth_response_tx.send(false).await;
+                } else {
+                    let result = promise_result.unwrap().await;
+                    if let Err(e) = result {
+                        println!(
+                            "[SSH Agent Native Module] calling UI callback promise was rejected: {}",
+                            e
+                        );
+                        let _ = auth_response_tx.send(false).await;
+                    } else {
+                        let _ = auth_response_tx.send(result.unwrap()).await;
+                    }
+                }
+            }
+        });
+
+        match desktop_core::ssh_agent::start_server(auth_request_tx, Arc::new(Mutex::new(auth_response_rx))).await {
+            Ok(_) => Ok(()),
+            Err(e) => Err(napi::Error::from_reason(e.to_string())),
+        }
+    }
+    #[napi]
+    pub async fn set_keys(new_keys: Vec<PrivateKey>) -> napi::Result<()> {
+        desktop_core::ssh_agent::set_keys(
+            new_keys
+                .iter()
+                .map(|k| (k.private_key.clone(), k.name.clone(), k.uuid.clone()))
+                .collect(),
+        )
+        .await
+        .map_err(|e| napi::Error::from_reason(e.to_string()))?;
+        Ok(())
+    }
+
+    #[napi]
+    pub async fn lock() -> napi::Result<()> {
+        desktop_core::ssh_agent::lock().await.map_err(|e| napi::Error::from_reason(e.to_string()))
+    }
+
+    #[napi]
+    pub async fn generate_keypair(key_algorithm: String) -> napi::Result<SSHKey> {
+        let key = match key_algorithm.as_str() {
+            "ed25519" => russh_keys::key::KeyPair::generate_ed25519(),
+            "rsa2048" => russh_keys::key::KeyPair::generate_rsa(2048, SignatureHash::SHA2_256),
+            "rsa3072" => russh_keys::key::KeyPair::generate_rsa(3072, SignatureHash::SHA2_256),
+            "rsa4096" => russh_keys::key::KeyPair::generate_rsa(4096, SignatureHash::SHA2_256),
+            _ => {
+                return Err(napi::Error::from_reason(
+                    "Unsupported key algorithm".to_string(),
+                ))
+            }
+        };
+        match key {
+            Some(k) => {
+                let mut buffer = Vec::new();
+                let private_key = russh_keys::encode_pkcs8_pem(&k, &mut buffer);
+                let buffer_string = String::from_utf8(buffer).unwrap();
+                match private_key {
+                    Ok(_pk) => {
+                        let public_key = match key_algorithm.as_str() {
+                            "ed25519" => "ssh-ed25519 ".to_owned() + &k.public_key_base64(),
+                            "rsa2048" => "ssh-rsa ".to_owned() + &k.public_key_base64(),
+                            "rsa3072" => "ssh-rsa ".to_owned() + &k.public_key_base64(),
+                            "rsa4096" => "ssh-rsa ".to_owned() + &k.public_key_base64(),
+                            _ => {
+                                return Err(napi::Error::from_reason(
+                                    "Unsupported key algorithm".to_string(),
+                                ))
+                            }
+                        };
+                        Ok(SSHKey {
+                            private_key: buffer_string.to_string(),
+                            public_key: public_key.to_string(),
+                            key_algorithm: key_algorithm.to_string(),
+                            key_fingerprint: "SHA256:".to_string()
+                                + &k.clone_public_key().unwrap().fingerprint().to_string(),
+                        })
+                    }
+                    Err(e) => Err(napi::Error::from_reason(e.to_string())),
+                }
+            }
+            None => Err(napi::Error::from_reason(
+                "Failed to generate key".to_string(),
+            )),
+        }
+    }
+
+}
 pub mod processisolations {
     #[napi]
     pub async fn disable_coredumps() -> napi::Result<()> {
@@ -169,12 +291,19 @@ pub mod processisolations {
 
 #[napi]
 pub mod powermonitors {
-    use napi::{threadsafe_function::{ErrorStrategy::CalleeHandled, ThreadsafeFunction, ThreadsafeFunctionCallMode}, tokio};
+    use napi::{
+        threadsafe_function::{
+            ErrorStrategy::CalleeHandled, ThreadsafeFunction, ThreadsafeFunctionCallMode,
+        },
+        tokio,
+    };
 
     #[napi]
     pub async fn on_lock(callback: ThreadsafeFunction<(), CalleeHandled>) -> napi::Result<()> {
         let (tx, mut rx) = tokio::sync::mpsc::channel::<()>(32);
-        desktop_core::powermonitor::on_lock(tx).await.map_err(|e| napi::Error::from_reason(e.to_string()))?;
+        desktop_core::powermonitor::on_lock(tx)
+            .await
+            .map_err(|e| napi::Error::from_reason(e.to_string()))?;
         tokio::spawn(async move {
             while let Some(message) = rx.recv().await {
                 callback.call(Ok(message.into()), ThreadsafeFunctionCallMode::NonBlocking);
@@ -187,5 +316,4 @@ pub mod powermonitors {
     pub async fn is_lock_monitor_available() -> napi::Result<bool> {
         Ok(desktop_core::powermonitor::is_lock_monitor_available().await)
     }
-
 }
