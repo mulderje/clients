@@ -1551,7 +1551,7 @@ export class CipherService implements CipherServiceAbstraction {
           {
             privateKey: null,
             publicKey: null,
-            keyAlgorithm: null,
+            keyFingerprint: null,
           },
           key,
         );
