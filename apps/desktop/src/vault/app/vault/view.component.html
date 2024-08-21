@@ -401,17 +401,51 @@
         </div>
         <!-- SSH Key -->
         <div *ngIf="cipher.card">
-          <div class="box-content-row" *ngIf="cipher.sshKey.privateKey">
-            <span class="row-label">{{ "sshPrivatekey" | i18n }}</span>
-            {{ cipher.sshKey.privateKey }}
+          <div class="box-content-row box-content-row-flex" appBoxRow>
+            <div class="row-main">
+              <label for="sshPublicKey">{{ "sshPublicKey" | i18n }}</label>
+              <input
+                id="sshPublicKey"
+                type="text"
+                name="SSHKey.SSHPublicKey"
+                [ngModel]="cipher.sshKey.publicKey"
+                readonly
+              />
+            </div>
+            <div class="action-buttons">
+              <button
+                type="button"
+                class="row-btn"
+                appStopClick
+                (click)="copy(cipher.sshKey.publicKey, 'sshPublicKey', 'SSHPublicKey')"
+                appA11yTitle="{{ 'generateSSHKey' | i18n }}"
+              >
+                <i class="bwi bwi-lg bwi-clone" aria-hidden="true"></i>
+              </button>
+            </div>
           </div>
-          <div class="box-content-row" *ngIf="cipher.sshKey.publicKey">
-            <span class="row-label">{{ "sshPublicKey" | i18n }}</span>
-            {{ cipher.sshKey.publicKey }}
-          </div>
-          <div class="box-content-row" *ngIf="cipher.sshKey.keyFingerprint">
-            <span class="row-label">{{ "sshKeyFingerprint" | i18n }}</span>
-            {{ cipher.sshKey.keyFingerprint }}
+          <div class="box-content-row box-content-row-flex" appBoxRow>
+            <div class="row-main">
+              <label for="sshKeyFingerprint">{{ "sshFingerprint" | i18n }}</label>
+              <input
+                id="sshKeyFingerprint"
+                type="text"
+                name="SSHKey.SSHKeyFingerprint"
+                [ngModel]="cipher.sshKey.keyFingerprint"
+                readonly
+              />
+            </div>
+            <div class="action-buttons">
+              <button
+                type="button"
+                class="row-btn"
+                appStopClick
+                (click)="copy(cipher.sshKey.keyFingerprint, 'sshFingerprint', 'SSHFingerprint')"
+                appA11yTitle="{{ 'generateSSHKey' | i18n }}"
+              >
+                <i class="bwi bwi-lg bwi-clone" aria-hidden="true"></i>
+              </button>
+            </div>
           </div>
         </div>
       </div>
