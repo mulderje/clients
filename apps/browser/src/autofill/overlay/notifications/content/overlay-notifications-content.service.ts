@@ -69,7 +69,7 @@ export class OverlayNotificationsContentService
     }
 
     const { type, typeData } = message.data;
-    if (type !== this.currentNotificationBarType) {
+    if (this.currentNotificationBarType && type !== this.currentNotificationBarType) {
       this.closeNotificationBar();
     }
 
