@@ -206,10 +206,6 @@ export class OverlayNotificationsContentService
    * @param initData - The initialization data for the notification bar.
    */
   private setupInitNotificationBarMessageListener(initData: NotificationBarIframeInitData) {
-    if (!this.notificationBarIframeElement) {
-      return;
-    }
-
     const handleInitNotificationBarMessage = (event: MessageEvent) => {
       const { source, data } = event;
       if (
@@ -223,7 +219,9 @@ export class OverlayNotificationsContentService
       globalThis.removeEventListener("message", handleInitNotificationBarMessage);
     };
 
-    globalThis.addEventListener("message", handleInitNotificationBarMessage);
+    if (this.notificationBarIframeElement) {
+      globalThis.addEventListener("message", handleInitNotificationBarMessage);
+    }
   }
 
   /**
