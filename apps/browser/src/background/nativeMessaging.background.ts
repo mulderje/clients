@@ -285,7 +285,9 @@ export class NativeMessagingBackground {
     switch (message.command) {
       case "biometricUnlock": {
         if (
-          ["not available", "not enabled", "not supported", "not unlocked", "canceled"].includes(message.response)
+          ["not available", "not enabled", "not supported", "not unlocked", "canceled"].includes(
+            message.response,
+          )
         ) {
           this.rejecter(message.response);
           return;

@@ -50,5 +50,5 @@ export const BiometricErrors: Record<BiometricErrorTypes, BiometricError> = {
   "not available": {
     title: "biometricsNotAvailableTitle",
     description: "biometricsNotAvailableDesc",
-  }
+  },
 };
