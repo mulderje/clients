@@ -11,7 +11,6 @@ export class SSHKeyExport {
     req.privateKey = "";
     req.publicKey = "";
     req.keyFingerprint = "";
-    req.keyAlgorithm = "";
     return req;
   }
 
@@ -19,14 +18,12 @@ export class SSHKeyExport {
     view.privateKey = req.privateKey;
     view.publicKey = req.publicKey;
     view.keyFingerprint = req.keyFingerprint;
-    view.keyAlgorithm = req.keyAlgorithm;
     return view;
   }
 
   static toDomain(req: SSHKeyExport, domain = new SSHKeyDomain()) {
     domain.privateKey = req.privateKey != null ? new EncString(req.privateKey) : null;
     domain.publicKey = req.publicKey != null ? new EncString(req.publicKey) : null;
-    domain.keyAlgorithm = req.keyAlgorithm != null ? new EncString(req.keyAlgorithm) : null;
     domain.keyFingerprint = req.keyFingerprint != null ? new EncString(req.keyFingerprint) : null;
     return domain;
   }
@@ -34,7 +31,6 @@ export class SSHKeyExport {
   privateKey: string;
   publicKey: string;
   keyFingerprint: string;
-  keyAlgorithm: string;
 
   constructor(o?: SSHKeyView | SSHKeyDomain) {
     if (o == null) {
@@ -44,6 +40,5 @@ export class SSHKeyExport {
     this.privateKey = safeGetString(o.privateKey);
     this.publicKey = safeGetString(o.publicKey);
     this.keyFingerprint = safeGetString(o.keyFingerprint);
-    this.keyAlgorithm = safeGetString(o.keyAlgorithm);
   }
 }
