@@ -104,6 +104,30 @@ export class CryptoService implements CryptoServiceAbstraction {
     await this.storeAdditionalKeys(key, userId);
   }
 
+  async setUserKeys(
+    userKey: UserKey,
+    encPrivateKey: EncryptedString,
+    userId: UserId,
+  ): Promise<void> {
+    if (userKey == null) {
+      throw new Error("No userKey provided. Lock the user to clear the key");
+    }
+    if (encPrivateKey == null) {
+      throw new Error("No encPrivateKey provided.");
+    }
+    if (userId == null) {
+      throw new Error("No userId provided.");
+    }
+
+    const decryptedPrivateKey = await this.decryptPrivateKey(encPrivateKey, userKey);
+    if (decryptedPrivateKey == null) {
+      throw new Error("Could not decrypt encPrivateKey with userKey.");
+    }
+
+    await this.setUserKey(userKey, userId);
+    await this.setPrivateKey(encPrivateKey, userId);
+  }
+
   async refreshAdditionalKeys(): Promise<void> {
     const activeUserId = await firstValueFrom(this.stateProvider.activeUserId$);
 
