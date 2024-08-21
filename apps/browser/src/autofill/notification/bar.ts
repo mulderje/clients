@@ -219,9 +219,7 @@ function handleSaveCipherAttemptCompletedMessage(message: NotificationBarWindowM
     return;
   }
   const messageName =
-    notificationBarIframeInitData.type === "add"
-      ? "saveCipherAttemptSuccess"
-      : "updateCipherAttemptSuccess";
+    notificationBarIframeInitData.type === "add" ? "passwordSaved" : "passwordUpdated";
 
   addSaveButtonContainers.forEach((element) => {
     element.textContent = chrome.i18n.getMessage(messageName);
