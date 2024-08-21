@@ -40,6 +40,7 @@ import { CardDetailsSectionComponent } from "./card-details-section/card-details
 import { IdentitySectionComponent } from "./identity/identity.component";
 import { ItemDetailsSectionComponent } from "./item-details/item-details-section.component";
 import { LoginDetailsSectionComponent } from "./login-details-section/login-details-section.component";
+import { SSHKeySectionComponent } from "./sshkey-section/sshkey-section.component";
 
 @Component({
   selector: "vault-cipher-form",
@@ -63,6 +64,7 @@ import { LoginDetailsSectionComponent } from "./login-details-section/login-deta
     ItemDetailsSectionComponent,
     CardDetailsSectionComponent,
     IdentitySectionComponent,
+    SSHKeySectionComponent,
     NgIf,
     AdditionalOptionsSectionComponent,
     LoginDetailsSectionComponent,

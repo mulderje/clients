@@ -403,6 +403,9 @@
   "typeSecureNote": {
     "message": "Secure note"
   },
+  "typeSSHKey": {
+    "message": "SSH key"
+  },
   "typeLoginPlural": {
     "message": "Logins"
   },
@@ -8428,7 +8431,7 @@
   "deleteProviderRecoverConfirmDesc": {
     "message": "You have requested to delete this Provider. Use the button below to confirm."
   },
- "deleteProviderWarning": {
+  "deleteProviderWarning": {
     "message": "Deleting your provider is permanent. It cannot be undone."
   },
   "errorAssigningTargetCollection": {
@@ -8512,7 +8515,7 @@
   },
   "createdNewClient": {
     "message": "Successfully created new client"
-   },
+  },
   "noAccess": {
     "message": "No access"
   },
@@ -8948,5 +8951,26 @@
   },
   "additionalStorageGbMessage": {
     "message": "GB additional storage"
+  },
+  "sshKeyAlgorithm": {
+    "message": "Key algorithm"
+  },
+  "sshKeyFingerprint": {
+    "message": "Fingerprint"
+  },
+  "sshKeyPublicKey": {
+    "message": "Public key"
+  },
+  "sshKeyAlgorithmED25519": {
+    "message": "ED25519"
+  },
+  "sshKeyAlgorithmRSA2048": {
+    "message": "RSA 2048-Bit"
+  },
+  "sshKeyAlgorithmRSA3072": {
+    "message": "RSA 3072-Bit"
+  },
+  "sshKeyAlgorithmRSA4096": {
+    "message": "RSA 4096-Bit"
   }
 }

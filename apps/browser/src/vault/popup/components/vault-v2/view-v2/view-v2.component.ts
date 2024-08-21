@@ -100,6 +100,8 @@ export class ViewV2Component {
         );
       case CipherType.SecureNote:
         return this.i18nService.t("viewItemHeader", this.i18nService.t("note").toLowerCase());
+      case CipherType.SSHKey:
+        return this.i18nService.t("viewItemHeader", this.i18nService.t("typeSSHkey").toLowerCase());
     }
   }
 

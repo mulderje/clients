@@ -165,6 +165,11 @@ export class VaultPopupListFiltersService {
       label: this.i18nService.t("note"),
       icon: "bwi-sticky-note",
     },
+    {
+      value: CipherType.SSHKey,
+      label: this.i18nService.t("typeSSHKey"),
+      icon: "bwi-key",
+    },
   ];
 
   /** Resets `filterForm` to the original state */
