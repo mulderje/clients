@@ -30,6 +30,8 @@ const BroadcasterSubscriptionId = "AddEditComponent";
 export class AddEditComponent extends BaseAddEditComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild("form")
   private form: NgForm;
+  showPrivateKey = false;
+
   constructor(
     cipherService: CipherService,
     folderService: FolderService,
@@ -136,5 +138,9 @@ export class AddEditComponent extends BaseAddEditComponent implements OnInit, On
     this.platformUtilsService.launchUri(
       "https://bitwarden.com/help/managing-items/#protect-individual-items",
     );
+  }
+
+  togglePrivateKey() {
+    this.showPrivateKey = !this.showPrivateKey;
   }
 }
