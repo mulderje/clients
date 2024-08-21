@@ -136,10 +136,13 @@ export class LockComponent implements OnInit, OnDestroy {
     }
 
     await this.biometricStateService.setUserPromptCancelled();
-    const userKey = await this.cryptoService.getUserKeyFromStorage(KeySuffixOptions.Biometric);
+    const userKey = await this.cryptoService.getUserKeyFromStorage(
+      KeySuffixOptions.Biometric,
+      this.activeUserId,
+    );
 
     if (userKey) {
-      await this.setUserKeyAndContinue(userKey, false);
+      await this.setUserKeyAndContinue(userKey, this.activeUserId, false);
     }
 
     return !!userKey;
@@ -183,7 +186,7 @@ export class LockComponent implements OnInit, OnDestroy {
       const userKey = await this.pinService.decryptUserKeyWithPin(this.pin, userId);
 
       if (userKey) {
-        await this.setUserKeyAndContinue(userKey);
+        await this.setUserKeyAndContinue(userKey, userId);
         return; // successfully unlocked
       }
 
@@ -266,11 +269,15 @@ export class LockComponent implements OnInit, OnDestroy {
     const userKey = await this.masterPasswordService.decryptUserKeyWithMasterKey(
       response.masterKey,
     );
-    await this.setUserKeyAndContinue(userKey, true);
+    await this.setUserKeyAndContinue(userKey, userId, true);
   }
 
-  private async setUserKeyAndContinue(key: UserKey, evaluatePasswordAfterUnlock = false) {
-    await this.cryptoService.setUserKey(key);
+  private async setUserKeyAndContinue(
+    key: UserKey,
+    userId: UserId,
+    evaluatePasswordAfterUnlock = false,
+  ) {
+    await this.cryptoService.setUserKey(key, userId);
 
     // Now that we have a decrypted user key in memory, we can check if we
     // need to establish trust on the current device
@@ -325,10 +332,7 @@ export class LockComponent implements OnInit, OnDestroy {
   private async load(userId: UserId) {
     this.pinLockType = await this.pinService.getPinLockType(userId);
 
-    const ephemeralPinSet = await this.pinService.getPinKeyEncryptedUserKeyEphemeral(userId);
-
-    this.pinEnabled =
-      (this.pinLockType === "EPHEMERAL" && !!ephemeralPinSet) || this.pinLockType === "PERSISTENT";
+    this.pinEnabled = await this.pinService.isPinDecryptionAvailable(userId);
 
     this.masterPasswordEnabled = await this.userVerificationService.hasMasterPassword();
 
