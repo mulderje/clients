@@ -445,11 +445,12 @@ describe("OverlayNotificationsBackground", () => {
       });
 
       it("triggers the notification on the beforeRequest listener when a post-submission redirection is encountered", async () => {
+        sender.tab = mock<chrome.tabs.Tab>({ id: 4 });
         sendMockExtensionMessage(
           {
             command: "formFieldSubmitted",
             uri: "example.com",
-            username: "username",
+            username: "",
             password: "password",
             newPassword: "newPassword",
           },
@@ -485,7 +486,7 @@ describe("OverlayNotificationsBackground", () => {
         );
         await flushPromises();
 
-        expect(notificationAddLoginSpy).toHaveBeenCalled();
+        expect(notificationChangedPasswordSpy).toHaveBeenCalled();
       });
     });
   });
