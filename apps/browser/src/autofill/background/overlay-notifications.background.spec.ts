@@ -6,6 +6,7 @@ import { ServerConfig } from "@bitwarden/common/platform/abstractions/config/ser
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { EnvironmentServerConfigData } from "@bitwarden/common/platform/models/data/server-config.data";
 
+import { BrowserApi } from "../../platform/browser/browser-api";
 import AutofillField from "../models/autofill-field";
 import AutofillPageDetails from "../models/autofill-page-details";
 import {
@@ -204,6 +205,44 @@ describe("OverlayNotificationsBackground", () => {
 
       expect(overlayNotificationsBackground["modifyLoginCipherFormData"].size).toBe(0);
     });
+
+    it("attempts to store the modified login cipher form data within the onBeforeRequest listener when the data is not captured through a submit button click event", async () => {
+      const pageDetails = mock<AutofillPageDetails>({ fields: [mock<AutofillField>()] });
+      const tab = mock<chrome.tabs.Tab>({ id: sender.tab.id });
+      jest.spyOn(BrowserApi, "getTab").mockResolvedValueOnce(tab);
+      const response = {
+        command: "formFieldSubmitted",
+        uri: "example.com",
+        username: "username",
+        password: "password",
+        newPassword: "newPassword",
+      };
+      jest.spyOn(BrowserApi, "tabSendMessage").mockResolvedValueOnce(response);
+      sendMockExtensionMessage(
+        { command: "collectPageDetailsResponse", details: pageDetails },
+        sender,
+      );
+      await flushPromises();
+
+      triggerWebRequestOnBeforeRequestEvent(
+        mock<chrome.webRequest.WebRequestDetails>({
+          url: "https://example.com",
+          tabId: sender.tab.id,
+          method: "POST",
+          requestId: "123345",
+        }),
+      );
+      await flushPromises();
+
+      expect(
+        overlayNotificationsBackground["modifyLoginCipherFormData"].get(sender.tab.id),
+      ).toEqual({
+        uri: "example.com",
+        username: "username",
+        password: "password",
+        newPassword: "newPassword",
+      });
+    });
   });
 
   describe("web request listeners", () => {
@@ -310,14 +349,6 @@ describe("OverlayNotificationsBackground", () => {
       const requestId = "123345";
 
       beforeEach(async () => {
-        triggerWebRequestOnBeforeRequestEvent(
-          mock<chrome.webRequest.WebRequestDetails>({
-            url: sender.url,
-            tabId: sender.tab.id,
-            method: "POST",
-            requestId,
-          }),
-        );
         sendMockExtensionMessage(
           {
             command: "formFieldSubmitted",
@@ -327,6 +358,14 @@ describe("OverlayNotificationsBackground", () => {
             newPassword: "newPassword",
           },
           sender,
+        );
+        triggerWebRequestOnBeforeRequestEvent(
+          mock<chrome.webRequest.WebRequestDetails>({
+            url: sender.url,
+            tabId: sender.tab.id,
+            method: "POST",
+            requestId,
+          }),
         );
         await flushPromises();
       });

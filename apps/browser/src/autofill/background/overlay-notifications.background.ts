@@ -192,8 +192,37 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
    * @param details - The details of the web request
    */
   private handleOnBeforeRequestEvent = (details: chrome.webRequest.WebRequestDetails) => {
-    if (this.isValidFormSubmissionRequest(details)) {
-      this.activeFormSubmissionRequests.add(details.requestId);
+    if (!this.isValidFormSubmissionRequest(details)) {
+      return;
+    }
+
+    const { requestId, tabId, frameId } = details;
+    this.activeFormSubmissionRequests.add(requestId);
+    if (!this.modifyLoginCipherFormData.has(tabId)) {
+      this.getFormFieldDataFromTab(tabId, frameId).catch((error) => this.logService.error(error));
+    }
+  };
+
+  /**
+   * Retrieves the form field data from the tab. This is used to get the modified login form data
+   * in cases where the submit button is not clicked, but the form is submitted through other means.
+   *
+   * @param tabId - The senders tab id
+   * @param frameId - The frame where the form is located
+   */
+  private getFormFieldDataFromTab = async (tabId: number, frameId: number) => {
+    const tab = await BrowserApi.getTab(tabId);
+    if (!tab) {
+      return;
+    }
+
+    const response = (await BrowserApi.tabSendMessage(
+      tab,
+      { command: "getFormFieldDataForNotification" },
+      { frameId },
+    )) as OverlayNotificationsExtensionMessage;
+    if (response) {
+      this.storeModifiedLoginFormData(response, { tab });
     }
   };
 

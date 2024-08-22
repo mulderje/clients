@@ -39,6 +39,7 @@ import {
 import {
   AutofillOverlayContentExtensionMessageHandlers,
   AutofillOverlayContentService as AutofillOverlayContentServiceInterface,
+  NotificationFormFieldData,
   OpenAutofillInlineMenuOptions,
   SubFrameDataFromWindowMessage,
 } from "./abstractions/autofill-overlay-content.service";
@@ -86,6 +87,7 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
     checkMostRecentlyFocusedFieldHasValue: () => this.mostRecentlyFocusedFieldHasValue(),
     setupRebuildSubFrameOffsetsListeners: () => this.setupRebuildSubFrameOffsetsListeners(),
     destroyAutofillInlineMenuListeners: () => this.destroy(),
+    getFormFieldDataForNotification: () => this.getFormFieldDataForNotification(),
   };
   private readonly cardFieldQualifiers: Record<string, CallableFunction> = {
     [AutofillFieldQualifier.cardholderName]:
@@ -587,12 +589,19 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
    * Handles the repositioning of the autofill overlay when the form is submitted.
    */
   private handleFormFieldSubmitEvent = () => {
-    void this.sendExtensionMessage("formFieldSubmitted", {
+    void this.sendExtensionMessage("formFieldSubmitted", this.getFormFieldDataForNotification());
+  };
+
+  /**
+   * Returns the form field data used for add login and change password notifications.
+   */
+  private getFormFieldDataForNotification = (): NotificationFormFieldData => {
+    return {
       uri: globalThis.document.URL,
       username: this.userFilledFields["username"]?.value || "",
       password: this.userFilledFields["password"]?.value || "",
       newPassword: this.userFilledFields["newPassword"]?.value || "",
-    });
+    };
   };
 
   /**
