@@ -1016,6 +1016,7 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
       focusedFieldRects: { width, height, top, left },
       filledByCipherType: autofillFieldData?.filledByCipherType,
       showInlineMenuAccountCreation: autofillFieldData?.showInlineMenuAccountCreation,
+      showPasskeys: !!autofillFieldData?.showPasskeys,
       accountCreationFieldType,
     };
 
@@ -1098,6 +1099,7 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
       this.inlineMenuFieldQualificationService.isFieldForLoginForm(autofillFieldData, pageDetails)
     ) {
       autofillFieldData.filledByCipherType = CipherType.Login;
+      autofillFieldData.showPasskeys = autofillFieldData.autoCompleteType.includes("webauthn");
       return false;
     }
 
