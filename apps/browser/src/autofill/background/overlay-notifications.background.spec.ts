@@ -443,6 +443,50 @@ describe("OverlayNotificationsBackground", () => {
 
         expect(notificationAddLoginSpy).toHaveBeenCalled();
       });
+
+      it("triggers the notification on the beforeRequest listener when a post-submission redirection is encountered", async () => {
+        sendMockExtensionMessage(
+          {
+            command: "formFieldSubmitted",
+            uri: "example.com",
+            username: "username",
+            password: "password",
+            newPassword: "newPassword",
+          },
+          sender,
+        );
+        await flushPromises();
+        chrome.tabs.get = jest.fn().mockImplementationOnce((tabId, callback) => {
+          callback(
+            mock<chrome.tabs.Tab>({
+              status: "complete",
+              url: sender.url,
+            }),
+          );
+        });
+
+        triggerWebRequestOnBeforeRequestEvent(
+          mock<chrome.webRequest.WebRequestDetails>({
+            url: sender.url,
+            tabId: sender.tab.id,
+            method: "POST",
+            requestId,
+          }),
+        );
+        await flushPromises();
+
+        triggerWebRequestOnBeforeRequestEvent(
+          mock<chrome.webRequest.WebRequestDetails>({
+            url: "https://example.com/redirect",
+            tabId: sender.tab.id,
+            method: "GET",
+            requestId,
+          }),
+        );
+        await flushPromises();
+
+        expect(notificationAddLoginSpy).toHaveBeenCalled();
+      });
     });
   });
 
