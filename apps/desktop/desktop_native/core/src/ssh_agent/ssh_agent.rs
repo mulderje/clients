@@ -7,7 +7,7 @@ use std::sync::{Arc, RwLock};
 use byteorder::{BigEndian, ByteOrder};
 use futures::stream::{Stream, StreamExt};
 use russh_cryptovec::CryptoVec;
-use ssh_key::SigningKey;
+use ssh_key::{HashAlg, SigningKey};
 use crate::ssh_agent::russh_encoding::{Encoding, Reader, Position};
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 

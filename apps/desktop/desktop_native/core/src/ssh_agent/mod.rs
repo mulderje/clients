@@ -95,17 +95,7 @@ pub async fn set_keys(new_keys: Vec<(String, String, String)>) -> Result<(), any
         let private_key = ssh_key::private::PrivateKey::from_openssh(&key).unwrap();
         let public_key_bytes = private_key.public_key().to_bytes().unwrap();
 
-        // let key_pair = russh_keys::decode_secret_key(&key, None)?;
-        // let pubkey = key_pair.clone_public_key()?;
         let keys = &KEYSTORE;
-        // keys.0.write().unwrap().insert(
-        //     pubkey.public_key_bytes(),
-        //     Key {
-        //         key_pair: Some(key_pair),
-        //         name: name.clone(),
-        //         cipher_uuid: uuid.clone(),
-        //     },
-        // );
         keys.0.write().unwrap().insert(
             public_key_bytes,
             Key {
