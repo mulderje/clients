@@ -274,6 +274,7 @@ describe("OverlayNotificationsBackground", () => {
           mock<chrome.webRequest.WebRequestDetails>({
             url: sender.url,
             tabId: sender.tab.id,
+            method: "POST",
           }),
         );
 
@@ -287,6 +288,7 @@ describe("OverlayNotificationsBackground", () => {
           mock<chrome.webRequest.WebRequestDetails>({
             url: sender.url,
             tabId: sender.tab.id,
+            method: "POST",
           }),
         );
 
@@ -413,7 +415,7 @@ describe("OverlayNotificationsBackground", () => {
           {
             command: "formFieldSubmitted",
             uri: "example.com",
-            username: "",
+            username: "username",
             password: "password",
             newPassword: "newPassword",
           },
@@ -439,7 +441,7 @@ describe("OverlayNotificationsBackground", () => {
         );
         await flushPromises();
 
-        expect(notificationChangedPasswordSpy).toHaveBeenCalled();
+        expect(notificationAddLoginSpy).toHaveBeenCalled();
       });
     });
   });
