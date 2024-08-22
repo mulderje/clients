@@ -5,6 +5,7 @@ import { Router } from "@angular/router";
 import { RouterTestingModule } from "@angular/router/testing";
 import { MockProxy, mock } from "jest-mock-extended";
 
+import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { MessageSender } from "@bitwarden/common/platform/messaging";
 import { GlobalStateProvider } from "@bitwarden/common/platform/state";
 import { FakeGlobalState, FakeGlobalStateProvider } from "@bitwarden/common/spec";
@@ -38,6 +39,7 @@ export class TestComponent {
 }
 
 describe("popup view cache", () => {
+  const configServiceMock = mock<ConfigService>();
   let testBed: TestBed;
   let service: PopupViewCacheService;
   let fakeGlobalState: FakeGlobalState<Record<string, string>>;
@@ -50,6 +52,7 @@ describe("popup view cache", () => {
   };
 
   beforeEach(async () => {
+    jest.spyOn(configServiceMock, "getFeatureFlag").mockResolvedValue(true);
     messageSenderMock = mock<MessageSender>();
 
     const fakeGlobalStateProvider = new FakeGlobalStateProvider();
@@ -65,6 +68,7 @@ describe("popup view cache", () => {
       providers: [
         { provide: GlobalStateProvider, useValue: fakeGlobalStateProvider },
         { provide: MessageSender, useValue: messageSenderMock },
+        { provide: ConfigService, useValue: configServiceMock },
       ],
     });
 
@@ -199,5 +203,22 @@ describe("popup view cache", () => {
 
     await router.navigate(["b"]);
     expect(messageSenderMock.send).toHaveBeenCalledWith(ClEAR_VIEW_CACHE_COMMAND, {});
+  });
+
+  it("should ignore cached values when feature flag is off", async () => {
+    jest.spyOn(configServiceMock, "getFeatureFlag").mockResolvedValue(false);
+
+    await initServiceWithState({ "foo-123": JSON.stringify("bar") });
+
+    const injector = TestBed.inject(Injector);
+
+    const signal = service.signal({
+      key: "foo-123",
+      initialValue: "foo",
+      injector,
+    });
+
+    // The cached state is ignored
+    expect(signal()).toBe("foo");
   });
 });
