@@ -196,16 +196,24 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
     chrome.webRequest.onBeforeRequest.removeListener(this.handleOnBeforeRequestEvent);
     chrome.webRequest.onCompleted.removeListener(this.handleOnCompletedRequestEvent);
     if (this.websiteOriginsWithFields.size) {
-      const websiteOrigins = Array.from(this.websiteOriginsWithFields.values());
-      const urls: string[] = [];
-      websiteOrigins.forEach((origins) => urls.push(...origins));
-      const requestFilter: chrome.webRequest.RequestFilter = {
-        urls,
-        types: ["main_frame", "sub_frame", "xmlhttprequest"],
-      };
+      const requestFilter: chrome.webRequest.RequestFilter = this.generateRequestFilter();
       chrome.webRequest.onBeforeRequest.addListener(this.handleOnBeforeRequestEvent, requestFilter);
       chrome.webRequest.onCompleted.addListener(this.handleOnCompletedRequestEvent, requestFilter);
     }
+  }
+
+  /**
+   * Generates the request filter for the web requests. This is used to filter out the web requests
+   * that are not from the tabs that have fillable form fields.
+   */
+  private generateRequestFilter(): chrome.webRequest.RequestFilter {
+    const websiteOrigins = Array.from(this.websiteOriginsWithFields.values());
+    const urls: string[] = [];
+    websiteOrigins.forEach((origins) => urls.push(...origins));
+    return {
+      urls,
+      types: ["main_frame", "sub_frame", "xmlhttprequest"],
+    };
   }
 
   /**
