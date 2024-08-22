@@ -456,7 +456,7 @@ describe("OverlayNotificationsBackground", () => {
           sender,
         );
         await flushPromises();
-        chrome.tabs.get = jest.fn().mockImplementationOnce((tabId, callback) => {
+        chrome.tabs.get = jest.fn().mockImplementation((tabId, callback) => {
           callback(
             mock<chrome.tabs.Tab>({
               status: "complete",
