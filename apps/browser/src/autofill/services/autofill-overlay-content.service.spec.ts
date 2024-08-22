@@ -2540,6 +2540,24 @@ describe("AutofillOverlayContentService", () => {
         expect(autofillOverlayContentService.destroy).toHaveBeenCalled();
       });
     });
+
+    describe("getFormFieldDataForNotification message handler", () => {
+      it("returns the form field data for a notification", async () => {
+        sendMockExtensionMessage(
+          { command: "getFormFieldDataForNotification" },
+          mock<chrome.runtime.MessageSender>(),
+          sendResponseSpy,
+        );
+        await flushPromises();
+
+        expect(sendResponseSpy).toHaveBeenCalledWith({
+          uri: globalThis.document.URL,
+          username: "",
+          password: "",
+          newPassword: "",
+        });
+      });
+    });
   });
 
   describe("destroy", () => {
