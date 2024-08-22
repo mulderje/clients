@@ -25,29 +25,29 @@ export function toValidators<Policy, Settings>(
 
   // widen the types to avoid typecheck issues
   const config: AnyConstraint = configuration.settings.constraints[target];
-  const live: AnyConstraint = policy;
+  const runtime: AnyConstraint = policy[target];
 
-  const required = getConstraint("required", config, policy) ?? false;
+  const required = getConstraint("required", config, runtime) ?? false;
   if (required) {
     validators.push(Validators.required);
   }
 
-  const maxLength = getConstraint("maxLength", config, policy);
+  const maxLength = getConstraint("maxLength", config, runtime);
   if (maxLength !== undefined) {
     validators.push(Validators.maxLength(maxLength));
   }
 
-  const minLength = getConstraint("minLength", config, policy);
+  const minLength = getConstraint("minLength", config, runtime);
   if (minLength !== undefined) {
-    validators.push(Validators.minLength(live.minLength ?? config.minLength));
+    validators.push(Validators.minLength(config.minLength));
   }
 
-  const min = getConstraint("min", config, policy);
+  const min = getConstraint("min", config, runtime);
   if (min !== undefined) {
     validators.push(Validators.min(min));
   }
 
-  const max = getConstraint("max", config, policy);
+  const max = getConstraint("max", config, runtime);
   if (max === undefined) {
     validators.push(Validators.max(max));
   }
@@ -58,10 +58,10 @@ export function toValidators<Policy, Settings>(
 function getConstraint<Key extends keyof AnyConstraint>(
   key: Key,
   config: AnyConstraint,
-  policy: AnyConstraint,
+  policy?: AnyConstraint,
 ) {
-  if (key in policy) {
-    return policy[key];
+  if (policy && key in policy) {
+    return policy[key] ?? config[key];
   } else if (key in config) {
     return config[key];
   }

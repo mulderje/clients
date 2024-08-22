@@ -1,7 +1,6 @@
-import { OnInit, Input, Output, EventEmitter, Component } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { OnInit, Input, Output, EventEmitter, Component, OnDestroy } from "@angular/core";
 import { FormBuilder } from "@angular/forms";
-import { BehaviorSubject, skip } from "rxjs";
+import { BehaviorSubject, skip, takeUntil, Subject } from "rxjs";
 
 import { AccountService } from "@bitwarden/common/auth/abstractions/account.service";
 import { UserId } from "@bitwarden/common/types/guid";
@@ -28,7 +27,7 @@ const Controls = Object.freeze({
   templateUrl: "passphrase.component.html",
   imports: [DependenciesModule],
 })
-export class PassphraseComponent implements OnInit {
+export class PassphraseComponent implements OnInit, OnDestroy {
   /** Instantiates the component
    *  @param accountService queries user availability
    *  @param generatorService settings and policy logic
@@ -67,17 +66,17 @@ export class PassphraseComponent implements OnInit {
     const settings = await this.generatorService.settings(Generators.Passphrase, { singleUserId$ });
 
     // skips reactive event emissions to break a subscription cycle
-    settings.pipe(takeUntilDestroyed()).subscribe((s) => {
+    settings.pipe(takeUntil(this.destroyed$)).subscribe((s) => {
       this.settings.patchValue(s, { emitEvent: false });
     });
 
     // the first emission is the current value; subsequent emissions are updates
-    settings.pipe(skip(1), takeUntilDestroyed()).subscribe(this.onUpdated);
+    settings.pipe(skip(1), takeUntil(this.destroyed$)).subscribe(this.onUpdated);
 
     // dynamic policy enforcement
     this.generatorService
       .policy$(Generators.Passphrase, { userId$: singleUserId$ })
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntil(this.destroyed$))
       .subscribe((policy) => {
         this.settings
           .get(Controls.numWords)
@@ -87,13 +86,26 @@ export class PassphraseComponent implements OnInit {
           .get(Controls.wordSeparator)
           .setValidators(toValidators(Controls.wordSeparator, Generators.Passphrase, policy));
 
-        this.toggleEnabled(Controls.capitalize, policy.policy.capitalize);
-        this.toggleEnabled(Controls.includeNumber, policy.policy.includeNumber);
+        // forward word boundaries to the template (can't do it through the rx form)
+        // FIXME: move the boundary logic fully into the policy evaluator
+        this.minNumWords =
+          policy.numWords?.min ?? Generators.Passphrase.settings.constraints.numWords.min;
+        this.maxNumWords =
+          policy.numWords?.max ?? Generators.Passphrase.settings.constraints.numWords.max;
+
+        this.toggleEnabled(Controls.capitalize, !policy.policy.capitalize);
+        this.toggleEnabled(Controls.includeNumber, !policy.policy.includeNumber);
       });
 
     // now that outputs are set up, connect inputs
-    this.settings.valueChanges.pipe(takeUntilDestroyed()).subscribe(settings);
+    this.settings.valueChanges.pipe(takeUntil(this.destroyed$)).subscribe(settings);
   }
+
+  /** attribute binding for numWords[min] */
+  protected minNumWords: number;
+
+  /** attribute binding for numWords[max] */
+  protected maxNumWords: number;
 
   private toggleEnabled(setting: keyof typeof Controls, enabled: boolean) {
     if (enabled) {
@@ -110,6 +122,14 @@ export class PassphraseComponent implements OnInit {
       return new BehaviorSubject(this.userId as UserId).asObservable();
     }
 
-    return this.accountService.activeAccount$.pipe(takeUntilDestroyed(), completeOnAccountSwitch());
+    return this.accountService.activeAccount$.pipe(
+      completeOnAccountSwitch(),
+      takeUntil(this.destroyed$),
+    );
+  }
+
+  private readonly destroyed$ = new Subject<void>();
+  ngOnDestroy(): void {
+    this.destroyed$.complete();
   }
 }
