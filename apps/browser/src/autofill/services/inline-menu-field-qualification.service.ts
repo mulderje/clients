@@ -441,7 +441,7 @@ export class InlineMenuFieldQualificationService
       // If the form that contains the field has more than one visible field, we should assume
       // that the field is part of an account creation form.
       const fieldsWithinForm = pageDetails.fields.filter(
-        (pageDetailsField) => pageDetailsField.form === field.form && pageDetailsField.viewable,
+        (pageDetailsField) => pageDetailsField.form === field.form,
       );
       return fieldsWithinForm.length === 1;
     }
