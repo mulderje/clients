@@ -186,7 +186,7 @@ export class MembersComponent extends BaseMembersComponent<OrganizationUserView>
             .find((p) => p.organizationId === this.organization.id);
           this.orgResetPasswordPolicyEnabled = resetPasswordPolicy?.enabled;
 
-          const billingMetadata = await this.billingApiService.getOrganizationBillingMetadata(
+          const billingMetadata = await this.billingApiService.getOrganizationMetadata(
             this.organization.id,
           );
 

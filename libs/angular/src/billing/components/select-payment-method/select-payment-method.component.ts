@@ -9,7 +9,7 @@ import {
   StripeServiceAbstraction,
 } from "@bitwarden/common/billing/abstractions";
 import { PaymentMethodType } from "@bitwarden/common/billing/enums";
-import { TokenizedPaymentMethod } from "@bitwarden/common/billing/models/domain";
+import { TokenizedPaymentSource } from "@bitwarden/common/billing/models/domain";
 
 @Component({
   selector: "app-select-payment-method",
@@ -20,7 +20,7 @@ export class SelectPaymentMethodComponent implements OnInit, OnDestroy {
   @Input() showBankAccount: boolean = true;
   @Input() showPayPal: boolean = true;
   @Input() private startWith: PaymentMethodType = PaymentMethodType.Card;
-  @Input() protected onSubmit: (tokenizedPaymentMethod: TokenizedPaymentMethod) => Promise<void>;
+  @Input() protected onSubmit: (tokenizedPaymentMethod: TokenizedPaymentSource) => Promise<void>;
 
   private destroy$ = new Subject<void>();
 
@@ -42,7 +42,7 @@ export class SelectPaymentMethodComponent implements OnInit, OnDestroy {
     private stripeService: StripeServiceAbstraction,
   ) {}
 
-  async tokenizePaymentMethod(): Promise<TokenizedPaymentMethod> {
+  async tokenize(): Promise<TokenizedPaymentSource> {
     const type = this.selected;
 
     if (this.usingStripe) {
@@ -86,7 +86,7 @@ export class SelectPaymentMethodComponent implements OnInit, OnDestroy {
   };
 
   submit = async () => {
-    const tokenizedPaymentMethod = await this.tokenizePaymentMethod();
+    const tokenizedPaymentMethod = await this.tokenize();
     await this.onSubmit(tokenizedPaymentMethod);
   };
 

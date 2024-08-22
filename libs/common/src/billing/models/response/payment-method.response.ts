@@ -1,11 +1,11 @@
 import { BaseResponse } from "../../../models/response/base.response";
 
-import { MaskedPaymentMethodResponse } from "./masked-payment-method.response";
+import { PaymentSourceResponse } from "./payment-source.response";
 import { TaxInfoResponse } from "./tax-info.response";
 
-export class PaymentInformationResponse extends BaseResponse {
+export class PaymentMethodResponse extends BaseResponse {
   accountCredit: number;
-  paymentMethod?: MaskedPaymentMethodResponse;
+  paymentSource?: PaymentSourceResponse;
   taxInformation?: TaxInfoResponse;
 
   constructor(response: any) {
@@ -14,7 +14,7 @@ export class PaymentInformationResponse extends BaseResponse {
 
     const paymentMethod = this.getResponseProperty("PaymentMethod");
     if (paymentMethod) {
-      this.paymentMethod = new MaskedPaymentMethodResponse(paymentMethod);
+      this.paymentSource = new PaymentSourceResponse(paymentMethod);
     }
 
     const taxInformation = this.getResponseProperty("TaxInformation");

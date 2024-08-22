@@ -6,10 +6,11 @@ import {
   SelectPaymentMethodComponent,
 } from "@bitwarden/angular/billing/components";
 import { ApiService } from "@bitwarden/common/abstractions/api.service";
-import { OrganizationApiServiceAbstraction } from "@bitwarden/common/admin-console/abstractions/organization/organization-api.service.abstraction";
+import { BillingApiServiceAbstraction } from "@bitwarden/common/billing/abstractions";
 import { PaymentMethodType } from "@bitwarden/common/billing/enums";
-import { TaxInformation } from "@bitwarden/common/billing/models/domain";
+import { TaxInformation, TokenizedPaymentSource } from "@bitwarden/common/billing/models/domain";
 import { PaymentRequest } from "@bitwarden/common/billing/models/request/payment.request";
+import { UpdatePaymentMethodRequest } from "@bitwarden/common/billing/models/request/update-payment-method.request";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { DialogService, ToastService } from "@bitwarden/components";
 
@@ -36,10 +37,10 @@ export class AdjustPaymentDialogV2Component {
 
   constructor(
     private apiService: ApiService,
+    private billingApiService: BillingApiServiceAbstraction,
     @Inject(DIALOG_DATA) protected dialogParams: AdjustPaymentDialogV2Params,
     private dialogRef: DialogRef<AdjustPaymentDialogV2ResultType>,
     private i18nService: I18nService,
-    private organizationApiService: OrganizationApiServiceAbstraction,
     private toastService: ToastService,
   ) {}
 
@@ -59,29 +60,19 @@ export class AdjustPaymentDialogV2Component {
       return;
     }
 
-    const request = new PaymentRequest();
-
-    const { token, type } = await this.selectPaymentMethod.tokenizePaymentMethod();
-    request.paymentToken = token;
-    request.paymentMethodType = type;
-
+    const paymentSource = await this.selectPaymentMethod.tokenize();
     const taxInformation = this.manageTaxInformation.getTaxInformation();
-    request.country = taxInformation.country;
-    request.postalCode = taxInformation.postalCode;
 
     if (!this.dialogParams.organizationId) {
-      await this.apiService.postAccountPayment(request);
-    } else {
-      if (taxInformation.includeTaxId) {
-        request.taxId = taxInformation.taxId;
-        request.line1 = taxInformation.line1;
-        request.line2 = taxInformation.line2;
-        request.city = taxInformation.city;
-        request.state = taxInformation.state;
-      }
-
-      await this.organizationApiService.updatePayment(this.dialogParams.organizationId, request);
+      await this.updatePremiumUserPaymentMethod(paymentSource, taxInformation);
     }
+
+    const request = UpdatePaymentMethodRequest.from(paymentSource, taxInformation);
+
+    await this.billingApiService.updateOrganizationPaymentMethod(
+      this.dialogParams.organizationId,
+      request,
+    );
 
     this.toastService.showToast({
       variant: "success",
@@ -90,6 +81,18 @@ export class AdjustPaymentDialogV2Component {
     });
 
     this.dialogRef.close(AdjustPaymentDialogV2ResultType.Submitted);
+  };
+
+  private updatePremiumUserPaymentMethod = async (
+    { type, token }: TokenizedPaymentSource,
+    { country, postalCode }: TaxInformation,
+  ) => {
+    const paymentRequest = new PaymentRequest();
+    paymentRequest.paymentToken = token;
+    paymentRequest.paymentMethodType = type;
+    paymentRequest.country = country;
+    paymentRequest.postalCode = postalCode;
+    await this.apiService.postAccountPayment(paymentRequest);
   };
 
   static open = (

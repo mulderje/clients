@@ -1,12 +1,12 @@
 import { PaymentMethodType } from "@bitwarden/common/billing/enums";
-import { MaskedPaymentMethodResponse } from "@bitwarden/common/billing/models/response/masked-payment-method.response";
+import { PaymentSourceResponse } from "@bitwarden/common/billing/models/response/payment-source.response";
 
 export class MaskedPaymentMethod {
   type: PaymentMethodType;
   description: string;
   needsVerification: boolean;
 
-  static from(response: MaskedPaymentMethodResponse | undefined) {
+  static from(response: PaymentSourceResponse | undefined) {
     if (response === undefined) {
       return null;
     }
