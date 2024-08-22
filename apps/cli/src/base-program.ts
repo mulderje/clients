@@ -121,10 +121,14 @@ export abstract class BaseProgram {
    * @returns the userId of the active account
    */
   protected async exitIfNotAuthed() {
-    const userId = (await firstValueFrom(this.serviceContainer.accountService.activeAccount$)).id;
+    const fail = () => this.processResponse(Response.error("You are not logged in."), true);
+    const userId = (await firstValueFrom(this.serviceContainer.accountService.activeAccount$))?.id;
+    if (!userId) {
+      fail();
+    }
     const authed = await this.serviceContainer.stateService.getIsAuthenticated({ userId });
     if (!authed) {
-      this.processResponse(Response.error("You are not logged in."), true);
+      fail();
     }
     return userId;
   }
