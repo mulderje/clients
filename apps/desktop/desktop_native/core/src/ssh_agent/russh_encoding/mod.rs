@@ -15,7 +15,6 @@
 
 use byteorder::{BigEndian, ByteOrder, WriteBytesExt};
 use russh_cryptovec::CryptoVec;
-use thiserror::Error;
 
 use anyhow::Error;
 
