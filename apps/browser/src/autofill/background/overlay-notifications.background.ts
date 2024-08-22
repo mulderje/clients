@@ -552,7 +552,6 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
   private handleTabUpdated = (tabId: number, changeInfo: chrome.tabs.TabChangeInfo) => {
     if (changeInfo.status === "loading" && this.websiteOriginsWithFields.has(tabId)) {
       this.websiteOriginsWithFields.delete(tabId);
-      this.setupWebRequestsListeners();
     }
   };
 }

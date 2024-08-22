@@ -50,6 +50,10 @@ export class OverlayNotificationsContentService
       this.handleSaveCipherAttemptCompletedMessage(message),
   };
 
+  constructor() {
+    void sendExtensionMessage("checkNotificationQueue");
+  }
+
   /**
    * Returns the message handlers for the content script.
    */
