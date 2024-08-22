@@ -14,10 +14,10 @@ import { filter, firstValueFrom, skip } from "rxjs";
 import { Jsonify } from "type-fest";
 
 import {
-  ViewCacheService,
   FormCacheOptions,
   SignalCacheOptions,
-} from "@bitwarden/angular/platform/services/view-cache.service";
+  ViewCacheService,
+} from "@bitwarden/angular/platform/abstractions/view-cache.service";
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { MessageSender } from "@bitwarden/common/platform/messaging";

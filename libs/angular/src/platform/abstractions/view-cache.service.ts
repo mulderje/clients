@@ -1,4 +1,4 @@
-import { Injectable, Injector, signal, WritableSignal } from "@angular/core";
+import { Injector, WritableSignal } from "@angular/core";
 import type { FormGroup } from "@angular/forms";
 import type { Jsonify, JsonValue } from "type-fest";
 
@@ -41,10 +41,7 @@ export type FormCacheOptions<TFormGroup extends FormGroup> = BaseCacheOptions<
  * - browser extension popup: used to persist UI between popup open and close
  * - all other clients: noop
  */
-@Injectable({
-  providedIn: "root",
-})
-export class ViewCacheService {
+export abstract class ViewCacheService {
   /**
    * Create a signal from a previously cached value. Whenever the signal is updated, the new value is saved to the cache.
    *
@@ -60,9 +57,7 @@ export class ViewCacheService {
    * });
    * ```
    */
-  signal<T>(options: SignalCacheOptions<T>): WritableSignal<T> {
-    return signal(options.initialValue);
-  }
+  abstract signal<T>(options: SignalCacheOptions<T>): WritableSignal<T>;
 
   /**
    * - Initialize a form from a cached value
@@ -82,7 +77,7 @@ export class ViewCacheService {
    * });
    * ```
    **/
-  formGroup<TFormGroup extends FormGroup>(options: FormCacheOptions<TFormGroup>): TFormGroup {
-    return options.control;
-  }
+  abstract formGroup<TFormGroup extends FormGroup>(
+    options: FormCacheOptions<TFormGroup>,
+  ): TFormGroup;
 }
