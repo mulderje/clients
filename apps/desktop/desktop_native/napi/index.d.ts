@@ -64,7 +64,6 @@ export namespace processisolations {
   export function isCoreDumpingDisabled(): Promise<boolean>
   export function disableMemoryAccess(): Promise<void>
 }
-
 export namespace powermonitors {
   export function onLock(callback: (err: Error | null, ) => any): Promise<void>
   export function isLockMonitorAvailable(): Promise<boolean>

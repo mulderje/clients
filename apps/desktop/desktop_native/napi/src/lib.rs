@@ -154,9 +154,10 @@ pub mod sshagent {
 
     use napi::{
         bindgen_prelude::Promise,
-        threadsafe_function::{ErrorStrategy::CalleeHandled, ThreadsafeFunction},
+        threadsafe_function::{ErrorStrategy::CalleeHandled, ThreadsafeFunction}, Error,
     };
-    use russh_keys::{key::SignatureHash, PublicKeyBase64};
+    use rand_chacha::ChaCha8Rng;
+    use ssh_key::{rand_core::SeedableRng, Algorithm, HashAlg, LineEnding};
     use tokio::{self, sync::Mutex};
 
     #[napi(object)]
@@ -224,53 +225,53 @@ pub mod sshagent {
 
     #[napi]
     pub async fn generate_keypair(key_algorithm: String) -> napi::Result<SSHKey> {
+        // sourced from cryptographically secure entropy source, with sources for all targets: https://docs.rs/getrandom
+        // if it cannot be securely sourced, this will panic instead of leading to a weak key
+        let mut rng: ChaCha8Rng = ChaCha8Rng::from_entropy();
+
         let key = match key_algorithm.as_str() {
-            "ed25519" => russh_keys::key::KeyPair::generate_ed25519(),
-            "rsa2048" => russh_keys::key::KeyPair::generate_rsa(2048, SignatureHash::SHA2_256),
-            "rsa3072" => russh_keys::key::KeyPair::generate_rsa(3072, SignatureHash::SHA2_256),
-            "rsa4096" => russh_keys::key::KeyPair::generate_rsa(4096, SignatureHash::SHA2_256),
+            "ed25519" => ssh_key::PrivateKey::random(&mut rng, Algorithm::Ed25519).or_else(|e| Err(napi::Error::from_reason(e.to_string()))),
+            "rsa2048" | "rsa3072" | "rsa4096" => {
+                let bits = match key_algorithm.as_str() {
+                    "rsa2048" => 2048,
+                    "rsa3072" => 3072,
+                    "rsa4096" => 4096,
+                    _ => Err(napi::Error::from_reason("Unsupported RSA key size".to_string()))?,
+                };
+                let rsa_keypair: Result<ssh_key::private::RsaKeypair, Error> = ssh_key::private::RsaKeypair::random(&mut rng, bits).or_else(|e| Err(napi::Error::from_reason(e.to_string()))?);
+                let rsa_keypair = rsa_keypair?;
+                let private_key = ssh_key::PrivateKey::new(ssh_key::private::KeypairData::from(rsa_keypair), "".to_string()).or_else(|e| Err(napi::Error::from_reason(e.to_string())));
+                private_key
+            }
             _ => {
                 return Err(napi::Error::from_reason(
                     "Unsupported key algorithm".to_string(),
                 ))
             }
         };
+        
         match key {
-            Some(k) => {
-                let mut buffer = Vec::new();
-                let private_key = russh_keys::encode_pkcs8_pem(&k, &mut buffer);
-                let buffer_string = String::from_utf8(buffer).unwrap();
-                match private_key {
-                    Ok(_pk) => {
-                        let public_key = match key_algorithm.as_str() {
-                            "ed25519" => "ssh-ed25519 ".to_owned() + &k.public_key_base64(),
-                            "rsa2048" => "ssh-rsa ".to_owned() + &k.public_key_base64(),
-                            "rsa3072" => "ssh-rsa ".to_owned() + &k.public_key_base64(),
-                            "rsa4096" => "ssh-rsa ".to_owned() + &k.public_key_base64(),
-                            _ => {
-                                return Err(napi::Error::from_reason(
-                                    "Unsupported key algorithm".to_string(),
-                                ))
-                            }
-                        };
-                        Ok(SSHKey {
-                            private_key: buffer_string.to_string(),
-                            public_key: public_key.to_string(),
-                            key_algorithm: key_algorithm.to_string(),
-                            key_fingerprint: "SHA256:".to_string()
-                                + &k.clone_public_key().unwrap().fingerprint().to_string(),
-                        })
-                    }
-                    Err(e) => Err(napi::Error::from_reason(e.to_string())),
-                }
-            }
-            None => Err(napi::Error::from_reason(
-                "Failed to generate key".to_string(),
-            )),
+            Ok(key) => {
+                let public_key = key.public_key();
+                let public_key_base64 = public_key.to_string();
+                let private_key_openssh = key.to_openssh(LineEnding::LF);
+                let private_key_openssh_string = private_key_openssh.unwrap().to_string();
+                let fingerprint = key.fingerprint(HashAlg::Sha256);
+                let fingerprint_string = fingerprint.to_string();
+                Ok(SSHKey {
+                    private_key: private_key_openssh_string,
+                    public_key: public_key_base64,
+                    key_algorithm: key_algorithm.to_string(),
+                    key_fingerprint: fingerprint_string,
+                })
+            },
+            Err(e) => Err(napi::Error::from_reason(e.to_string())),
         }
     }
 
 }
+
+#[napi]
 pub mod processisolations {
     #[napi]
     pub async fn disable_coredumps() -> napi::Result<()> {
