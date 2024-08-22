@@ -72,8 +72,7 @@ export class OverlayNotificationsContentService
     if (this.currentNotificationBarType && type !== this.currentNotificationBarType) {
       this.closeNotificationBar();
     }
-
-    this.openNotificationBar({
+    const initData = {
       type,
       isVaultLocked: typeData.isVaultLocked,
       theme: typeData.theme,
@@ -81,7 +80,14 @@ export class OverlayNotificationsContentService
       importType: typeData.importType,
       applyRedesign: true,
       launchTimestamp: typeData.launchTimestamp,
-    });
+    };
+
+    if (globalThis.document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", () => this.openNotificationBar(initData));
+      return;
+    }
+
+    this.openNotificationBar(initData);
   }
 
   /**
