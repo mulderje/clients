@@ -116,20 +116,26 @@ export abstract class BaseProgram {
     }
   }
 
+  /**
+   * Exist if no user is authenticated
+   * @returns the userId of the active account
+   */
   protected async exitIfNotAuthed() {
-    const authed = await this.serviceContainer.stateService.getIsAuthenticated();
+    const userId = (await firstValueFrom(this.serviceContainer.accountService.activeAccount$)).id;
+    const authed = await this.serviceContainer.stateService.getIsAuthenticated({ userId });
     if (!authed) {
       this.processResponse(Response.error("You are not logged in."), true);
     }
+    return userId;
   }
 
   protected async exitIfLocked() {
-    await this.exitIfNotAuthed();
+    const userId = await this.exitIfNotAuthed();
     if (await this.serviceContainer.cryptoService.hasUserKey()) {
       return;
     } else if (process.env.BW_NOINTERACTION !== "true") {
       // must unlock
-      if (await this.serviceContainer.keyConnectorService.getUsesKeyConnector()) {
+      if (await this.serviceContainer.keyConnectorService.getUsesKeyConnector(userId)) {
         const response = Response.error(
           "Your vault is locked. You must unlock your vault using your session key.\n" +
             "If you do not have your session key, you can get a new one by logging out and logging in again.",
