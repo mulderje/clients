@@ -7,19 +7,19 @@ use std::sync::{Arc, RwLock};
 use byteorder::{BigEndian, ByteOrder};
 use futures::stream::{Stream, StreamExt};
 use russh_cryptovec::CryptoVec;
-use russh_keys::encoding::{Encoding, Reader};
+use ssh_key::{Algorithm, HashAlg, SigningKey};
+use crate::ssh_agent::russh_encoding::{Encoding, Reader, Position};
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 
 use crate::ssh_agent::msg;
-use russh_keys::encoding::Position;
-use russh_keys::{key, Error};
+use anyhow::Error;
 
 use super::msg::{REQUEST_IDENTITIES, SIGN_REQUEST};
 use std::result::Result;
 
 #[derive(Clone)]
 pub struct Key {
-    pub key_pair: Option<key::KeyPair>,
+    pub private_key: Option<ssh_key::private::PrivateKey>,
     pub name: String,
     pub cipher_uuid: String,
 }
@@ -116,7 +116,7 @@ impl<S: AsyncRead + AsyncWrite + Send + Unpin + 'static, A: Agent + Send + Sync 
                 }
             }
             Ok(SIGN_REQUEST) => {
-                let agent = self.agent.take().ok_or(Error::AgentFailure)?;
+                let agent = self.agent.take().ok_or(SSHAgentError::AgentFailure)?;
                 let (agent, signed) = self.try_sign(agent, r, writebuf).await?;
                 self.agent = Some(agent);
                 if signed {
@@ -141,7 +141,7 @@ impl<S: AsyncRead + AsyncWrite + Send + Unpin + 'static, A: Agent + Send + Sync 
     ) -> Result<(A, bool), Error> {
         let blob = r.read_string()?;
         let key = {
-            let k = self.keys.0.read().or(Err(Error::AgentFailure))?;
+            let k = self.keys.0.read().or(Err(SSHAgentError::AgentFailure))?;
             if let Some(key) = k.get(blob) {
                 key.clone()
             } else {
@@ -157,7 +157,7 @@ impl<S: AsyncRead + AsyncWrite + Send + Unpin + 'static, A: Agent + Send + Sync 
         }
 
         let key = {
-            let k = self.keys.0.read().or(Err(Error::AgentFailure))?;
+            let k = self.keys.0.read().or(Err(SSHAgentError::AgentFailure))?;
             if let Some(key) = k.get(blob) {
                 key.clone()
             } else {
@@ -165,11 +165,40 @@ impl<S: AsyncRead + AsyncWrite + Send + Unpin + 'static, A: Agent + Send + Sync 
             }
         };
 
-        match key.key_pair {
-            Some(key_pair) => {
+        match key.private_key {
+            Some(private_key) => {
                 writebuf.push(msg::SIGN_RESPONSE);
-                key_pair.add_signature(writebuf, data)?;
+                let signer: &dyn SigningKey = &private_key;
+                let sig = signer.try_sign(data).or(Err(SSHAgentError::AgentFailure));
+                let sig = match sig {
+                    Ok(sig) => sig,
+                    Err(err) => {
+                        println!("Error signing: {:?}", err);
+                        writebuf.push(msg::FAILURE);
+                        return Ok((agent, false));
+                    }
+                };
+
+                let sig_name = match private_key.algorithm() {
+                    ssh_key::Algorithm::Ed25519 => "ssh-ed25519",
+                    ssh_key::Algorithm::Rsa { hash: None }=> "ssh-rsa",
+                    ssh_key::Algorithm::Rsa { hash: Some(HashAlg::Sha256) } => "rsa-sha2-256",
+                    ssh_key::Algorithm::Rsa { hash: Some(HashAlg::Sha512) } => "rsa-sha2-512",
+                    _ => {
+                        println!("Unsupported signing algorithm");
+                        writebuf.push(msg::FAILURE);
+                        return Ok((agent, false));
+                    }
+                };
+
+                let sig_bytes = sig.as_bytes();
+                writebuf.push_u32_be(sig_name.len() as u32 + sig_bytes.len() as u32 + 8);          
+                writebuf.extend_ssh_string(sig_name.as_bytes());
+                println!("Signature: {:?} len {:?} signame {:?}", sig_bytes, sig_bytes.len(), sig_name);
+                writebuf.extend_ssh_string(sig.as_bytes());
+                
                 let len = writebuf.len();
+                println!("len: {:?}", len);
                 BigEndian::write_u32(writebuf, (len - 4) as u32);
 
                 Ok((agent, true))
@@ -180,4 +209,11 @@ impl<S: AsyncRead + AsyncWrite + Send + Unpin + 'static, A: Agent + Send + Sync 
             }
         }
     }
+}
+
+
+#[derive(Debug, thiserror::Error)]
+pub enum SSHAgentError {
+    #[error("Agent failure")]
+    AgentFailure,
 }

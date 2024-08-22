@@ -24,14 +24,13 @@ libc = "=0.2.155"
 rand = "=0.8.5"
 retry = "=2.0.0"
 russh-cryptovec = "0.7.3"
-russh-keys = "0.44.0"
 scopeguard = "=1.2.0"
 sha2 = "=0.10.8"
 ssh-encoding = "0.2.0"
 ssh-key = "0.6.6"
 thiserror = "=1.0.61"
-tokio = { version = "1.38.0", features = ["io-util", "sync", "macros"] }
-tokio-stream = "0.1.15"
+tokio = { version = "1.38.0", features = ["io-util", "sync", "macros", "net"] }
+tokio-stream = { version = "0.1.15", features = ["net"] }
 typenum = "=1.17.0"
 
 [target.'cfg(windows)'.dependencies]
