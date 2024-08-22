@@ -461,6 +461,12 @@ export class InlineMenuFieldQualificationService
       return false;
     }
 
+    // If no visible fields are found on the page, but we have a single password
+    // field we should assume that the field is part of a login form.
+    if (passwordFieldsInPageDetails.length === 1) {
+      return true;
+    }
+
     // If no visible password fields are found, this field might be part of a multipart form.
     // Check for an invalid autocompleteType to determine if the field is part of a login form.
     return !this.fieldContainsAutocompleteValues(field, this.autocompleteDisabledValues);
