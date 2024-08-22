@@ -23,16 +23,16 @@ export class EmptyComponent {}
 
 @Component({ template: "" })
 export class TestComponent {
-  private dirtyViewCacheService = inject(PopupViewCacheService);
+  private viewCacheService = inject(PopupViewCacheService);
 
-  formGroup = this.dirtyViewCacheService.formGroup({
+  formGroup = this.viewCacheService.formGroup({
     key: "test-form-cache",
     control: new FormGroup({
       name: new FormControl("initial name"),
     }),
   });
 
-  signal = this.dirtyViewCacheService.signal({
+  signal = this.viewCacheService.signal({
     key: "test-signal",
     initialValue: "initial signal",
   });

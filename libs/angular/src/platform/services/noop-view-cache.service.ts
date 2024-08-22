@@ -7,6 +7,12 @@ import {
   ViewCacheService,
 } from "../abstractions/view-cache.service";
 
+/**
+ * The functionality of the {@link ViewCacheService} is only needed in the browser extension popup,
+ * yet is provided to all clients to make sharing components easier.
+ *
+ * Non-extension clients use this noop implementation.
+ *  */
 @Injectable({
   providedIn: "root",
 })
