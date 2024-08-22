@@ -149,9 +149,12 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
     message: OverlayNotificationsExtensionMessage,
     sender: chrome.runtime.MessageSender,
   ) => {
-    this.clearLoginCipherFormDataSubject.next();
-
     const { uri, username, password, newPassword } = message;
+    if (!username && !password && !newPassword) {
+      return;
+    }
+
+    this.clearLoginCipherFormDataSubject.next();
     const formData = { uri, username, password, newPassword };
 
     const existingModifyLoginData = this.modifyLoginCipherFormData.get(sender.tab.id);
