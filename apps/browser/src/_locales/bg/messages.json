@@ -25,9 +25,6 @@
   "finishCreatingYourAccountBySettingAPassword": {
     "message": "Завършете регистрацията си като зададете парола"
   },
-  "login": {
-    "message": "Вписване"
-  },
   "enterpriseSingleSignOn": {
     "message": "Еднократна идентификация (SSO)"
   },
@@ -305,22 +302,22 @@
     "message": "Редактиране на папка"
   },
   "newFolder": {
-    "message": "New folder"
+    "message": "Нова папка"
   },
   "folderName": {
-    "message": "Folder name"
+    "message": "Име на папката"
   },
   "folderHintText": {
-    "message": "Nest a folder by adding the parent folder's name followed by a “/”. Example: Social/Forums"
+    "message": "Можете да вложите една папка в друга като въведете името на горната папка, а след това „/“. Пример: Социални/Форуми"
   },
   "noFoldersAdded": {
-    "message": "No folders added"
+    "message": "Няма добавени папки"
   },
   "createFoldersToOrganize": {
-    "message": "Create folders to organize your vault items"
+    "message": "Създавайте папки, за да организирате елементите в трезора си"
   },
   "deleteFolderPermanently": {
-    "message": "Are you sure you want to permanently delete this folder?"
+    "message": "Наистина ли искате да изтриете тази папка окончателно?"
   },
   "deleteFolder": {
     "message": "Изтриване на папка"
@@ -689,6 +686,9 @@
   },
   "totpHelperWithCapture": {
     "message": "Битуорден може да съхранява и попълва кодовете за 2-стъпково потвърждаване. Изберете иконката с камера, за да направите екранна снимка на QR-кода от този уеб сайт или копирайте ключа в това поле."
+  },
+  "learnMoreAboutAuthenticators": {
+    "message": "Научете повече за средствата за удостоверяване"
   },
   "copyTOTP": {
     "message": "Копиране на удостоверителния ключ (TOTP)"
@@ -1079,6 +1079,9 @@
   "ppremiumSignUpStorage": {
     "message": "1 GB пространство за файлове, които се шифрират."
   },
+  "premiumSignUpEmergency": {
+    "message": "Авариен достъп"
+  },
   "premiumSignUpTwoStepOptions": {
     "message": "Частно двустепенно удостоверяване чрез YubiKey и Duo."
   },
@@ -1100,13 +1103,28 @@
   "premiumPurchaseAlert": {
     "message": "Може да платите абонамента си през сайта bitwarden.com. Искате ли да го посетите сега?"
   },
+  "premiumPurchaseAlertV2": {
+    "message": "Можете да закупите платената версия от настройките на регистрацията си, в приложението по уеб на Битуорден."
+  },
   "premiumCurrentMember": {
     "message": "Честито, ползвате платен абонамент!"
   },
   "premiumCurrentMemberThanks": {
     "message": "Благодарим ви за подкрепата на Bitwarden."
   },
+  "premiumFeatures": {
+    "message": "Преминете към платената версия и ще получите:"
+  },
   "premiumPrice": {
+    "message": "И това само за $PRICE$ на година!",
+    "placeholders": {
+      "price": {
+        "content": "$1",
+        "example": "$10"
+      }
+    }
+  },
+  "premiumPriceV2": {
     "message": "И това само за $PRICE$ на година!",
     "placeholders": {
       "price": {
@@ -2293,6 +2311,24 @@
   },
   "createdSend": {
     "message": "Създадено изпращане",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createdSendSuccessfully": {
+    "message": "Изпращането е създадено успешно!",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "sendAvailability": {
+    "message": "Изпращането ще бъде достъпно за всеки с връзката през следващите $DAYS$ дни.",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "placeholders": {
+      "days": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "sendLinkCopied": {
+    "message": "Връзката към Изпращането е копирана",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "editedSend": {
@@ -3883,6 +3919,16 @@
   "websiteUri": {
     "message": "Уеб сайт (адрес)"
   },
+  "websiteUriCount": {
+    "message": "Уеб сайт (адрес) $COUNT$",
+    "description": "Label for an input field that contains a website URI. The input field is part of a list of fields, and the count indicates the position of the field in the list.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
   "websiteAdded": {
     "message": "Уеб сайтът е добавен"
   },
@@ -3922,6 +3968,12 @@
   },
   "autoFillOnPageLoad": {
     "message": "Автоматично попълване при зареждане на страницата?"
+  },
+  "cardExpiredTitle": {
+    "message": "Изтекла карта"
+  },
+  "cardExpiredMessage": {
+    "message": "Ако сте я подновили, актуализирайте информацията за картата"
   },
   "cardDetails": {
     "message": "Данни за картата"
@@ -4166,9 +4218,12 @@
     "message": "Действия по регистрацията"
   },
   "showNumberOfAutofillSuggestions": {
-    "message": "Show number of login autofill suggestions on extension icon"
+    "message": "Показване на броя предложения за автоматично попълване на данни за вписване върху иконката на добавката"
   },
   "systemDefault": {
-    "message": "System default"
+    "message": "По подразбиране за системата"
+  },
+  "enterprisePolicyRequirementsApplied": {
+    "message": "Изискванията на политиката за големи компании бяха приложени към тази настройка"
   }
 }

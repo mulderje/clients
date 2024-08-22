@@ -7,7 +7,6 @@ export enum FeatureFlag {
   BrowserFilelessImport = "browser-fileless-import",
   ItemShare = "item-share",
   GeneratorToolsModernization = "generator-tools-modernization",
-  ShowPaymentMethodWarningBanners = "show-payment-method-warning-banners",
   EnableConsolidatedBilling = "enable-consolidated-billing",
   AC1795_UpdatedSubscriptionStatusSection = "AC-1795_updated-subscription-status-section",
   EnableDeleteProvider = "AC-1218-delete-provider",
@@ -32,6 +31,7 @@ export enum FeatureFlag {
   EnableUpgradePasswordManagerSub = "AC-2708-upgrade-password-manager-sub",
   GenerateIdentityFillScriptRefactor = "generate-identity-fill-script-refactor",
   DelayFido2PageScriptInitWithinMv2 = "delay-fido2-page-script-init-within-mv2",
+  AccountDeprovisioning = "pm-10308-account-deprovisioning",
 }
 
 export type AllowedFeatureFlagTypes = boolean | number | string;
@@ -49,7 +49,6 @@ export const DefaultFeatureFlagValue = {
   [FeatureFlag.BrowserFilelessImport]: FALSE,
   [FeatureFlag.ItemShare]: FALSE,
   [FeatureFlag.GeneratorToolsModernization]: FALSE,
-  [FeatureFlag.ShowPaymentMethodWarningBanners]: FALSE,
   [FeatureFlag.EnableConsolidatedBilling]: FALSE,
   [FeatureFlag.AC1795_UpdatedSubscriptionStatusSection]: FALSE,
   [FeatureFlag.EnableDeleteProvider]: FALSE,
@@ -74,6 +73,7 @@ export const DefaultFeatureFlagValue = {
   [FeatureFlag.EnableUpgradePasswordManagerSub]: FALSE,
   [FeatureFlag.GenerateIdentityFillScriptRefactor]: FALSE,
   [FeatureFlag.DelayFido2PageScriptInitWithinMv2]: FALSE,
+  [FeatureFlag.AccountDeprovisioning]: FALSE,
 } satisfies Record<FeatureFlag, AllowedFeatureFlagTypes>;
 
 export type DefaultFeatureFlagValueType = typeof DefaultFeatureFlagValue;

@@ -23,10 +23,7 @@
     "message": "Jāiestata droša parole"
   },
   "finishCreatingYourAccountBySettingAPassword": {
-    "message": "Jāpabeidz sava konta izveida ar paroles iestatīšanu"
-  },
-  "login": {
-    "message": "Pieteikties"
+    "message": "Sava konta izveidošana jāpabeidz ar paroles iestatīšanu"
   },
   "enterpriseSingleSignOn": {
     "message": "Uzņēmuma vienotā pieteikšanās"
@@ -690,6 +687,9 @@
   "totpHelperWithCapture": {
     "message": "Bitwarden can store and fill 2-step verification codes. Select the camera icon to take a screenshot of this website's authenticator QR code, or copy and paste the key into this field."
   },
+  "learnMoreAboutAuthenticators": {
+    "message": "Uzzināt vairāk par autentificētājiem"
+  },
   "copyTOTP": {
     "message": "Ievietot starpliktuvē autentificētāja atslēgu (TOTP)"
   },
@@ -1079,6 +1079,9 @@
   "ppremiumSignUpStorage": {
     "message": "1 GB šifrētas krātuves datņu pielikumiem."
   },
+  "premiumSignUpEmergency": {
+    "message": "Ārkārtas piekļuve"
+  },
   "premiumSignUpTwoStepOptions": {
     "message": "Tādas slēgtā pirmavota divpakāpju pieteikšanās iespējas kā YubiKey un Duo."
   },
@@ -1100,14 +1103,29 @@
   "premiumPurchaseAlert": {
     "message": "Premium dalību ir iespējams iegādāties bitwarden.com tīmekļa glabātavā. Vai tagad apmeklēt tīmekļvietni?"
   },
+  "premiumPurchaseAlertV2": {
+    "message": "Premium var iegādāties Bitwarden tīmekļa lietotnē sava konta iestatījumos."
+  },
   "premiumCurrentMember": {
     "message": "Tu esi Premium dalībnieks!"
   },
   "premiumCurrentMemberThanks": {
     "message": "Paldies, ka atbalsti Bitwarden!"
   },
+  "premiumFeatures": {
+    "message": "Uzlabo uz \"Premium\" un saņem:"
+  },
   "premiumPrice": {
     "message": "Viss par tikai $PRICE$ gadā!",
+    "placeholders": {
+      "price": {
+        "content": "$1",
+        "example": "$10"
+      }
+    }
+  },
+  "premiumPriceV2": {
+    "message": "Viss par tikai $PRICE$ gadā.",
     "placeholders": {
       "price": {
         "content": "$1",
@@ -2293,6 +2311,24 @@
   },
   "createdSend": {
     "message": "Send izveidots",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createdSendSuccessfully": {
+    "message": "Send tika veiksmīgi izveidots.",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "sendAvailability": {
+    "message": "Send būs pieejams nākamās $DAYS$ dienas ikvienam, kuram ir saite.",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "placeholders": {
+      "days": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "sendLinkCopied": {
+    "message": "Send saite ievietota starpliktuvē",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "editedSend": {
@@ -3883,6 +3919,16 @@
   "websiteUri": {
     "message": "Tīmekļvietne (URI)"
   },
+  "websiteUriCount": {
+    "message": "Tīmekļvietne (URI) $COUNT$",
+    "description": "Label for an input field that contains a website URI. The input field is part of a list of fields, and the count indicates the position of the field in the list.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
   "websiteAdded": {
     "message": "Tīmekļvietne pievienota"
   },
@@ -3922,6 +3968,12 @@
   },
   "autoFillOnPageLoad": {
     "message": "Automātiski aizpildīt lapas ielādes brīdī?"
+  },
+  "cardExpiredTitle": {
+    "message": "Beidzies kartes derīgums"
+  },
+  "cardExpiredMessage": {
+    "message": "Ja atjaunoji to, jāatjaunina kartes informācija"
   },
   "cardDetails": {
     "message": "Kartes dati"
@@ -4166,9 +4218,12 @@
     "message": "Konta darbības"
   },
   "showNumberOfAutofillSuggestions": {
-    "message": "Show number of login autofill suggestions on extension icon"
+    "message": "Paplašinājuma ikonā rādīt pieteikšanās automātiskās aizpildes ieteikumu skaitu"
   },
   "systemDefault": {
-    "message": "System default"
+    "message": "Sistēmas noklusējums"
+  },
+  "enterprisePolicyRequirementsApplied": {
+    "message": "Šim iestatījumam tika piemērotas uzņēmējdarbības nosacījumu prasības"
   }
 }

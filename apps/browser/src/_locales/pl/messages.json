@@ -25,9 +25,6 @@
   "finishCreatingYourAccountBySettingAPassword": {
     "message": "Ukończ tworzenie konta poprzez ustawienie hasła"
   },
-  "login": {
-    "message": "Zaloguj się"
-  },
   "enterpriseSingleSignOn": {
     "message": "Logowanie jednokrotne"
   },
@@ -690,6 +687,9 @@
   "totpHelperWithCapture": {
     "message": "Bitwarden może przechowywać i wypełniać kody weryfikacyjne. Wybierz ikonę aparatu, aby zrobić zrzut ekranu z kodem QR lub skopiuj i wklej klucz do tego pola."
   },
+  "learnMoreAboutAuthenticators": {
+    "message": "Learn more about authenticators"
+  },
   "copyTOTP": {
     "message": "Kopiuj klucz uwierzytelniający (TOTP)"
   },
@@ -1079,6 +1079,9 @@
   "ppremiumSignUpStorage": {
     "message": "1 GB miejsca na zaszyfrowane załączniki."
   },
+  "premiumSignUpEmergency": {
+    "message": "Emergency access."
+  },
   "premiumSignUpTwoStepOptions": {
     "message": "Własnościowe opcje logowania dwuetapowego, takie jak YubiKey i Duo."
   },
@@ -1100,14 +1103,29 @@
   "premiumPurchaseAlert": {
     "message": "Konto Premium możesz zakupić na stronie sejfu bitwarden.com. Czy chcesz otworzyć tę stronę?"
   },
+  "premiumPurchaseAlertV2": {
+    "message": "You can purchase Premium from your account settings on the Bitwarden web app."
+  },
   "premiumCurrentMember": {
     "message": "Posiadasz konto Premium!"
   },
   "premiumCurrentMemberThanks": {
     "message": "Dziękujemy za wspieranie Bitwarden."
   },
+  "premiumFeatures": {
+    "message": "Upgrade to premium and receive:"
+  },
   "premiumPrice": {
     "message": "Wszystko to jedynie za $PRICE$ /rok!",
+    "placeholders": {
+      "price": {
+        "content": "$1",
+        "example": "$10"
+      }
+    }
+  },
+  "premiumPriceV2": {
+    "message": "All for just $PRICE$ per year!",
     "placeholders": {
       "price": {
         "content": "$1",
@@ -2293,6 +2311,24 @@
   },
   "createdSend": {
     "message": "Wysyłka została utworzona",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createdSendSuccessfully": {
+    "message": "Send created successfully!",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "sendAvailability": {
+    "message": "The Send will be available to anyone with the link for the next $DAYS$ days.",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "placeholders": {
+      "days": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "sendLinkCopied": {
+    "message": "Send link copied",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "editedSend": {
@@ -3883,6 +3919,16 @@
   "websiteUri": {
     "message": "Strona internetowa (URI)"
   },
+  "websiteUriCount": {
+    "message": "Website (URI) $COUNT$",
+    "description": "Label for an input field that contains a website URI. The input field is part of a list of fields, and the count indicates the position of the field in the list.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
   "websiteAdded": {
     "message": "Strona dodana"
   },
@@ -3922,6 +3968,12 @@
   },
   "autoFillOnPageLoad": {
     "message": "Włącz autouzupełnianie po załadowaniu strony?"
+  },
+  "cardExpiredTitle": {
+    "message": "Expired card"
+  },
+  "cardExpiredMessage": {
+    "message": "If you've renewed it, update the card's information"
   },
   "cardDetails": {
     "message": "Szczegóły karty"
@@ -4170,5 +4222,8 @@
   },
   "systemDefault": {
     "message": "System default"
+  },
+  "enterprisePolicyRequirementsApplied": {
+    "message": "Enterprise policy requirements have been applied to this setting"
   }
 }

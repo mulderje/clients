@@ -25,9 +25,6 @@
   "finishCreatingYourAccountBySettingAPassword": {
     "message": "Zdajte heslo na vytvorenie účtu"
   },
-  "login": {
-    "message": "Prihlásiť sa"
-  },
   "enterpriseSingleSignOn": {
     "message": "Jednotné prihlásenie pre podniky (SSO)"
   },
@@ -305,22 +302,22 @@
     "message": "Upraviť priečinok"
   },
   "newFolder": {
-    "message": "New folder"
+    "message": "Nový priečinok"
   },
   "folderName": {
-    "message": "Folder name"
+    "message": "Názov priečinka"
   },
   "folderHintText": {
-    "message": "Nest a folder by adding the parent folder's name followed by a “/”. Example: Social/Forums"
+    "message": "Vnorte priečinok pridaním názvu nadradeného priečinka a znaku \"/\". Príklad: Sociálne siete/Fóra"
   },
   "noFoldersAdded": {
-    "message": "No folders added"
+    "message": "Neboli pridané žiadne priečinky"
   },
   "createFoldersToOrganize": {
-    "message": "Create folders to organize your vault items"
+    "message": "Vytvorte priečinky na usporiadanie položiek trezoru"
   },
   "deleteFolderPermanently": {
-    "message": "Are you sure you want to permanently delete this folder?"
+    "message": "Naozaj chcete natrvalo odstrániť tento priečinok?"
   },
   "deleteFolder": {
     "message": "Odstrániť priečinok"
@@ -689,6 +686,9 @@
   },
   "totpHelperWithCapture": {
     "message": "Bitwarden umožňuje uložiť a vyplniť kódy dvojstupňového overenia. Vyberte ikonu fotoaparátu a zosnímajte obrazovku QR kódu overovacej aplikácie tejto webovej stránky alebo skopírujte a vložte kľúč do tohto poľa."
+  },
+  "learnMoreAboutAuthenticators": {
+    "message": "Viac informácií o overovateľoch"
   },
   "copyTOTP": {
     "message": "Kopírovať kľúč overovateľa (TOTP)"
@@ -1079,6 +1079,9 @@
   "ppremiumSignUpStorage": {
     "message": "1 GB šifrovaného úložiska."
   },
+  "premiumSignUpEmergency": {
+    "message": "Núdzový prístup"
+  },
   "premiumSignUpTwoStepOptions": {
     "message": "Proprietárne možnosti dvojstupňového prihlásenia ako napríklad YubiKey a Duo."
   },
@@ -1100,14 +1103,29 @@
   "premiumPurchaseAlert": {
     "message": "Svoje prémiové členstvo môžete zakúpiť vo webovom trezore bitwarden.com. Chcete navštíviť túto stránku teraz?"
   },
+  "premiumPurchaseAlertV2": {
+    "message": "Prémiové členstvo si môžete zakúpiť v nastaveniach svojho účtu vo webovej aplikácii Bitwarden."
+  },
   "premiumCurrentMember": {
     "message": "Ste prémiovým členom!"
   },
   "premiumCurrentMemberThanks": {
     "message": "Ďakujeme, že podporujete Bitwarden."
   },
+  "premiumFeatures": {
+    "message": "Povýšte na premium a získajte:"
+  },
   "premiumPrice": {
     "message": "Všetko len za %price% /rok!",
+    "placeholders": {
+      "price": {
+        "content": "$1",
+        "example": "$10"
+      }
+    }
+  },
+  "premiumPriceV2": {
+    "message": "Všetko len za $PRICE$ ročne!",
     "placeholders": {
       "price": {
         "content": "$1",
@@ -1831,17 +1849,17 @@
     "message": "Použiť toto heslo"
   },
   "useThisUsername": {
-    "message": "Použit toto používateľské meno"
+    "message": "Použiť toto používateľské meno"
   },
   "securePasswordGenerated": {
-    "message": "Secure password generated! Don't forget to also update your password on the website."
+    "message": "Bezpečné heslo vygenerované! Nezabudnite tiež aktualizovať heslo na stránke."
   },
   "useGeneratorHelpTextPartOne": {
-    "message": "Use the generator",
+    "message": "Použite generátor",
     "description": "This will be used as part of a larger sentence, broken up to include the generator icon. The full sentence will read 'Use the generator [GENERATOR_ICON] to create a strong unique password'"
   },
   "useGeneratorHelpTextPartTwo": {
-    "message": "to create a strong unique password",
+    "message": "na vytvorenie silného, unikátneho hesla.",
     "description": "This will be used as part of a larger sentence, broken up to include the generator icon. The full sentence will read 'Use the generator [GENERATOR_ICON] to create a strong unique password'"
   },
   "vaultTimeoutAction": {
@@ -2293,6 +2311,24 @@
   },
   "createdSend": {
     "message": "Send vytvorený",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createdSendSuccessfully": {
+    "message": "Send bol úspešne vytvorený!",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "sendAvailability": {
+    "message": "Send bude k dispozícii každému s odkazom po dobu $DAYS$ dní.",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "placeholders": {
+      "days": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "sendLinkCopied": {
+    "message": "Skopírovaný odkaz na Send",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "editedSend": {
@@ -3883,6 +3919,16 @@
   "websiteUri": {
     "message": "Webová stránka (URI)"
   },
+  "websiteUriCount": {
+    "message": "Webová stránka (URI) $COUNT$",
+    "description": "Label for an input field that contains a website URI. The input field is part of a list of fields, and the count indicates the position of the field in the list.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
   "websiteAdded": {
     "message": "Webová stránka pridaná"
   },
@@ -3923,6 +3969,12 @@
   "autoFillOnPageLoad": {
     "message": "Automaticky vyplniť pri načítaní stránky?"
   },
+  "cardExpiredTitle": {
+    "message": "Exspirovaná karta"
+  },
+  "cardExpiredMessage": {
+    "message": "Ak ste kartu obnovili, aktualizujte jej údaje"
+  },
   "cardDetails": {
     "message": "Podrobnosti o karte"
   },
@@ -3945,15 +3997,15 @@
     "message": "Údaje"
   },
   "passkeys": {
-    "message": "Passkeys",
+    "message": "Prístupové kľúče",
     "description": "A section header for a list of passkeys."
   },
   "passwords": {
-    "message": "Passwords",
+    "message": "Heslá",
     "description": "A section header for a list of passwords."
   },
   "logInWithPasskeyAriaLabel": {
-    "message": "Log in with passkey",
+    "message": "Prihlásiť sa s prístupovým kľúčom",
     "description": "ARIA label for the inline menu button that logs in with a passkey."
   },
   "assign": {
@@ -4166,9 +4218,12 @@
     "message": "Operácie s účtom"
   },
   "showNumberOfAutofillSuggestions": {
-    "message": "Show number of login autofill suggestions on extension icon"
+    "message": "Zobraziť počet odporúčaných prihlasovacích údajov na ikone rozšírenia"
   },
   "systemDefault": {
-    "message": "System default"
+    "message": "Predvolené systémom"
+  },
+  "enterprisePolicyRequirementsApplied": {
+    "message": "Na toto nastavenie boli uplatnené požiadavky pravidiel spoločnosti"
   }
 }

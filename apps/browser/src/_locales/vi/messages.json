@@ -25,9 +25,6 @@
   "finishCreatingYourAccountBySettingAPassword": {
     "message": "Hoàn thành việc tạo tài khoản của bạn bằng cách đặt mật khẩu"
   },
-  "login": {
-    "message": "Đăng nhập"
-  },
   "enterpriseSingleSignOn": {
     "message": "Đăng nhập bằng tài khoản tổ chức"
   },
@@ -690,6 +687,9 @@
   "totpHelperWithCapture": {
     "message": "Bitwarden có thể lưu trữ và điền mã xác minh 2 bước. Hãy chọn biểu tượng máy ảnh để chụp mã QR xác thực của trang web, hoặc sao chép và dán khoá vào ô này."
   },
+  "learnMoreAboutAuthenticators": {
+    "message": "Learn more about authenticators"
+  },
   "copyTOTP": {
     "message": "Sao chép khóa Authenticator (TOTP)"
   },
@@ -1079,6 +1079,9 @@
   "ppremiumSignUpStorage": {
     "message": "1GB bộ nhớ lưu trữ được mã hóa cho các tệp đính kèm."
   },
+  "premiumSignUpEmergency": {
+    "message": "Emergency access."
+  },
   "premiumSignUpTwoStepOptions": {
     "message": "Các tùy chọn xác minh hai bước như YubiKey và Duo."
   },
@@ -1100,14 +1103,29 @@
   "premiumPurchaseAlert": {
     "message": "Bạn có thể nâng cấp làm thành viên cao cấp trong kho bitwarden nền web. Bạn có muốn truy cập trang web bây giờ?"
   },
+  "premiumPurchaseAlertV2": {
+    "message": "You can purchase Premium from your account settings on the Bitwarden web app."
+  },
   "premiumCurrentMember": {
     "message": "Bạn là một thành viên cao cấp!"
   },
   "premiumCurrentMemberThanks": {
     "message": "Cảm ơn bạn vì đã hỗ trợ Bitwarden."
   },
+  "premiumFeatures": {
+    "message": "Upgrade to premium and receive:"
+  },
   "premiumPrice": {
     "message": "Tất cả chỉ với $PRICE$/năm!",
+    "placeholders": {
+      "price": {
+        "content": "$1",
+        "example": "$10"
+      }
+    }
+  },
+  "premiumPriceV2": {
+    "message": "All for just $PRICE$ per year!",
     "placeholders": {
       "price": {
         "content": "$1",
@@ -1441,7 +1459,7 @@
     "message": "Thương hiệu"
   },
   "expirationMonth": {
-    "message": "Tháng Hết Hạn"
+    "message": "Tháng hết hạn"
   },
   "expirationYear": {
     "message": "Năm hết hạn"
@@ -1967,16 +1985,16 @@
     "message": "Mật khẩu chính bạn chọn không đáp ứng yêu cầu."
   },
   "receiveMarketingEmailsV2": {
-    "message": "Nhận lời khuyên, thông báo và cơ hội nghiên cứu từ Bitwarden trong hộp thư đến của bạn."
+    "message": "Nhận đề xuất, thông báo và cơ hội nghiên cứu từ Bitwarden trong hộp thư đến của bạn."
   },
   "unsubscribe": {
-    "message": "Huỷ đăng ký"
+    "message": "Hủy đăng ký"
   },
   "atAnyTime": {
     "message": "bất cứ lúc nào."
   },
   "byContinuingYouAgreeToThe": {
-    "message": "Bằng cách tiếp tục, bạn đồng ý"
+    "message": "Nếu tiếp tục, bạn đồng ý"
   },
   "and": {
     "message": "và"
@@ -2295,6 +2313,24 @@
     "message": "Đã tạo mục Gửi",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
+  "createdSendSuccessfully": {
+    "message": "Send created successfully!",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "sendAvailability": {
+    "message": "The Send will be available to anyone with the link for the next $DAYS$ days.",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "placeholders": {
+      "days": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "sendLinkCopied": {
+    "message": "Send link copied",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
   "editedSend": {
     "message": "Đã lưu mục Gửi",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
@@ -2463,7 +2499,7 @@
     "message": "Không tìm thấy danh tính duy nhất."
   },
   "convertOrganizationEncryptionDesc": {
-    "message": "$ORGANIZATION$ hiện đang dùng SSO với khoá máy chủ tự lưu trữ. Từ giờ không cần mật khẩu chính để đăng nhập vào tổ chức này nữa.",
+    "message": "$ORGANIZATION$ đang sử dụng SSO với khóa máy chủ tự lưu trữ. Mật khẩu chính không còn cần để đăng nhập cho các thành viên của tổ chức này.",
     "placeholders": {
       "organization": {
         "content": "$1",
@@ -3878,10 +3914,20 @@
     "message": "Khóa xác thực"
   },
   "autofillOptions": {
-    "message": "Auto-fill options"
+    "message": "Autofill options"
   },
   "websiteUri": {
     "message": "Website (URI)"
+  },
+  "websiteUriCount": {
+    "message": "Website (URI) $COUNT$",
+    "description": "Label for an input field that contains a website URI. The input field is part of a list of fields, and the count indicates the position of the field in the list.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
   },
   "websiteAdded": {
     "message": "Website added"
@@ -3922,6 +3968,12 @@
   },
   "autoFillOnPageLoad": {
     "message": "Autofill on page load?"
+  },
+  "cardExpiredTitle": {
+    "message": "Expired card"
+  },
+  "cardExpiredMessage": {
+    "message": "If you've renewed it, update the card's information"
   },
   "cardDetails": {
     "message": "Thông tin thẻ"
@@ -4170,5 +4222,8 @@
   },
   "systemDefault": {
     "message": "System default"
+  },
+  "enterprisePolicyRequirementsApplied": {
+    "message": "Enterprise policy requirements have been applied to this setting"
   }
 }

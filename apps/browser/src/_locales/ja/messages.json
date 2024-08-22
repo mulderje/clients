@@ -25,9 +25,6 @@
   "finishCreatingYourAccountBySettingAPassword": {
     "message": "パスワードを設定してアカウントの作成を完了してください"
   },
-  "login": {
-    "message": "ログイン"
-  },
   "enterpriseSingleSignOn": {
     "message": "組織のシングルサインオン"
   },
@@ -690,6 +687,9 @@
   "totpHelperWithCapture": {
     "message": "Bitwarden は2段階認証コードを保存・入力できます。 カメラアイコンを選択して、このウェブサイトの認証 QR コードのスクリーンショットを撮るか、キーをコピーしてこのフィールドに貼り付けてください。"
   },
+  "learnMoreAboutAuthenticators": {
+    "message": "認証方法の詳細"
+  },
   "copyTOTP": {
     "message": "認証キーのコピー (TOTP)"
   },
@@ -1079,6 +1079,9 @@
   "ppremiumSignUpStorage": {
     "message": "1GB の暗号化されたファイルストレージ"
   },
+  "premiumSignUpEmergency": {
+    "message": "緊急アクセス"
+  },
   "premiumSignUpTwoStepOptions": {
     "message": "YubiKey、Duo などのプロプライエタリな2段階認証オプション。"
   },
@@ -1100,14 +1103,29 @@
   "premiumPurchaseAlert": {
     "message": "プレミアム会員権は bitwarden.com ウェブ保管庫で購入できます。ウェブサイトを開きますか？"
   },
+  "premiumPurchaseAlertV2": {
+    "message": "Bitwarden ウェブアプリでアカウント設定からプレミアムを購入できます。"
+  },
   "premiumCurrentMember": {
     "message": "あなたはプレミアム会員です！"
   },
   "premiumCurrentMemberThanks": {
     "message": "Bitwarden を支援いただき、ありがとうございます。"
   },
+  "premiumFeatures": {
+    "message": "プレミアムにアップグレードして受け取る："
+  },
   "premiumPrice": {
     "message": "全部でなんと$PRICE$/年だけ！",
+    "placeholders": {
+      "price": {
+        "content": "$1",
+        "example": "$10"
+      }
+    }
+  },
+  "premiumPriceV2": {
+    "message": "すべて込みで年間たったの$PRICE$！",
     "placeholders": {
       "price": {
         "content": "$1",
@@ -2293,6 +2311,24 @@
   },
   "createdSend": {
     "message": "作成した Send",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "createdSendSuccessfully": {
+    "message": "Send を作成しました！",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
+  },
+  "sendAvailability": {
+    "message": "Send は、次の $DAYS$ 日間はリンクを知っている人全員が利用できます。",
+    "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated.",
+    "placeholders": {
+      "days": {
+        "content": "$1",
+        "example": "5"
+      }
+    }
+  },
+  "sendLinkCopied": {
+    "message": "Send リンクをコピーしました",
     "description": "'Send' is a noun and the name of a feature called 'Bitwarden Send'. It should not be translated."
   },
   "editedSend": {
@@ -3883,6 +3919,16 @@
   "websiteUri": {
     "message": "ウェブサイト (URI)"
   },
+  "websiteUriCount": {
+    "message": "ウェブサイト (URI) $COUNT$",
+    "description": "Label for an input field that contains a website URI. The input field is part of a list of fields, and the count indicates the position of the field in the list.",
+    "placeholders": {
+      "count": {
+        "content": "$1",
+        "example": "3"
+      }
+    }
+  },
   "websiteAdded": {
     "message": "ウェブサイトを追加しました"
   },
@@ -3922,6 +3968,12 @@
   },
   "autoFillOnPageLoad": {
     "message": "ページ読み込み時に自動入力する"
+  },
+  "cardExpiredTitle": {
+    "message": "期限切れのカード"
+  },
+  "cardExpiredMessage": {
+    "message": "カードの更新があった場合、カード情報を更新してください"
   },
   "cardDetails": {
     "message": "カード情報"
@@ -4170,5 +4222,8 @@
   },
   "systemDefault": {
     "message": "システムのデフォルト"
+  },
+  "enterprisePolicyRequirementsApplied": {
+    "message": "エンタープライズポリシー要件がこの設定に適用されました"
   }
 }
