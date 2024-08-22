@@ -87,7 +87,7 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
     checkMostRecentlyFocusedFieldHasValue: () => this.mostRecentlyFocusedFieldHasValue(),
     setupRebuildSubFrameOffsetsListeners: () => this.setupRebuildSubFrameOffsetsListeners(),
     destroyAutofillInlineMenuListeners: () => this.destroy(),
-    getFormFieldDataForNotification: () => this.getFormFieldDataForNotification(),
+    getFormFieldDataForNotification: () => this.handleGetFormFieldDataForNotificationMessage(),
   };
   private readonly cardFieldQualifiers: Record<string, CallableFunction> = {
     [AutofillFieldQualifier.cardholderName]:
@@ -590,6 +590,19 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
    */
   private handleFormFieldSubmitEvent = () => {
     void this.sendExtensionMessage("formFieldSubmitted", this.getFormFieldDataForNotification());
+  };
+
+  /**
+   * Handles capturing the form field data for a notification message. Is triggered from the
+   * background script when a POST request is encountered. Will not trigger this behavior
+   * in the case where the user is still typing in the field.
+   */
+  private handleGetFormFieldDataForNotificationMessage = async () => {
+    if (await this.isFieldCurrentlyFocused()) {
+      return;
+    }
+
+    return this.getFormFieldDataForNotification();
   };
 
   /**
@@ -1280,6 +1293,13 @@ export class AutofillOverlayContentService implements AutofillOverlayContentServ
    */
   private async isInlineMenuListVisible() {
     return (await this.sendExtensionMessage("checkIsAutofillInlineMenuListVisible")) === true;
+  }
+
+  /**
+   * Checks if the field is currently focused within the top frame.
+   */
+  private async isFieldCurrentlyFocused() {
+    return (await this.sendExtensionMessage("checkIsFieldCurrentlyFocused")) === true;
   }
 
   /**
