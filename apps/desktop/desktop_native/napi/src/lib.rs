@@ -254,8 +254,8 @@ pub mod sshagent {
             Ok(key) => {
                 let public_key = key.public_key();
                 let public_key_base64 = public_key.to_string();
-                let private_key_openssh = key.to_openssh(LineEnding::LF);
-                let private_key_openssh_string = private_key_openssh.unwrap().to_string();
+                let private_key_openssh = key.to_openssh(LineEnding::LF).or_else(|e| Err(napi::Error::from_reason(e.to_string())))?;
+                let private_key_openssh_string = private_key_openssh.to_string();
                 let fingerprint = key.fingerprint(HashAlg::Sha256);
                 let fingerprint_string = fingerprint.to_string();
                 Ok(SSHKey {
