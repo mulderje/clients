@@ -246,9 +246,26 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
 
     const { requestId, tabId, frameId } = details;
     this.activeFormSubmissionRequests.add(requestId);
-    if (!this.modifyLoginCipherFormData.has(details.tabId)) {
+
+    if (this.notificationDataIncompleteOnBeforeRequest(tabId)) {
       this.getFormFieldDataFromTab(tabId, frameId).catch((error) => this.logService.error(error));
     }
+  };
+
+  /**
+   * Captures the modified login form data if the tab contains incomplete data. This is used as
+   * a redundancy to ensure that the modified login form data is captured in cases where the form
+   * is split into multiple parts.
+   *
+   * @param tabId - The id of the tab
+   */
+  private notificationDataIncompleteOnBeforeRequest = (tabId: number) => {
+    const modifyLoginData = this.modifyLoginCipherFormData.get(tabId);
+    return (
+      !modifyLoginData ||
+      !this.shouldTriggerAddLoginNotification(modifyLoginData) ||
+      !this.shouldTriggerChangePasswordNotification(modifyLoginData)
+    );
   };
 
   /**
@@ -385,7 +402,7 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
     modifyLoginData: ModifyLoginCipherFormData,
     tab: chrome.tabs.Tab,
   ) => {
-    if (modifyLoginData.newPassword && !modifyLoginData.username) {
+    if (this.shouldTriggerChangePasswordNotification(modifyLoginData)) {
       // These notifications are temporarily setup as "messages" to the notification background.
       // This will be structured differently in a future refactor.
       await this.notificationBackground.changedPassword(
@@ -403,7 +420,7 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
       return;
     }
 
-    if (modifyLoginData.username && (modifyLoginData.password || modifyLoginData.newPassword)) {
+    if (this.shouldTriggerAddLoginNotification(modifyLoginData)) {
       await this.notificationBackground.addLogin(
         {
           command: "bgAddLogin",
@@ -417,6 +434,26 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
       );
       this.clearCompletedWebRequest(requestId, tab);
     }
+  };
+
+  /**
+   * Determines if the change password notification should be triggered.
+   *
+   * @param modifyLoginData - The modified login form data
+   */
+  private shouldTriggerChangePasswordNotification = (
+    modifyLoginData: ModifyLoginCipherFormData,
+  ) => {
+    return modifyLoginData.newPassword && !modifyLoginData.username;
+  };
+
+  /**
+   * Determines if the add login notification should be triggered.
+   *
+   * @param modifyLoginData - The modified login form data
+   */
+  private shouldTriggerAddLoginNotification = (modifyLoginData: ModifyLoginCipherFormData) => {
+    return modifyLoginData.username && (modifyLoginData.password || modifyLoginData.newPassword);
   };
 
   /**
