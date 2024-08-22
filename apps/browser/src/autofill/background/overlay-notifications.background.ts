@@ -65,7 +65,7 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
     sender: chrome.runtime.MessageSender,
   ) {
     if (await this.shouldInitAddLoginOrChangePasswordNotification(message, sender)) {
-      this.websiteOriginsWithFields.set(sender.tab.id, this.getTabOriginMatchPattern(sender.url));
+      this.websiteOriginsWithFields.set(sender.tab.id, this.getSenderUrlMatchPatterns(sender));
       this.setupWebRequestsListeners();
     }
   }
@@ -102,19 +102,39 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
   }
 
   /**
-   * Returns the match pattern for the tab's origin URL.
+   * Returns the match patterns for the sender's URL. This is used to filter out
+   * the web requests that are not from the sender's tab.
+   *
+   * @param sender - The sender of the message
+   */
+  private getSenderUrlMatchPatterns(sender: chrome.runtime.MessageSender) {
+    return new Set([
+      ...this.generateMatchPatterns(sender.url),
+      ...this.generateMatchPatterns(sender.tab.url),
+    ]);
+  }
+
+  /**
+   * Generates the origin and subdomain match patterns for the URL.
    *
    * @param url - The URL of the tab
    */
-  private getTabOriginMatchPattern(url: string) {
+  private generateMatchPatterns(url: string): string[] {
     try {
       if (!url.startsWith("http")) {
         url = `https://${url}`;
       }
 
-      return `${new URL(url).origin}/*`;
+      const originMatchPattern = `${new URL(url).origin}/*`;
+
+      const parsedUrl = new URL(url);
+      const splitHost = parsedUrl.hostname.split(".");
+      const domain = splitHost.slice(-2).join(".");
+      const subDomainMatchPattern = `${parsedUrl.protocol}//*.${domain}/*`;
+
+      return [originMatchPattern, subDomainMatchPattern];
     } catch {
-      return "";
+      return [];
     }
   }
 
@@ -176,8 +196,11 @@ export class OverlayNotificationsBackground implements OverlayNotificationsBackg
     chrome.webRequest.onBeforeRequest.removeListener(this.handleOnBeforeRequestEvent);
     chrome.webRequest.onCompleted.removeListener(this.handleOnCompletedRequestEvent);
     if (this.websiteOriginsWithFields.size) {
+      const websiteOrigins = Array.from(this.websiteOriginsWithFields.values());
+      const urls: string[] = [];
+      websiteOrigins.forEach((origins) => urls.push(...origins));
       const requestFilter: chrome.webRequest.RequestFilter = {
-        urls: Array.from(this.websiteOriginsWithFields.values()),
+        urls,
         types: ["main_frame", "sub_frame", "xmlhttprequest"],
       };
       chrome.webRequest.onBeforeRequest.addListener(this.handleOnBeforeRequestEvent, requestFilter);

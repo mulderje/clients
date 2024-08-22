@@ -8,7 +8,7 @@ export type NotificationTypeData = {
   launchTimestamp?: number;
 };
 
-export type WebsiteOriginsWithFields = Map<chrome.tabs.Tab["id"], string>;
+export type WebsiteOriginsWithFields = Map<chrome.tabs.Tab["id"], Set<string>>;
 
 export type ActiveFormSubmissionRequests = Set<chrome.webRequest.ResourceRequest["requestId"]>;
 
