@@ -43,6 +43,8 @@ export class PopupViewCacheService implements ViewCacheService {
   private messageSender = inject(MessageSender);
   private router = inject(Router);
 
+  private featureEnabled: boolean;
+
   private _cache: Record<string, string>;
   private get cache(): Record<string, string> {
     if (!this._cache) {
@@ -55,8 +57,8 @@ export class PopupViewCacheService implements ViewCacheService {
    * Initialize the service. This should only be called once.
    */
   async init() {
-    const featureEnabled = await this.configService.getFeatureFlag(FeatureFlag.PersistPopupView);
-    const initialState = featureEnabled
+    this.featureEnabled = await this.configService.getFeatureFlag(FeatureFlag.PersistPopupView);
+    const initialState = this.featureEnabled
       ? await firstValueFrom(this.globalStateProvider.get(POPUP_VIEW_CACHE_KEY).state$)
       : {};
     this._cache = Object.freeze(initialState ?? {});
@@ -118,6 +120,10 @@ export class PopupViewCacheService implements ViewCacheService {
   }
 
   private updateState(key: string, value: string) {
+    if (!this.featureEnabled) {
+      return;
+    }
+
     this.messageSender.send(SAVE_VIEW_CACHE_COMMAND, {
       key,
       value,
