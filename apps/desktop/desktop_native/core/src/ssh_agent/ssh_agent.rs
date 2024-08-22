@@ -7,7 +7,7 @@ use std::sync::{Arc, RwLock};
 use byteorder::{BigEndian, ByteOrder};
 use futures::stream::{Stream, StreamExt};
 use russh_cryptovec::CryptoVec;
-use ssh_key::{Algorithm, HashAlg, SigningKey};
+use ssh_key::SigningKey;
 use crate::ssh_agent::russh_encoding::{Encoding, Reader, Position};
 use tokio::io::{AsyncRead, AsyncReadExt, AsyncWrite, AsyncWriteExt};
 
@@ -178,8 +178,8 @@ impl<S: AsyncRead + AsyncWrite + Send + Unpin + 'static, A: Agent + Send + Sync 
                         return Ok((agent, false));
                     }
                 };
-
-                let sig_name = match private_key.algorithm() {
+  
+                let sig_name = match sig.algorithm() {
                     ssh_key::Algorithm::Ed25519 => "ssh-ed25519",
                     ssh_key::Algorithm::Rsa { hash: None }=> "ssh-rsa",
                     ssh_key::Algorithm::Rsa { hash: Some(HashAlg::Sha256) } => "rsa-sha2-256",
@@ -191,14 +191,11 @@ impl<S: AsyncRead + AsyncWrite + Send + Unpin + 'static, A: Agent + Send + Sync 
                     }
                 };
 
-                let sig_bytes = sig.as_bytes();
-                writebuf.push_u32_be(sig_name.len() as u32 + sig_bytes.len() as u32 + 8);          
+                writebuf.push_u32_be(sig_name.len() as u32 + sig.as_bytes().len() as u32 + 8);          
                 writebuf.extend_ssh_string(sig_name.as_bytes());
-                println!("Signature: {:?} len {:?} signame {:?}", sig_bytes, sig_bytes.len(), sig_name);
                 writebuf.extend_ssh_string(sig.as_bytes());
                 
                 let len = writebuf.len();
-                println!("len: {:?}", len);
                 BigEndian::write_u32(writebuf, (len - 4) as u32);
 
                 Ok((agent, true))
