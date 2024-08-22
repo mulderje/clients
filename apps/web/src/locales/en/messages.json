@@ -194,6 +194,12 @@
   "dr": {
     "message": "Dr"
   },
+  "cardExpiredTitle": {
+    "message": "Expired card"
+  },
+  "cardExpiredMessage": {
+    "message": "If you've renewed it, update the card's information"
+  },
   "expirationMonth": {
     "message": "Expiration month"
   },
@@ -4844,9 +4850,6 @@
   },
   "copySendLinkOnSave": {
     "message": "Copy the link to share this Send to my clipboard upon save."
-  },
-  "copyLink": {
-    "message": "Copy link"
   },
   "sendLinkLabel": {
     "message": "Send link",
