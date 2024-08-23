@@ -419,6 +419,23 @@
                   "enableHardwareAccelerationDesc" | i18n
                 }}</small>
               </div>
+              <div class="form-group">
+                <div class="checkbox">
+                  <label for="enableSSHAgent">
+                    <input
+                      id="enableSSHAgent"
+                      type="checkbox"
+                      aria-describedby="enableSSHAgentHelp"
+                      formControlName="enableSSHAgent"
+                      (change)="saveSSHAgent()"
+                    />
+                    {{ "enableSSHAgent" | i18n }}
+                  </label>
+                </div>
+                <small id="enableSSHAgentHelp" class="help-block">{{
+                  "enableSSHAgentDesc" | i18n
+                }}</small>
+              </div>
               <div class="form-group" *ngIf="showDuckDuckGoIntegrationOption">
                 <div class="checkbox">
                   <label for="enableDuckDuckGoBrowserIntegration">

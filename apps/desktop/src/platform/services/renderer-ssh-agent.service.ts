@@ -11,6 +11,8 @@ import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.servi
 import { CipherType } from "@bitwarden/common/vault/enums";
 import { DialogService, ToastService } from "@bitwarden/components";
 
+import { DesktopSettingsService } from "./desktop-settings.service";
+
 @Injectable({
   providedIn: "root",
 })
@@ -24,6 +26,7 @@ export class SSHAgentService {
     private accountService: AccountService,
     private toastService: ToastService,
     private i18nService: I18nService,
+    private desktopSettingsService: DesktopSettingsService,
   ) {
     this.messageListener
       .messages$(new CommandDefinition("sshagent.signrequest"))
@@ -84,6 +87,11 @@ export class SSHAgentService {
       });
 
     setInterval(async () => {
+      if ((await firstValueFrom(this.desktopSettingsService.sshAgentEnabled$)) == false) {
+        await ipc.platform.sshagent.setKeys([]);
+        return;
+      }
+
       const ciphers = await this.cipherService.getAllDecrypted();
       if (ciphers == null) {
         await ipc.platform.sshagent.lock();

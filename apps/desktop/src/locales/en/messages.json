@@ -210,6 +210,15 @@
   "sshAgentUnlockTimeout": {
     "message": "SSH key request timed out."
   },
+  "enableSSHAgent": {
+    "message": "Enable SSH agent"
+  },
+  "enableSSHAgentDesc": {
+    "message": "Enable the SSH agent to sign SSH requests right from your Bitwarden vault."
+  },
+  "enableSSHAgentHelp": {
+    "message": "The SSH agent is a service targeted at developers that allows you to sign SSH requests directly from your Bitwarden vault."
+  },
   "premiumRequired": {
     "message": "Premium required"
   },
