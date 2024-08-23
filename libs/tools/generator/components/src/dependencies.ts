@@ -8,15 +8,19 @@ import { JslibServicesModule } from "@bitwarden/angular/services/jslib-services.
 import { PolicyService } from "@bitwarden/common/admin-console/abstractions/policy/policy.service.abstraction";
 import { StateProvider } from "@bitwarden/common/platform/state";
 import {
+  CardComponent,
   CheckboxModule,
   ColorPasswordModule,
   FormFieldModule,
   InputModule,
+  SectionComponent,
+  SectionHeaderComponent,
 } from "@bitwarden/components";
 import { CredentialGeneratorService } from "@bitwarden/generator-core";
 
 /** Shared module containing generator component dependencies */
 @NgModule({
+  imports: [SectionComponent, SectionHeaderComponent, CardComponent],
   exports: [
     JslibModule,
     JslibServicesModule,
@@ -26,6 +30,9 @@ import { CredentialGeneratorService } from "@bitwarden/generator-core";
     ColorPasswordModule,
     InputModule,
     CheckboxModule,
+    SectionComponent,
+    SectionHeaderComponent,
+    CardComponent,
   ],
   providers: [
     safeProvider({

@@ -46,6 +46,10 @@ export class PassphraseComponent implements OnInit, OnDestroy {
   @Input()
   userId: UserId | null;
 
+  /** When `true`, an options header is displayed by the component. Otherwise, the header is hidden. */
+  @Input()
+  showHeader: boolean = true;
+
   /** Emits settings updates and completes if the settings become unavailable.
    * @remarks this does not emit the initial settings. If you would like
    *   to receive live settings updates including the initial update,
