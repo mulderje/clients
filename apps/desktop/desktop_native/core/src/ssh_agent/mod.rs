@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
 use anyhow::Error;
+use async_stream::stream;
+use futures::stream::{Stream, StreamExt};
+
 use ssh_agent::Key;
 use std::collections::HashMap;
 use std::sync::RwLock;
@@ -9,6 +12,7 @@ use tokio::sync::Mutex;
 pub mod msg;
 pub mod ssh_agent;
 pub mod russh_encoding;
+pub mod namedpipelistenerstream;
 
 #[cfg(unix)]
 use tokio::net::UnixListener;
@@ -85,6 +89,25 @@ pub async fn start_server(
     auth_response_rx: Arc<Mutex<tokio::sync::mpsc::Receiver<bool>>>,
 ) -> Result<(), anyhow::Error> {
     println!("[SSH Agent Native Module] Windows is not supported yet");
+    use std::io;
+    use futures::stream;
+    use tokio::net::windows::named_pipe::{NamedPipeServer, ServerOptions};
+
+    const PIPE_NAME: &str = r"\\.\pipe\named-pipe-idiomatic-server";
+
+    let mut server = ServerOptions::new()
+        .first_pipe_instance(true)
+        .create(PIPE_NAME)?;
+
+// Spawn the server loop.
+    let server = tokio::spawn(async move {
+        server.connect().await.unwrap();
+        let connected_client = server;
+        server = ServerOptions::new().create(PIPE_NAME).unwrap();
+        connected_client.
+
+        Ok::<_, io::Error>(())
+    });
     Ok(())
 }
 
@@ -122,3 +145,4 @@ pub async fn lock() -> Result<(), anyhow::Error> {
     }
     Ok(())
 }
+

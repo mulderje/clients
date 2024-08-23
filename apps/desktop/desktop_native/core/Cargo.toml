@@ -15,12 +15,14 @@ anyhow = "=1.0.86"
 arboard = { version = "=3.4.0", default-features = false, features = [
   "wayland-data-control",
 ] }
+async-stream = "0.3.5"
 base64 = "=0.22.1"
 byteorder = "1.5.0"
 cbc = { version = "=0.1.2", features = ["alloc"] }
 futures = "0.3.30"
 homedir = "0.3.3"
 libc = "=0.2.155"
+pin-project = "1.1.5"
 rand = "=0.8.5"
 retry = "=2.0.0"
 russh-cryptovec = "0.7.3"
