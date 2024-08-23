@@ -214,6 +214,14 @@ export class LoginComponent extends BaseLoginComponent implements OnInit, OnDest
     // Save sso params
     await this.ssoLoginService.setSsoState(state);
     await this.ssoLoginService.setCodeVerifier(ssoCodeVerifier);
-    await ipc.platform.localhostCallbackService.openSsoPrompt(codeChallenge, state);
+    try {
+      await ipc.platform.localhostCallbackService.openSsoPrompt(codeChallenge, state);
+    } catch (err) {
+      this.platformUtilsService.showToast(
+        "error",
+        this.i18nService.t("errorOccured"),
+        this.i18nService.t("ssoError"),
+      );
+    }
   }
 }
