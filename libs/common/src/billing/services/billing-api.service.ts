@@ -162,6 +162,19 @@ export class BillingApiService implements BillingApiServiceAbstraction {
     );
   }
 
+  async updateOrganizationTaxInformation(
+    organizationId: string,
+    request: ExpandedTaxInfoUpdateRequest,
+  ) {
+    return await this.apiService.send(
+      "PUT",
+      "/organizations/" + organizationId + "/billing/tax-information",
+      request,
+      true,
+      false,
+    );
+  }
+
   async updateProviderClientOrganization(
     providerId: string,
     organizationId: string,

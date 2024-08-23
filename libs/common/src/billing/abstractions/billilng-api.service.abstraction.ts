@@ -50,6 +50,11 @@ export abstract class BillingApiServiceAbstraction {
     request: UpdatePaymentMethodRequest,
   ) => Promise<void>;
 
+  updateOrganizationTaxInformation: (
+    organizationId: string,
+    request: ExpandedTaxInfoUpdateRequest,
+  ) => Promise<void>;
+
   updateProviderClientOrganization: (
     providerId: string,
     organizationId: string,

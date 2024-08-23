@@ -1,7 +1,7 @@
 import { PaymentMethodType } from "@bitwarden/common/billing/enums";
 import { PaymentSourceResponse } from "@bitwarden/common/billing/models/response/payment-source.response";
 
-export class MaskedPaymentMethod {
+export class PaymentSource {
   type: PaymentMethodType;
   description: string;
   needsVerification: boolean;

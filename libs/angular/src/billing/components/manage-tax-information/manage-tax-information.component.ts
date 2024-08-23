@@ -32,6 +32,7 @@ export class ManageTaxInformationComponent implements OnInit, OnDestroy {
   });
 
   private taxInformation: TaxInformation;
+
   private destroy$ = new Subject<void>();
 
   constructor(private formBuilder: FormBuilder) {}

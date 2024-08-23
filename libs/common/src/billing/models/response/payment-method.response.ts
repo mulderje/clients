@@ -12,7 +12,7 @@ export class PaymentMethodResponse extends BaseResponse {
     super(response);
     this.accountCredit = this.getResponseProperty("AccountCredit");
 
-    const paymentMethod = this.getResponseProperty("PaymentMethod");
+    const paymentMethod = this.getResponseProperty("PaymentSource");
     if (paymentMethod) {
       this.paymentSource = new PaymentSourceResponse(paymentMethod);
     }

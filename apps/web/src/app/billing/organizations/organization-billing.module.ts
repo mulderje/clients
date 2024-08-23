@@ -20,6 +20,8 @@ import { SecretsManagerSubscribeStandaloneComponent } from "./sm-subscribe-stand
 import { SubscriptionHiddenComponent } from "./subscription-hidden.component";
 import { SubscriptionStatusComponent } from "./subscription-status.component";
 
+import { OrganizationPaymentMethodComponent } from "./";
+
 @NgModule({
   imports: [
     OrganizationBillingRoutingModule,
@@ -42,6 +44,7 @@ import { SubscriptionStatusComponent } from "./subscription-status.component";
     SubscriptionHiddenComponent,
     SubscriptionStatusComponent,
     ChangePlanDialogComponent,
+    OrganizationPaymentMethodComponent,
   ],
 })
 export class OrganizationBillingModule {}
