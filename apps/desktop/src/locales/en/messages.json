@@ -3054,6 +3054,6 @@
     "message": "Text Sends"
   },
   "ssoError": {
-    "message": "There was an error with the SSO login. Please try again."
+    "message": "No free ports could be found for the sso login."
   }
 }
