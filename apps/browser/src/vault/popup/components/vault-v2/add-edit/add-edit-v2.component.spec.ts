@@ -1,13 +1,15 @@
 import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
 import { ActivatedRoute, Router } from "@angular/router";
-import { mock } from "jest-mock-extended";
+import { mock, MockProxy } from "jest-mock-extended";
 import { BehaviorSubject } from "rxjs";
 
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { I18nService } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { PlatformUtilsService } from "@bitwarden/common/platform/abstractions/platform-utils.service";
+import { CipherService } from "@bitwarden/common/vault/abstractions/cipher.service";
 import { Cipher } from "@bitwarden/common/vault/models/domain/cipher";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
+import { AddEditCipherInfo } from "@bitwarden/common/vault/types/add-edit-cipher-info";
 import { CipherFormConfig, CipherFormConfigService, CipherFormMode } from "@bitwarden/vault";
 
 import { BrowserFido2UserInterfaceSession } from "../../../../../autofill/fido2/services/browser-fido2-user-interface.service";
@@ -25,6 +27,8 @@ jest.mock("qrcode-parser", () => {});
 describe("AddEditV2Component", () => {
   let component: AddEditV2Component;
   let fixture: ComponentFixture<AddEditV2Component>;
+  let addEditCipherInfo$: BehaviorSubject<AddEditCipherInfo | null>;
+  let cipherServiceMock: MockProxy<CipherService>;
 
   const buildConfigResponse = { originalCipher: {} } as CipherFormConfig;
   const buildConfig = jest.fn((mode: CipherFormMode) =>
@@ -41,6 +45,10 @@ describe("AddEditV2Component", () => {
     navigate.mockClear();
     back.mockClear();
 
+    addEditCipherInfo$ = new BehaviorSubject(null);
+    cipherServiceMock = mock<CipherService>();
+    cipherServiceMock.addEditCipherInfo$ = addEditCipherInfo$.asObservable();
+
     await TestBed.configureTestingModule({
       imports: [AddEditV2Component],
       providers: [
@@ -51,6 +59,7 @@ describe("AddEditV2Component", () => {
         { provide: Router, useValue: { navigate } },
         { provide: ActivatedRoute, useValue: { queryParams: queryParams$ } },
         { provide: I18nService, useValue: { t: (key: string) => key } },
+        { provide: CipherService, useValue: cipherServiceMock },
       ],
     })
       .overrideProvider(CipherFormConfigService, {
