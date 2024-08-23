@@ -104,7 +104,6 @@ pub async fn start_server(
         server.connect().await.unwrap();
         let connected_client = server;
         server = ServerOptions::new().create(PIPE_NAME).unwrap();
-        connected_client.
 
         Ok::<_, io::Error>(())
     });
