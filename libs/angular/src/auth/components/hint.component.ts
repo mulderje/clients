@@ -24,7 +24,7 @@ export class HintComponent implements OnInit {
     protected platformUtilsService: PlatformUtilsService,
     private logService: LogService,
     private loginEmailService: LoginEmailServiceAbstraction,
-    private toastService: ToastService,
+    protected toastService: ToastService,
   ) {}
 
   ngOnInit(): void {

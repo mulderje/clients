@@ -164,11 +164,11 @@ export class LoginComponent extends BaseLoginComponent implements OnInit, OnDest
   async continue() {
     await super.validateEmail();
     if (!this.formGroup.controls.email.valid) {
-      this.toastService.showToast(
-        "error",
-        this.i18nService.t("errorOccured"),
-        this.i18nService.t("invalidEmail"),
-      );
+      this.toastService.showToast({
+        variant: "error",
+        title: this.i18nService.t("errorOccured"),
+        message: this.i18nService.t("invalidEmail"),
+      });
       return;
     }
     this.focusInput();
