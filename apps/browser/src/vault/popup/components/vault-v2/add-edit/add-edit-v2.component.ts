@@ -336,6 +336,14 @@ const mapAddEditCipherInfoToInitialValues = (
     return initialValues;
   }
 
+  if (cipherInfo.collectionIds != null) {
+    initialValues.collectionIds = cipherInfo.collectionIds as CollectionId[];
+  }
+
+  if (cipherInfo.cipher == null) {
+    return initialValues;
+  }
+
   const cipher = cipherInfo.cipher;
 
   if (cipher.folderId != null) {
@@ -344,10 +352,6 @@ const mapAddEditCipherInfoToInitialValues = (
 
   if (cipher.organizationId != null) {
     initialValues.organizationId = cipher.organizationId as OrganizationId;
-  }
-
-  if (cipherInfo.collectionIds != null) {
-    initialValues.collectionIds = cipherInfo.collectionIds as CollectionId[];
   }
 
   if (cipher.name != null) {
