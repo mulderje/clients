@@ -1,3 +1,4 @@
+---
 name: Chromatic
 
 on:
@@ -13,7 +14,7 @@ jobs:
   check-run:
     name: Check PR run
     uses: bitwarden/gh-actions/.github/workflows/check-run.yml@main
-  
+
   chromatic:
     name: Chromatic
     runs-on: ubuntu-22.04
@@ -56,7 +57,7 @@ jobs:
         run: npm run build-storybook:ci
 
       - name: Publish to Chromatic
-        uses: chromaui/action@c9067691aca4a28d6fbb40d9eea6e144369fbcae # v10.9.5
+        uses: chromaui/action@b984808b772126a9f44b2b7737b131b68a2ede32 # v11.7.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
