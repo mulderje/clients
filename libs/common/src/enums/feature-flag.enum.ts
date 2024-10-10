@@ -9,7 +9,6 @@ export enum FeatureFlag {
   GeneratorToolsModernization = "generator-tools-modernization",
   EnableConsolidatedBilling = "enable-consolidated-billing",
   AC1795_UpdatedSubscriptionStatusSection = "AC-1795_updated-subscription-status-section",
-  EnableDeleteProvider = "AC-1218-delete-provider",
   ExtensionRefresh = "extension-refresh",
   PersistPopupView = "persist-popup-view",
   PM4154_BulkEncryptionService = "PM-4154-bulk-encryption-service",
@@ -21,7 +20,6 @@ export enum FeatureFlag {
   EnableTimeThreshold = "PM-5864-dollar-threshold",
   InlineMenuPositioningImprovements = "inline-menu-positioning-improvements",
   ProviderClientVaultPrivacyBanner = "ac-2833-provider-client-vault-privacy-banner",
-  VaultBulkManagementAction = "vault-bulk-management-action",
   AC2828_ProviderPortalMembersPage = "AC-2828_provider-portal-members-page",
   IdpAutoSubmitLogin = "idp-auto-submit-login",
   UnauthenticatedExtensionUIRefresh = "unauth-ui-refresh",
@@ -33,8 +31,10 @@ export enum FeatureFlag {
   NotificationBarAddLoginImprovements = "notification-bar-add-login-improvements",
   AC2476_DeprecateStripeSourcesAPI = "AC-2476-deprecate-stripe-sources-api",
   CipherKeyEncryption = "cipher-key-encryption",
+  VerifiedSsoDomainEndpoint = "pm-12337-refactor-sso-details-endpoint",
   PM11901_RefactorSelfHostingLicenseUploader = "PM-11901-refactor-self-hosting-license-uploader",
   Pm3478RefactorOrganizationUserApi = "pm-3478-refactor-organizationuser-api",
+  AccessIntelligence = "pm-13227-access-intelligence",
 }
 
 export type AllowedFeatureFlagTypes = boolean | number | string;
@@ -54,7 +54,6 @@ export const DefaultFeatureFlagValue = {
   [FeatureFlag.GeneratorToolsModernization]: FALSE,
   [FeatureFlag.EnableConsolidatedBilling]: FALSE,
   [FeatureFlag.AC1795_UpdatedSubscriptionStatusSection]: FALSE,
-  [FeatureFlag.EnableDeleteProvider]: FALSE,
   [FeatureFlag.ExtensionRefresh]: FALSE,
   [FeatureFlag.PersistPopupView]: FALSE,
   [FeatureFlag.PM4154_BulkEncryptionService]: FALSE,
@@ -66,7 +65,6 @@ export const DefaultFeatureFlagValue = {
   [FeatureFlag.EnableTimeThreshold]: FALSE,
   [FeatureFlag.InlineMenuPositioningImprovements]: FALSE,
   [FeatureFlag.ProviderClientVaultPrivacyBanner]: FALSE,
-  [FeatureFlag.VaultBulkManagementAction]: FALSE,
   [FeatureFlag.AC2828_ProviderPortalMembersPage]: FALSE,
   [FeatureFlag.IdpAutoSubmitLogin]: FALSE,
   [FeatureFlag.UnauthenticatedExtensionUIRefresh]: FALSE,
@@ -78,8 +76,10 @@ export const DefaultFeatureFlagValue = {
   [FeatureFlag.NotificationBarAddLoginImprovements]: FALSE,
   [FeatureFlag.AC2476_DeprecateStripeSourcesAPI]: FALSE,
   [FeatureFlag.CipherKeyEncryption]: FALSE,
+  [FeatureFlag.VerifiedSsoDomainEndpoint]: FALSE,
   [FeatureFlag.PM11901_RefactorSelfHostingLicenseUploader]: FALSE,
   [FeatureFlag.Pm3478RefactorOrganizationUserApi]: FALSE,
+  [FeatureFlag.AccessIntelligence]: FALSE,
 } satisfies Record<FeatureFlag, AllowedFeatureFlagTypes>;
 
 export type DefaultFeatureFlagValueType = typeof DefaultFeatureFlagValue;

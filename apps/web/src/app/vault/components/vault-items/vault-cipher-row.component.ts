@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { firstValueFrom } from "rxjs";
 
+import { CollectionView } from "@bitwarden/admin-console/common";
 import { Organization } from "@bitwarden/common/admin-console/models/domain/organization";
 import { FeatureFlag } from "@bitwarden/common/enums/feature-flag.enum";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { CipherType } from "@bitwarden/common/vault/enums";
 import { CipherView } from "@bitwarden/common/vault/models/view/cipher.view";
-import { CollectionView } from "@bitwarden/common/vault/models/view/collection.view";
 
 import { VaultItemEvent } from "./vault-item-event";
 import { RowHeightClass } from "./vault-items.component";
@@ -35,7 +35,6 @@ export class VaultCipherRowComponent implements OnInit {
   @Input() collections: CollectionView[];
   @Input() viewingOrgVault: boolean;
   @Input() canEditCipher: boolean;
-  @Input() vaultBulkManagementActionEnabled: boolean;
 
   @Output() onEvent = new EventEmitter<VaultItemEvent>();
 
@@ -100,17 +99,15 @@ export class VaultCipherRowComponent implements OnInit {
   }
 
   protected get disableMenu() {
-    return (
-      !(
-        this.isNotDeletedLoginCipher ||
-        this.showCopyPassword ||
-        this.showCopyTotp ||
-        this.showLaunchUri ||
-        this.showAttachments ||
-        this.showClone ||
-        this.canEditCipher ||
-        this.cipher.isDeleted
-      ) && this.vaultBulkManagementActionEnabled
+    return !(
+      this.isNotDeletedLoginCipher ||
+      this.showCopyPassword ||
+      this.showCopyTotp ||
+      this.showLaunchUri ||
+      this.showAttachments ||
+      this.showClone ||
+      this.canEditCipher ||
+      this.cipher.isDeleted
     );
   }
 
@@ -120,14 +117,6 @@ export class VaultCipherRowComponent implements OnInit {
 
   protected clone() {
     this.onEvent.emit({ type: "clone", item: this.cipher });
-  }
-
-  protected moveToOrganization() {
-    this.onEvent.emit({ type: "moveToOrganization", items: [this.cipher] });
-  }
-
-  protected editCollections() {
-    this.onEvent.emit({ type: "viewCipherCollections", item: this.cipher });
   }
 
   protected events() {

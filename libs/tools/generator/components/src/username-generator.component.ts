@@ -26,23 +26,10 @@ import {
   isUsernameAlgorithm,
 } from "@bitwarden/generator-core";
 
-import { CatchallSettingsComponent } from "./catchall-settings.component";
-import { DependenciesModule } from "./dependencies";
-import { SubaddressSettingsComponent } from "./subaddress-settings.component";
-import { UsernameSettingsComponent } from "./username-settings.component";
-import { completeOnAccountSwitch } from "./util";
-
 /** Component that generates usernames and emails */
 @Component({
-  standalone: true,
   selector: "tools-username-generator",
   templateUrl: "username-generator.component.html",
-  imports: [
-    DependenciesModule,
-    CatchallSettingsComponent,
-    SubaddressSettingsComponent,
-    UsernameSettingsComponent,
-  ],
 })
 export class UsernameGeneratorComponent implements OnInit, OnDestroy {
   /** Instantiates the username generator
@@ -72,14 +59,20 @@ export class UsernameGeneratorComponent implements OnInit, OnDestroy {
 
   /** Tracks the selected generation algorithm */
   protected credential = this.formBuilder.group({
-    type: ["username" as CredentialAlgorithm],
+    type: [null as CredentialAlgorithm],
   });
 
   async ngOnInit() {
     if (this.userId) {
       this.userId$.next(this.userId);
     } else {
-      this.singleUserId$().pipe(takeUntil(this.destroyed)).subscribe(this.userId$);
+      this.accountService.activeAccount$
+        .pipe(
+          map((acct) => acct.id),
+          distinctUntilChanged(),
+          takeUntil(this.destroyed),
+        )
+        .subscribe(this.userId$);
     }
 
     this.generatorService
@@ -121,7 +114,11 @@ export class UsernameGeneratorComponent implements OnInit, OnDestroy {
     // assume the last-visible generator algorithm is the user's preferred one
     const preferences = await this.generatorService.preferences({ singleUserId$: this.userId$ });
     this.credential.valueChanges
-      .pipe(withLatestFrom(preferences), takeUntil(this.destroyed))
+      .pipe(
+        filter(({ type }) => !!type),
+        withLatestFrom(preferences),
+        takeUntil(this.destroyed),
+      )
       .subscribe(([{ type }, preference]) => {
         if (isEmailAlgorithm(type)) {
           preference.email.algorithm = type;
@@ -201,19 +198,6 @@ export class UsernameGeneratorComponent implements OnInit, OnDestroy {
 
   /** Emits when a new credential is requested */
   protected readonly generate$ = new Subject<void>();
-
-  private singleUserId$() {
-    // FIXME: this branch should probably scan for the user and make sure
-    // the account is unlocked
-    if (this.userId) {
-      return new BehaviorSubject(this.userId as UserId).asObservable();
-    }
-
-    return this.accountService.activeAccount$.pipe(
-      completeOnAccountSwitch(),
-      takeUntil(this.destroyed),
-    );
-  }
 
   private toOptions(algorithms: CredentialGeneratorInfo[]) {
     const options: Option<CredentialAlgorithm>[] = algorithms.map((algorithm) => ({

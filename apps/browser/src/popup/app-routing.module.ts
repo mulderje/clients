@@ -11,12 +11,13 @@ import {
   unauthGuardFn,
 } from "@bitwarden/angular/auth/guards";
 import { canAccessFeature } from "@bitwarden/angular/platform/guard/feature-flag.guard";
-import { generatorSwap } from "@bitwarden/angular/tools/generator/generator-swap";
 import { extensionRefreshRedirect } from "@bitwarden/angular/utils/extension-refresh-redirect";
 import { extensionRefreshSwap } from "@bitwarden/angular/utils/extension-refresh-swap";
 import {
   AnonLayoutWrapperComponent,
   AnonLayoutWrapperData,
+  LockIcon,
+  LockV2Component,
   PasswordHintComponent,
   RegistrationFinishComponent,
   RegistrationStartComponent,
@@ -181,6 +182,7 @@ const routes: Routes = [
     path: "lock",
     component: LockComponent,
     canActivate: [lockGuard()],
+    canMatch: [extensionRefreshRedirect("/lockV2")],
     data: { state: "lock", doNotSaveUrl: true } satisfies RouteDataProperties,
   },
   ...twofactorRefactorSwap(
@@ -440,6 +442,28 @@ const routes: Routes = [
   ),
   {
     path: "",
+    component: ExtensionAnonLayoutWrapperComponent,
+    children: [
+      {
+        path: "lockV2",
+        canActivate: [canAccessFeature(FeatureFlag.ExtensionRefresh), lockGuard()],
+        data: {
+          pageIcon: LockIcon,
+          pageTitle: "yourVaultIsLockedV2",
+          showReadonlyHostname: true,
+          showAcctSwitcher: true,
+        } satisfies ExtensionAnonLayoutWrapperData,
+        children: [
+          {
+            path: "",
+            component: LockV2Component,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    path: "",
     component: AnonLayoutWrapperComponent,
     children: [
       {
@@ -530,7 +554,7 @@ const routes: Routes = [
         canDeactivate: [clearVaultStateGuard],
         data: { state: "tabs_vault" } satisfies RouteDataProperties,
       }),
-      ...generatorSwap(GeneratorComponent, CredentialGeneratorComponent, {
+      ...extensionRefreshSwap(GeneratorComponent, CredentialGeneratorComponent, {
         path: "generator",
         canActivate: [authGuard],
         data: { state: "tabs_generator" } satisfies RouteDataProperties,

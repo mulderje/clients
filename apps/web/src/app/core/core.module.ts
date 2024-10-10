@@ -1,11 +1,18 @@
 import { CommonModule } from "@angular/common";
 import { APP_INITIALIZER, NgModule, Optional, SkipSelf } from "@angular/core";
+import { Router } from "@angular/router";
 
-import { OrganizationUserApiService } from "@bitwarden/admin-console/common";
+import {
+  CollectionAdminService,
+  DefaultCollectionAdminService,
+  OrganizationUserApiService,
+  CollectionService,
+} from "@bitwarden/admin-console/common";
 import { SafeProvider, safeProvider } from "@bitwarden/angular/platform/utils/safe-provider";
 import {
   CLIENT_TYPE,
   DEFAULT_VAULT_TIMEOUT,
+  ENV_ADDITIONAL_REGIONS,
   LOCALES_DIRECTORY,
   MEMORY_STORAGE,
   OBSERVABLE_DISK_LOCAL_STORAGE,
@@ -20,6 +27,7 @@ import { JslibServicesModule } from "@bitwarden/angular/services/jslib-services.
 import { ModalService as ModalServiceAbstraction } from "@bitwarden/angular/services/modal.service";
 import {
   RegistrationFinishService as RegistrationFinishServiceAbstraction,
+  LockComponentService,
   SetPasswordJitService,
 } from "@bitwarden/auth/angular";
 import { InternalUserDecryptionOptionsServiceAbstraction } from "@bitwarden/auth/common";
@@ -35,11 +43,16 @@ import { ClientType } from "@bitwarden/common/enums";
 import { AppIdService } from "@bitwarden/common/platform/abstractions/app-id.service";
 import { ConfigService } from "@bitwarden/common/platform/abstractions/config/config.service";
 import { CryptoService as CryptoServiceAbstraction } from "@bitwarden/common/platform/abstractions/crypto.service";
-import { EnvironmentService } from "@bitwarden/common/platform/abstractions/environment.service";
+import { EncryptService } from "@bitwarden/common/platform/abstractions/encrypt.service";
+import {
+  EnvironmentService,
+  Urls,
+} from "@bitwarden/common/platform/abstractions/environment.service";
 import { FileDownloadService } from "@bitwarden/common/platform/abstractions/file-download/file-download.service";
 import { I18nService as I18nServiceAbstraction } from "@bitwarden/common/platform/abstractions/i18n.service";
 import { LogService } from "@bitwarden/common/platform/abstractions/log.service";
 import { PlatformUtilsService as PlatformUtilsServiceAbstraction } from "@bitwarden/common/platform/abstractions/platform-utils.service";
+import { SdkClientFactory } from "@bitwarden/common/platform/abstractions/sdk/sdk-client-factory";
 import { AbstractStorageService } from "@bitwarden/common/platform/abstractions/storage.service";
 import { ThemeType } from "@bitwarden/common/platform/enums";
 import { AppIdService as DefaultAppIdService } from "@bitwarden/common/platform/services/app-id.service";
@@ -47,6 +60,7 @@ import { MemoryStorageService } from "@bitwarden/common/platform/services/memory
 // eslint-disable-next-line import/no-restricted-paths -- Implementation for memory storage
 import { MigrationBuilderService } from "@bitwarden/common/platform/services/migration-builder.service";
 import { MigrationRunner } from "@bitwarden/common/platform/services/migration-runner";
+import { NoopSdkClientFactory } from "@bitwarden/common/platform/services/sdk/noop-sdk-client-factory";
 import { StorageServiceProvider } from "@bitwarden/common/platform/services/storage-service.provider";
 /* eslint-disable import/no-restricted-paths -- Implementation for memory storage */
 import { GlobalStateProvider, StateProvider } from "@bitwarden/common/platform/state";
@@ -60,19 +74,25 @@ import {
 import { VaultTimeout, VaultTimeoutStringType } from "@bitwarden/common/types/vault-timeout.type";
 import { BiometricsService } from "@bitwarden/key-management";
 
+import { flagEnabled } from "../../utils/flags";
 import { PolicyListService } from "../admin-console/core/policy-list.service";
-import { WebRegistrationFinishService, WebSetPasswordJitService } from "../auth";
+import {
+  WebSetPasswordJitService,
+  WebRegistrationFinishService,
+  WebLockComponentService,
+} from "../auth";
 import { AcceptOrganizationInviteService } from "../auth/organization-invite/accept-organization.service";
 import { HtmlStorageService } from "../core/html-storage.service";
 import { I18nService } from "../core/i18n.service";
 import { WebBiometricsService } from "../key-management/web-biometric.service";
 import { WebEnvironmentService } from "../platform/web-environment.service";
 import { WebMigrationRunner } from "../platform/web-migration-runner";
+import { WebSdkClientFactory } from "../platform/web-sdk-client-factory";
 import { WebStorageServiceProvider } from "../platform/web-storage-service.provider";
-import { CollectionAdminService } from "../vault/core/collection-admin.service";
 
 import { EventService } from "./event.service";
 import { InitService } from "./init.service";
+import { ENV_URLS } from "./injection-tokens";
 import { ModalService } from "./modal.service";
 import { RouterService } from "./router.service";
 import { WebFileDownloadService } from "./web-file-download.service";
@@ -143,7 +163,6 @@ const safeProviders: SafeProvider[] = [
     useClass: WebFileDownloadService,
     useAngularDecorators: true,
   }),
-  safeProvider(CollectionAdminService),
   safeProvider({
     provide: WindowStorageService,
     useFactory: () => new WindowStorageService(window.localStorage),
@@ -164,9 +183,13 @@ const safeProviders: SafeProvider[] = [
     deps: [AbstractStorageService, LogService, MigrationBuilderService, WindowStorageService],
   }),
   safeProvider({
+    provide: ENV_URLS,
+    useValue: process.env.URLS as Urls,
+  }),
+  safeProvider({
     provide: EnvironmentService,
     useClass: WebEnvironmentService,
-    deps: [WINDOW, StateProvider, AccountService],
+    deps: [WINDOW, StateProvider, AccountService, ENV_ADDITIONAL_REGIONS, Router, ENV_URLS],
   }),
   safeProvider({
     provide: BiometricsService,
@@ -197,11 +220,17 @@ const safeProviders: SafeProvider[] = [
     ],
   }),
   safeProvider({
+    provide: LockComponentService,
+    useClass: WebLockComponentService,
+    deps: [],
+  }),
+  safeProvider({
     provide: SetPasswordJitService,
     useClass: WebSetPasswordJitService,
     deps: [
       ApiService,
       CryptoServiceAbstraction,
+      EncryptService,
       I18nServiceAbstraction,
       KdfConfigService,
       InternalMasterPasswordServiceAbstraction,
@@ -214,6 +243,16 @@ const safeProviders: SafeProvider[] = [
     provide: AppIdService,
     useClass: DefaultAppIdService,
     deps: [OBSERVABLE_DISK_LOCAL_STORAGE, LogService],
+  }),
+  safeProvider({
+    provide: CollectionAdminService,
+    useClass: DefaultCollectionAdminService,
+    deps: [ApiService, CryptoServiceAbstraction, EncryptService, CollectionService],
+  }),
+  safeProvider({
+    provide: SdkClientFactory,
+    useClass: flagEnabled("sdk") ? WebSdkClientFactory : NoopSdkClientFactory,
+    deps: [],
   }),
 ];
 
