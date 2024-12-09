@@ -1,3 +1,5 @@
+// FIXME: Update this file to be type safe and remove this and next line
+// @ts-strict-ignore
 import * as fs from "fs";
 import * as path from "path";
 
@@ -144,7 +146,6 @@ export class SendProgram extends BaseProgram {
           this.serviceContainer.auditService,
           this.serviceContainer.keyService,
           this.serviceContainer.encryptService,
-          this.serviceContainer.stateService,
           this.serviceContainer.searchService,
           this.serviceContainer.apiService,
           this.serviceContainer.organizationService,
