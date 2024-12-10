@@ -1,3 +1,5 @@
+// FIXME: Update this file to be type safe and remove this and next line
+// @ts-strict-ignore
 import { APP_INITIALIZER, NgModule, NgZone } from "@angular/core";
 import { Router } from "@angular/router";
 import { Subject, merge, of } from "rxjs";
@@ -576,8 +578,9 @@ const safeProviders: SafeProvider[] = [
   }),
   safeProvider({
     provide: SdkClientFactory,
-    useClass: flagEnabled("sdk") ? BrowserSdkClientFactory : NoopSdkClientFactory,
-    deps: [],
+    useFactory: (logService) =>
+      flagEnabled("sdk") ? new BrowserSdkClientFactory(logService) : new NoopSdkClientFactory(),
+    deps: [LogService],
   }),
   safeProvider({
     provide: LoginEmailService,
