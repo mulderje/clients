@@ -192,6 +192,13 @@
   "autoFillIdentity": {
     "message": "Automaattitäytä henkilöllisyys"
   },
+  "fillVerificationCode": {
+    "message": "Fill verification code"
+  },
+  "fillVerificationCodeAria": {
+    "message": "Fill Verification Code",
+    "description": "Aria label for the heading displayed the inline menu for totp code autofill"
+  },
   "generatePasswordCopied": {
     "message": "Luo salasana (leikepöydälle)"
   },
@@ -1125,6 +1132,10 @@
     "message": "VAROITUS",
     "description": "WARNING (should stay in capitalized letters if the language permits)"
   },
+  "warningCapitalized": {
+    "message": "Varoitus",
+    "description": "Warning (should maintain locale-relevant capitalization)"
+  },
   "confirmVaultExport": {
     "message": "Vahvista holvin vienti"
   },
@@ -1315,6 +1326,12 @@
   "enterVerificationCodeApp": {
     "message": "Syötä todennussovelluksesi näyttämä kuusinumeroinen todennuskoodi."
   },
+  "authenticationTimeout": {
+    "message": "Todennuksen aikakatkaisu"
+  },
+  "authenticationSessionTimedOut": {
+    "message": "Todennusistunto aikakatkaistiin. Ole hyvä ja aloita kirjautumisprosessi uudelleen."
+  },
   "enterVerificationCodeEmail": {
     "message": "Syötä osoitteeseen $EMAIL$ lähetetty kuusinumeroinen todennuskoodi.",
     "placeholders": {
@@ -1502,19 +1519,6 @@
   },
   "enableAutoFillOnPageLoadDesc": {
     "message": "Automaattinen täyttö suoritetaan sivun avautuessa, jos sivulla havaitaan kirjautumislomake."
-  },
-  "autofillOnPageLoadWarning": {
-    "message": "$OPENTAG$Varoitus:$CLOSETAG$ Vaarantuneet tai epäluotettavat sivustot voivat hyväksikäyttää sivun avautuessa suoritettavaa automaattista täyttöä.",
-    "placeholders": {
-      "openTag": {
-        "content": "$1",
-        "example": "<b>"
-      },
-      "closeTag": {
-        "content": "$2",
-        "example": "</b>"
-      }
-    }
   },
   "experimentalFeature": {
     "message": "Vaarantuneet tai epäluotettavat sivustot voivat hyväksikäyttää sivun avautuessa suoritettavaa automaattista täyttöä."
@@ -1852,7 +1856,7 @@
     "message": "Salatut muistiot"
   },
   "sshKeys": {
-    "message": "SSH Keys"
+    "message": "SSH-avaimet"
   },
   "clear": {
     "message": "Tyhjennä",
@@ -3176,7 +3180,7 @@
   "viewAllLogInOptions": {
     "message": "Näytä kaikki kirjautumisvaihtoehdot"
   },
-  "viewAllLoginOptions": {
+  "viewAllLoginOptionsV1": {
     "message": "Näytä kaikki kirjautumisvaihtoehdot"
   },
   "notificationSentDevice": {
@@ -3186,7 +3190,7 @@
     "message": "Laitteeseesi lähetettiin ilmoitus"
   },
   "makeSureYourAccountIsUnlockedAndTheFingerprintEtc": {
-    "message": "Make sure your account is unlocked and the fingerprint phrase matches on the other device"
+    "message": "Varmista, että vahvistavan laitteen holvi on avattu ja että se näyttää saman tunnistelausekkeen"
   },
   "youWillBeNotifiedOnceTheRequestIsApproved": {
     "message": "Sinulle ilmoitetaan, kun pyyntö on hyväksytty"
@@ -3288,16 +3292,16 @@
     "message": "Avautuu uudessa ikkunassa"
   },
   "rememberThisDeviceToMakeFutureLoginsSeamless": {
-    "message": "Remember this device to make future logins seamless"
+    "message": "Muista tämä laite tehdäksesi tulevista kirjautumisista saumattomia"
   },
   "deviceApprovalRequired": {
     "message": "Laitehyväksyntä vaaditaan. Valitse hyväksyntätapa alta:"
   },
   "deviceApprovalRequiredV2": {
-    "message": "Device approval required"
+    "message": "Laitteen hyväksyntä vaaditaan"
   },
   "selectAnApprovalOptionBelow": {
-    "message": "Select an approval option below"
+    "message": "Valitse hyväksyntävaihtoehto alla"
   },
   "rememberThisDevice": {
     "message": "Muista tämä laite"
@@ -3373,7 +3377,7 @@
     "message": "Käyttäjän sähköpostiosoite puuttuu"
   },
   "activeUserEmailNotFoundLoggingYouOut": {
-    "message": "Active user email not found. Logging you out."
+    "message": "Aktiivista käyttäjän sähköpostiosoitetta ei löytynyt. Kirjaudutaan ulos."
   },
   "deviceTrusted": {
     "message": "Laitteeseen luotettu"
@@ -3582,6 +3586,14 @@
   "unlockAccountAria": {
     "message": "Avaa tilisi lukitus. Avautuu uudessa ikkunassa.",
     "description": "Screen reader text (aria-label) for unlock account button in overlay"
+  },
+  "totpCodeAria": {
+    "message": "Time-based One-Time Password Verification Code",
+    "description": "Aria label for the totp code displayed in the inline menu for autofill"
+  },
+  "totpSecondsSpanAria": {
+    "message": "Time remaining before current TOTP expires",
+    "description": "Aria label for the totp seconds displayed in the inline menu for autofill"
   },
   "fillCredentialsFor": {
     "message": "Täytä kirjautumistiedot kohteesta",
@@ -3812,7 +3824,7 @@
     "message": "Avataan"
   },
   "loggedInExclamation": {
-    "message": "Logged in!"
+    "message": "Kirjautuminen onnistui!"
   },
   "passkeyNotCopied": {
     "message": "Pääsyavainta ei kopioida"
@@ -4897,5 +4909,14 @@
   },
   "beta": {
     "message": "Beta"
+  },
+  "extensionWidth": {
+    "message": "Laajennuksen leveys"
+  },
+  "wide": {
+    "message": "Leveä"
+  },
+  "extraWide": {
+    "message": "Erittäin leveä"
   }
 }

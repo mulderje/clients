@@ -192,6 +192,13 @@
   "autoFillIdentity": {
     "message": "自動入力 ID"
   },
+  "fillVerificationCode": {
+    "message": "Fill verification code"
+  },
+  "fillVerificationCodeAria": {
+    "message": "Fill Verification Code",
+    "description": "Aria label for the heading displayed the inline menu for totp code autofill"
+  },
   "generatePasswordCopied": {
     "message": "パスワードを生成 (コピー)"
   },
@@ -1125,6 +1132,10 @@
     "message": "警告",
     "description": "WARNING (should stay in capitalized letters if the language permits)"
   },
+  "warningCapitalized": {
+    "message": "Warning",
+    "description": "Warning (should maintain locale-relevant capitalization)"
+  },
   "confirmVaultExport": {
     "message": "保管庫のエクスポートの確認"
   },
@@ -1315,6 +1326,12 @@
   "enterVerificationCodeApp": {
     "message": "認証アプリに表示された6桁の認証コードを入力してください。"
   },
+  "authenticationTimeout": {
+    "message": "Authentication timeout"
+  },
+  "authenticationSessionTimedOut": {
+    "message": "The authentication session timed out. Please restart the login process."
+  },
   "enterVerificationCodeEmail": {
     "message": "$EMAIL$に送信された6桁の認証コードを入力してください。",
     "placeholders": {
@@ -1465,10 +1482,10 @@
     "message": "フォームフィールドに自動入力の候補を表示する"
   },
   "showInlineMenuIdentitiesLabel": {
-    "message": "Display identities as suggestions"
+    "message": "ID を候補として表示する"
   },
   "showInlineMenuCardsLabel": {
-    "message": "Display cards as suggestions"
+    "message": "カードを候補として表示する"
   },
   "showInlineMenuOnIconSelectionLabel": {
     "message": "アイコンが選択されているときに候補を表示する"
@@ -1502,19 +1519,6 @@
   },
   "enableAutoFillOnPageLoadDesc": {
     "message": "ページ読み込み時にログインフォームを検出したとき、ログイン情報を自動入力します。"
-  },
-  "autofillOnPageLoadWarning": {
-    "message": "$OPENTAG$警告:$CLOSETAG$ 侵害された、または信頼できないウェブサイトは、ページ読み込み時の自動入力を悪用する可能性があります。",
-    "placeholders": {
-      "openTag": {
-        "content": "$1",
-        "example": "<b>"
-      },
-      "closeTag": {
-        "content": "$2",
-        "example": "</b>"
-      }
-    }
   },
   "experimentalFeature": {
     "message": "ウイルス感染したり信頼できないウェブサイトは、ページの読み込み時の自動入力を悪用できてしまいます。"
@@ -3176,8 +3180,8 @@
   "viewAllLogInOptions": {
     "message": "View all log in options"
   },
-  "viewAllLoginOptions": {
-    "message": "すべてのログインオプションを表示"
+  "viewAllLoginOptionsV1": {
+    "message": "View all log in options"
   },
   "notificationSentDevice": {
     "message": "デバイスに通知を送信しました。"
@@ -3582,6 +3586,14 @@
   "unlockAccountAria": {
     "message": "アカウントのロックを解除し、新しいウィンドウで開く",
     "description": "Screen reader text (aria-label) for unlock account button in overlay"
+  },
+  "totpCodeAria": {
+    "message": "Time-based One-Time Password Verification Code",
+    "description": "Aria label for the totp code displayed in the inline menu for autofill"
+  },
+  "totpSecondsSpanAria": {
+    "message": "Time remaining before current TOTP expires",
+    "description": "Aria label for the totp seconds displayed in the inline menu for autofill"
   },
   "fillCredentialsFor": {
     "message": "資格情報を入力：",
@@ -4897,5 +4909,14 @@
   },
   "beta": {
     "message": "Beta"
+  },
+  "extensionWidth": {
+    "message": "Extension width"
+  },
+  "wide": {
+    "message": "Wide"
+  },
+  "extraWide": {
+    "message": "Extra wide"
   }
 }

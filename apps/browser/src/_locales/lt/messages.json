@@ -192,6 +192,13 @@
   "autoFillIdentity": {
     "message": "Tapatybės automatinis užpildymas"
   },
+  "fillVerificationCode": {
+    "message": "Fill verification code"
+  },
+  "fillVerificationCodeAria": {
+    "message": "Fill Verification Code",
+    "description": "Aria label for the heading displayed the inline menu for totp code autofill"
+  },
   "generatePasswordCopied": {
     "message": "Sukurti slaptažodį (nukopijuotas)"
   },
@@ -1125,6 +1132,10 @@
     "message": "ĮSPĖJIMAS",
     "description": "WARNING (should stay in capitalized letters if the language permits)"
   },
+  "warningCapitalized": {
+    "message": "Warning",
+    "description": "Warning (should maintain locale-relevant capitalization)"
+  },
   "confirmVaultExport": {
     "message": "Patvirtinti saugyklos eksportą"
   },
@@ -1315,6 +1326,12 @@
   "enterVerificationCodeApp": {
     "message": "Įvesk 6 skaitmenų patvirtinimo kodą iš tavo autentifikavimo aplikacijos."
   },
+  "authenticationTimeout": {
+    "message": "Authentication timeout"
+  },
+  "authenticationSessionTimedOut": {
+    "message": "The authentication session timed out. Please restart the login process."
+  },
   "enterVerificationCodeEmail": {
     "message": "Įvesk 6 skaitmenų prisijungimo kodą, kuris buvo išsiųstas $EMAIL$ el. paštu.",
     "placeholders": {
@@ -1502,19 +1519,6 @@
   },
   "enableAutoFillOnPageLoadDesc": {
     "message": "Jei aptikta prisijungimo forma, automatiškai užpildyti, kai kraunamas tinklalapis."
-  },
-  "autofillOnPageLoadWarning": {
-    "message": "$OPENTAG$Warning:$CLOSETAG$ Compromised or untrusted websites can exploit autofill on page load.",
-    "placeholders": {
-      "openTag": {
-        "content": "$1",
-        "example": "<b>"
-      },
-      "closeTag": {
-        "content": "$2",
-        "example": "</b>"
-      }
-    }
   },
   "experimentalFeature": {
     "message": "Pažeistos arba nepatikimos svetainės gali išnaudoti automatinį užpildymą įkeliant puslapį."
@@ -3176,7 +3180,7 @@
   "viewAllLogInOptions": {
     "message": "View all log in options"
   },
-  "viewAllLoginOptions": {
+  "viewAllLoginOptionsV1": {
     "message": "View all log in options"
   },
   "notificationSentDevice": {
@@ -3582,6 +3586,14 @@
   "unlockAccountAria": {
     "message": "Atrakinti savo paskyrą, atidaromas naujame lange",
     "description": "Screen reader text (aria-label) for unlock account button in overlay"
+  },
+  "totpCodeAria": {
+    "message": "Time-based One-Time Password Verification Code",
+    "description": "Aria label for the totp code displayed in the inline menu for autofill"
+  },
+  "totpSecondsSpanAria": {
+    "message": "Time remaining before current TOTP expires",
+    "description": "Aria label for the totp seconds displayed in the inline menu for autofill"
   },
   "fillCredentialsFor": {
     "message": "Užpildykite prisijungimo duomenis",
@@ -4897,5 +4909,14 @@
   },
   "beta": {
     "message": "Beta"
+  },
+  "extensionWidth": {
+    "message": "Extension width"
+  },
+  "wide": {
+    "message": "Wide"
+  },
+  "extraWide": {
+    "message": "Extra wide"
   }
 }
