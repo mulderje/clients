@@ -7,33 +7,25 @@ import {
   DIALOG_DATA,
   DialogModule,
   DialogRef,
-  IconModule,
+  DialogService,
 } from "@bitwarden/components";
+import { ShareItemFormComponent } from "@bitwarden/tools-share";
 import { I18nPipe } from "@bitwarden/ui-common";
 
-import { ShareItemFormComponent } from "../share-item-form/share-item-form.component";
-
-export interface ShareItemDrawerData {
+export interface ShareItemDesktopDialogData {
   cipher: CipherView;
 }
 
 @Component({
-  selector: "app-share-item-drawer",
-  templateUrl: "share-item-drawer.component.html",
+  selector: "app-share-item-desktop",
+  templateUrl: "share-item-desktop.component.html",
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    DialogModule,
-    ButtonModule,
-    I18nPipe,
-    ShareItemFormComponent,
-    IconModule,
-    AsyncActionsModule,
-  ],
+  imports: [DialogModule, ButtonModule, I18nPipe, ShareItemFormComponent, AsyncActionsModule],
 })
-export class ShareItemDrawerComponent {
+export class ShareItemDesktopComponent {
   private readonly dialogRef = inject(DialogRef);
-  protected readonly data: ShareItemDrawerData = inject(DIALOG_DATA);
+  protected readonly data: ShareItemDesktopDialogData = inject(DIALOG_DATA);
   protected readonly shareItemForm = viewChild.required(ShareItemFormComponent);
 
   protected readonly createAndCopyLink = async () => {
@@ -42,5 +34,11 @@ export class ShareItemDrawerComponent {
 
   protected async close(): Promise<void> {
     await this.dialogRef.close();
+  }
+
+  static open(dialogService: DialogService, cipher: CipherView) {
+    return dialogService.openDrawer(ShareItemDesktopComponent, {
+      data: { cipher },
+    });
   }
 }

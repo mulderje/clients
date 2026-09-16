@@ -7,18 +7,18 @@
     <button
       bitButton
       type="button"
-      id="share-item-drawer_button_copy-link"
+      id="share-item-desktop_button_copy-link"
       buttonType="primary"
+      startIcon="bwi-share-link"
       [bitAction]="createAndCopyLink"
       [disabled]="shareItemForm()?.form?.invalid"
-      startIcon="bwi-share-link"
     >
       {{ "copyLink" | i18n }}
     </button>
     <button
       bitButton
       type="button"
-      id="share-item-drawer_button_cancel"
+      id="share-item-desktop_button_cancel"
       buttonType="secondary"
       bitDialogClose
     >
